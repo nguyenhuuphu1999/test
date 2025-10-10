@@ -1,0 +1,38 @@
+{
+  "appTitle": "VPNCN2",
+  "welcomeTitle": "Mang Bạn Đến Internet Tự Do",
+  "welcomeSubtitle": "Với đường hầm VPN được mã hóa, dữ liệu của bạn luôn an toàn, ngay cả trên mạng công cộng hoặc không tin cậy.",
+  "createAccount": "Tạo Tài Khoản",
+  "signIn": "Đăng Nhập",
+  "helloAgain": "Xin Chào!",
+  "welcomeBack": "Chào mừng bạn quay lại, chúng tôi nhớ bạn!",
+  "usernameOrEmail": "Tên người dùng hoặc Email",
+  "password": "Mật khẩu",
+  "forgetPassword": "Quên mật khẩu?",
+  "dontHaveAccount": "Chưa có tài khoản?",
+  "signUp": "Đăng Ký",
+  "registerTitle": "ĐĂNG KÝ TÀI KHOẢN MỚI",
+  "fullName": "Họ và tên",
+  "userName": "Tên đăng nhập",
+  "email": "Email",
+  "confirmPassword": "Xác nhận mật khẩu",
+  "register": "Đăng ký",
+  "haveAccount": "Đã có tài khoản?",
+  "forgotTitle": "Quên Mật Khẩu",
+  "forgotSubtitle": "Nhập email để nhận liên kết đặt lại.",
+  "sendResetLink": "Gửi Liên Kết Đặt Lại",
+  "resetTitle": "Đặt Lại Mật Khẩu",
+  "newPassword": "Mật khẩu mới",
+  "confirmNewPassword": "Xác nhận mật khẩu mới",
+  "updatePassword": "Cập Nhật Mật Khẩu"
+  ,"home": "Trang chủ"
+  ,"hiUser": "Chào, {name}"
+  ,"payment": "Thanh toán"
+  ,"faq": "Hỏi đáp"
+  ,"buy": "Mua"
+  ,"searchYourKey": "Tìm khóa của bạn"
+  ,"connect": "Kết nối"
+  ,"remainDays": "Còn lại: {days} ngày"
+  ,"expired": "Hết hạn"
+}
+

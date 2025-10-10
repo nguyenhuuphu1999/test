@@ -1,0 +1,38 @@
+{
+  "appTitle": "VPNCN2",
+  "welcomeTitle": "Bring You To Freedom Internet",
+  "welcomeSubtitle": "With Our Encrypted VPN Tunnel, Your Data Stay Safe, Even Over Public Or Untrusted Internet Connections.",
+  "createAccount": "Create An Account",
+  "signIn": "Sign In",
+  "helloAgain": "Hello Again!",
+  "welcomeBack": "Wellcome Back You've Been Missed!",
+  "usernameOrEmail": "User Name Or Email",
+  "password": "Password",
+  "forgetPassword": "Forget Your Password?",
+  "dontHaveAccount": "Don't Have An Account?",
+  "signUp": "Sign Up",
+  "registerTitle": "REGISTER NEW ACCOUNT",
+  "fullName": "Full name",
+  "userName": "User name",
+  "email": "Email",
+  "confirmPassword": "Confirm Password",
+  "register": "Register",
+  "haveAccount": "Have An Account?",
+  "forgotTitle": "Forgot Password",
+  "forgotSubtitle": "Enter your email to receive a reset link.",
+  "sendResetLink": "Send Reset Link",
+  "resetTitle": "Reset Password",
+  "newPassword": "New Password",
+  "confirmNewPassword": "Confirm New Password",
+  "updatePassword": "Update Password"
+  ,"home": "Home"
+  ,"hiUser": "Hi, {name}"
+  ,"payment": "Payment"
+  ,"faq": "FAQ"
+  ,"buy": "Buy"
+  ,"searchYourKey": "Search your key"
+  ,"connect": "Connect"
+  ,"remainDays": "Remain: {days} Days"
+  ,"expired": "Expired"
+}
+
