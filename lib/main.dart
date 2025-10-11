@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vpncn2_app/widgets/auth_wrapper.dart';
+import 'package:vpncn2_app/auth/login_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:vpncn2_app/l10n/generated/app_localizations.dart';
 
@@ -26,7 +27,11 @@ class MyApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [Locale('en'), Locale('vi'), Locale('zh')],
-      home: const AuthWrapper(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const AuthWrapper(),
+        '/login': (context) => const LoginScreen(),
+      },
     );
   }
 }

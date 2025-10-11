@@ -10,6 +10,10 @@ import '../../features/auth/data/repositories/auth_repository_impl.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/domain/usecases/login_usecase.dart';
 import '../../features/auth/domain/usecases/register_usecase.dart';
+import '../../features/keys/data/datasources/keys_api.dart';
+import '../../features/keys/data/repositories/keys_repository_impl.dart';
+import '../../features/keys/domain/repositories/keys_repository.dart';
+import '../../features/keys/domain/usecases/get_keys_usecase.dart';
 
 final sl = GetIt.instance;
 
@@ -65,5 +69,20 @@ Future<void> initSimpleDI() async {
 
   if (!sl.isRegistered<RegisterUseCase>()) {
     sl.registerLazySingleton(() => RegisterUseCase(sl<AuthRepository>()));
+  }
+
+  // Keys feature - only if not already registered
+  if (!sl.isRegistered<KeysApi>()) {
+    sl.registerLazySingleton(() => KeysApi(sl<Dio>()));
+  }
+
+  if (!sl.isRegistered<KeysRepository>()) {
+    sl.registerLazySingleton<KeysRepository>(
+      () => KeysRepositoryImpl(sl<KeysApi>()),
+    );
+  }
+
+  if (!sl.isRegistered<GetKeysUseCase>()) {
+    sl.registerLazySingleton(() => GetKeysUseCase(sl<KeysRepository>()));
   }
 }

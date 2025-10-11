@@ -3,6 +3,7 @@ import '../core/di/simple_injector.dart';
 import '../features/auth/domain/entities/user.dart';
 import '../features/auth/domain/repositories/auth_repository.dart';
 import '../core/error/result.dart';
+import '../core/storage/token_store.dart';
 
 class UserService {
   static User? _currentUser;
@@ -53,6 +54,15 @@ class UserService {
   static void clearCurrentUser() {
     _currentUser = null;
     _userNotifier.value = null; // Notify listeners
+  }
+
+  // Sign out - clear all user data and tokens
+  static Future<void> signOut() async {
+    // Clear tokens from secure storage
+    await TokenStore.clearTokens();
+    
+    // Clear current user data
+    clearCurrentUser();
   }
 
   // Check if user is logged in

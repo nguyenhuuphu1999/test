@@ -93,14 +93,13 @@ class _ProfileContentState extends State<ProfileContent> {
                   ),
                   const Divider(),
                   ListTile(
-                    leading: const Icon(Icons.logout),
-                    title: const Text('Sign Out'),
+                    leading: const Icon(Icons.logout, color: Colors.red),
+                    title: const Text(
+                      'Sign Out',
+                      style: TextStyle(color: Colors.red),
+                    ),
                     trailing: const Icon(Icons.arrow_forward_ios),
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Sign Out tapped')),
-                      );
-                    },
+                    onTap: () => _showSignOutDialog(),
                   ),
                   const Divider(),
                   ListTile(
@@ -141,6 +140,71 @@ class _ProfileContentState extends State<ProfileContent> {
           duration: Duration(seconds: 1),
         ),
       );
+    }
+  }
+
+  void _showSignOutDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Sign Out'),
+          content: const Text('Are you sure you want to sign out?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _handleSignOut();
+              },
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Sign Out'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _handleSignOut() async {
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return const Center(child: CircularProgressIndicator());
+        },
+      );
+
+      // Sign out user
+      await UserService.signOut();
+
+      // Close loading dialog
+      if (mounted) Navigator.of(context).pop();
+
+      // Navigate to login screen
+      if (mounted) {
+        Navigator.of(
+          context,
+        ).pushNamedAndRemoveUntil('/login', (route) => false);
+      }
+    } catch (e) {
+      // Close loading dialog if still open
+      if (mounted) Navigator.of(context).pop();
+
+      // Show error message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Sign out failed: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 }

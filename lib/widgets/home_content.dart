@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:vpncn2_app/widgets/key_item_tile.dart';
 import 'package:vpncn2_app/widgets/common_search_field.dart';
 import 'package:vpncn2_app/services/user_service.dart';
+import 'package:vpncn2_app/services/keys_service.dart';
+import 'package:vpncn2_app/features/keys/domain/entities/key.dart' as KeyEntity;
 
 class HomeContent extends StatefulWidget {
   const HomeContent({super.key});
@@ -11,21 +13,52 @@ class HomeContent extends StatefulWidget {
 }
 
 class _HomeContentState extends State<HomeContent> {
-  final List<_KeyItem> _keyItems = [
-    _KeyItem(name: 'Key-name-01', quota: '50GB', remainDays: 30),
-    _KeyItem(name: 'Key-name-02', quota: '100GB', remainDays: 15),
-    _KeyItem(name: 'Key-name-03', quota: '200GB', remainDays: 7),
-  ];
+  List<KeyEntity.Key> _keys = [];
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadKeys();
+  }
+
+  Future<void> _loadKeys() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final result = await KeysService.getKeys(status: 1, pageSize: 10);
+
+    result.when(
+      ok: (keys) {
+        setState(() {
+          _keys = keys;
+          _isLoading = false;
+        });
+      },
+      err: (failure) {
+        setState(() {
+          _isLoading = false;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to load keys: ${failure.message}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      },
+    );
+  }
 
   Future<void> _onRefresh() async {
     // Refresh user data
     await UserService.getCurrentUser();
 
-    // Simulate refreshing key items data
-    await Future.delayed(const Duration(seconds: 1));
+    // Refresh keys data
+    await _loadKeys();
 
-    // You can add API calls here to refresh key items
-    // For now, we'll just show a message
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -50,40 +83,48 @@ class _HomeContentState extends State<HomeContent> {
         Expanded(
           child: RefreshIndicator(
             onRefresh: _onRefresh,
-            child: ListView.builder(
-              physics:
-                  const AlwaysScrollableScrollPhysics(), // Enable pull-to-refresh
-              itemCount: _keyItems.length,
-              itemBuilder: (context, index) {
-                final keyItem = _keyItems[index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 5),
-                  child: KeyItemTile(
-                    name: keyItem.name,
-                    quotaText: keyItem.quota,
-                    remainDays: keyItem.remainDays,
-                    onServerLocationChanged: (code, country) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Server location changed to $country'),
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _keys.isEmpty
+                ? const Center(
+                    child: Text(
+                      'No keys found',
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                  )
+                : ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: _keys.length,
+                    itemBuilder: (context, index) {
+                      final key = _keys[index];
+                      final remainDays = key.endDate
+                          .difference(DateTime.now())
+                          .inDays;
+                      final quotaGB = (key.dataLimit / (1024 * 1024 * 1024))
+                          .round();
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 5),
+                        child: KeyItemTile(
+                          name: key.name,
+                          quotaText: '${quotaGB}GB',
+                          remainDays: remainDays > 0 ? remainDays : 0,
+                          onServerLocationChanged: (code, country) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Server location changed to $country',
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       );
                     },
                   ),
-                );
-              },
-            ),
           ),
         ),
       ],
     );
   }
-}
-
-class _KeyItem {
-  final String name;
-  final String quota;
-  final int remainDays;
-
-  _KeyItem({required this.name, required this.quota, required this.remainDays});
 }
