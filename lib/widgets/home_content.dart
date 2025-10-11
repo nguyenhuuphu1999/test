@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vpncn2_app/widgets/key_item_tile.dart';
 import 'package:vpncn2_app/widgets/common_search_field.dart';
+import 'package:vpncn2_app/services/user_service.dart';
 
 class HomeContent extends StatelessWidget {
   const HomeContent({super.key});

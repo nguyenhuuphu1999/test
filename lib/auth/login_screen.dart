@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:vpncn2_app/auth/register_screen.dart';
 import 'package:vpncn2_app/auth/forgot_password_screen.dart';
 import 'package:vpncn2_app/l10n/generated/app_localizations.dart';
+import 'package:vpncn2_app/services/auth_service.dart';
+import 'package:vpncn2_app/services/user_service.dart';
+import 'package:vpncn2_app/core/error/result.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,12 +18,100 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool obscurePassword = true;
+  bool isLoading = false;
 
   @override
   void dispose() {
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleLogin() async {
+    if (formKey.currentState?.validate() ?? false) {
+      setState(() {
+        isLoading = true;
+      });
+
+      try {
+        final result = await AuthService.login(
+          emailController.text.trim(),
+          passwordController.text,
+        );
+
+        result.when(
+          ok: (user) async {
+            // Login successful - get fresh user info
+            try {
+              final userInfoResult = await UserService.getCurrentUser();
+              userInfoResult.when(
+                ok: (userInfo) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Welcome back, ${userInfo.fullName}!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+
+                  // Navigate to home screen with fresh user data
+                  Navigator.of(
+                    context,
+                  ).pushNamedAndRemoveUntil('/home', (route) => false);
+                },
+                err: (failure) {
+                  // Still navigate even if getCurrentUser fails
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Welcome back, ${user.fullName}!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+
+                  Navigator.of(
+                    context,
+                  ).pushNamedAndRemoveUntil('/home', (route) => false);
+                },
+              );
+            } catch (e) {
+              // Fallback if getCurrentUser fails
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Welcome back, ${user.fullName}!'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+
+              Navigator.of(
+                context,
+              ).pushNamedAndRemoveUntil('/home', (route) => false);
+            }
+          },
+          err: (failure) {
+            // Login failed
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(failure.message),
+                backgroundColor: Colors.red,
+              ),
+            );
+          },
+        );
+      } catch (e) {
+        // Unexpected error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('An unexpected error occurred: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } finally {
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+          });
+        }
+      }
+    }
   }
 
   @override
@@ -165,15 +256,20 @@ class _LoginScreenState extends State<LoginScreen> {
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              onPressed: () {
-                                if (formKey.currentState?.validate() ?? false) {
-                                  Navigator.of(context).pushNamedAndRemoveUntil(
-                                    '/home',
-                                    (route) => false,
-                                  );
-                                }
-                              },
-                              child: Text("Sign In"),
+                              onPressed: isLoading ? null : _handleLogin,
+                              child: isLoading
+                                  ? SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              Colors.white,
+                                            ),
+                                      ),
+                                    )
+                                  : Text("Sign In"),
                             ),
                           ),
                         ],

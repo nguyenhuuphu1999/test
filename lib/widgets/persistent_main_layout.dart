@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vpncn2_app/services/user_service.dart';
 
 class PersistentMainLayout extends StatefulWidget {
   final Widget body;
@@ -58,7 +59,7 @@ class _PersistentHeaderCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Hi, Manhnt',
+                'Hi, ${UserService.displayName}',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 20,
@@ -67,7 +68,7 @@ class _PersistentHeaderCard extends StatelessWidget {
                 ),
               ),
               Text(
-                '20\$',
+                UserService.moneyDisplay,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 20,
@@ -194,6 +195,7 @@ class _BottomItem extends StatelessWidget {
   final VoidCallback? onTap;
 
   const _BottomItem({
+    this.icon,
     this.imageAsset,
     required this.label,
     this.active = false,
