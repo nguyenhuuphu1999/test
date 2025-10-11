@@ -18,108 +18,112 @@ class WelcomeScreen extends StatelessWidget {
                 constraints: BoxConstraints(minHeight: constraints.maxHeight),
                 child: IntrinsicHeight(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24.0,
+                      vertical: 16.0,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[
-                        const SizedBox(height: 12),
-                        // Top auth actions
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: <Widget>[
-                            TextButton(
-                              onPressed: () {},
-                              child: Text(AppLocalizations.of(context)!.createAccount, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
-                            ),
-                            const SizedBox(width: 8),
-                            TextButton(
-                              onPressed: () {},
-                              child: Text(AppLocalizations.of(context)!.signIn, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
+                        // Main content - centered
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              Builder(builder: (context) {
-                                final double logoWidth = MediaQuery.of(context).size.width * 0.5;
-                                return Center(
-                                  child: Image.asset(
+                              // Logo and branding
+                              Column(
+                                children: [
+                                  Image.asset(
                                     'asset/images/logo-vpncn2.png',
-                                    width: logoWidth,
-                                    fit: BoxFit.contain,
+                                    width: 198,
+                                    height: 231,
                                   ),
-                                );
-                              }),
-                              const SizedBox(height: 16),
-                              Center(
-                                child: Text(
-                                  AppLocalizations.of(context)!.welcomeTitle,
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    height: 1.3,
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xFF1B2430),
+                                  SizedBox(height: 16),
+                                  Text(
+                                    "Bring You To Freedom Internet",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF1B2430),
+                                    ),
                                   ),
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                AppLocalizations.of(context)!.welcomeSubtitle,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  height: 1.5,
-                                  fontWeight: FontWeight.w400,
-                                  color: Color(0xFF394452),
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              // Small pager dots mimic
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: const <Widget>[
-                                  _Dot(active: true),
-                                  SizedBox(width: 6),
-                                  _Dot(active: false),
-                                  SizedBox(width: 6),
-                                  _Dot(active: false),
+                                  SizedBox(height: 16),
+                                  Text(
+                                    "With Our Encrypted VPN Tunnel, Your Data Stay Safe, Even Over Public Or Untrusted Internet Connections.",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xFF394452),
+                                    ),
+                                  ),
+                                  SizedBox(height: 40),
+                                  // Pagination dots
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      _Dot(active: true),
+                                      SizedBox(width: 8),
+                                      _Dot(active: false),
+                                      SizedBox(width: 8),
+                                      _Dot(active: false),
+                                    ],
+                                  ),
                                 ],
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 20),
-                        // CTA button
-                        SizedBox(
-                          height: 52,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF4894FE),
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+
+                        // Bottom buttons
+                        Column(
+                          children: [
+                            SizedBox(
+                              width: double.infinity,
+                              height: 52,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF4894FE),
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  textStyle: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => const RegisterScreen(),
+                                    ),
+                                  );
+                                },
+                                child: Text("Create An Account"),
+                              ),
                             ),
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(builder: (_) => const RegisterScreen()),
-                              );
-                            },
-                            child: Text(AppLocalizations.of(context)!.createAccount),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(builder: (_) => const LoginScreen()),
-                            );
-                          },
-                          child: Text(AppLocalizations.of(context)!.signIn, style: const TextStyle(color: Color(0xFF4894FE), fontSize: 14, fontWeight: FontWeight.w500)),
+                            SizedBox(height: 16),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) => const LoginScreen(),
+                                  ),
+                                );
+                              },
+                              child: Text(
+                                "Sign In",
+                                style: TextStyle(
+                                  color: Color(0xFF4894FE),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -151,5 +155,3 @@ class _Dot extends StatelessWidget {
     );
   }
 }
-
-

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vpncn2_app/l10n/generated/app_localizations.dart';
-import 'package:vpncn2_app/widgets/auth_header.dart';
 import 'package:vpncn2_app/widgets/auth_text_field.dart';
-import 'package:vpncn2_app/widgets/primary_button.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -17,7 +15,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController userNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
   bool obscurePassword = true;
   bool obscureConfirm = true;
 
@@ -34,115 +33,206 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF2F6F8),
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: IntrinsicHeight(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              // nội dung chính
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.only(bottom: bottomInset),
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      const SizedBox(height: 8),
-                      Center(
-                        child: Text(
-                          t.registerTitle,
-                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Color(0xFF1B2430)),
-                        ),
+                    children: [
+                      // Tiêu đề + logo
+                      Column(
+                        children: [
+                          const SizedBox(height: 12),
+                          Image.asset(
+                            'asset/images/logo-vpncn2.png',
+                            width: 120,
+                            height: 80,
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 12),
-                      const AuthHeader(title: '', subtitle: ''),
+
                       const SizedBox(height: 16),
+
+                      // Form
                       Form(
                         key: formKey,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: <Widget>[
-                            _LabeledField(label: t.userName, child: AuthTextField(controller: userNameController, hintText: t.userName, validator: (v) => (v==null||v.isEmpty) ? 'Required' : null)),
-                            const SizedBox(height: 12),
-                            _LabeledField(label: t.fullName, child: AuthTextField(controller: fullNameController, hintText: t.fullName, validator: (v) => (v==null||v.isEmpty) ? 'Required' : null)),
-                            const SizedBox(height: 12),
-                            _LabeledField(label: t.email, child: AuthTextField(controller: emailController, hintText: t.email, keyboardType: TextInputType.emailAddress, validator: (v) => (v==null||v.isEmpty) ? 'Required' : null)),
-                            const SizedBox(height: 12),
-                            _LabeledField(
-                              label: t.password,
-                              child: AuthTextField(
-                                controller: passwordController,
-                                hintText: t.password,
-                                obscureText: obscurePassword,
-                                suffixIcon: IconButton(icon: Icon(obscurePassword ? Icons.visibility_off : Icons.visibility), onPressed: () => setState(() => obscurePassword = !obscurePassword)),
-                                validator: (v) { if (v==null||v.isEmpty) return 'Required'; if (v.length<6) return 'Password too short'; return null; },
-                              ),
+                          children: [
+                            const _FormLabel(text: "User name"),
+                            AuthTextField(
+                              controller: userNameController,
+                              hintText: "Manhnt",
+                              validator: (v) =>
+                                  (v == null || v.isEmpty) ? 'Required' : null,
                             ),
                             const SizedBox(height: 12),
-                            _LabeledField(
-                              label: t.confirmPassword,
-                              child: AuthTextField(
-                                controller: confirmPasswordController,
-                                hintText: t.confirmPassword,
-                                obscureText: obscureConfirm,
-                                suffixIcon: IconButton(icon: Icon(obscureConfirm ? Icons.visibility_off : Icons.visibility), onPressed: () => setState(() => obscureConfirm = !obscureConfirm)),
-                                validator: (v) { if (v==null||v.isEmpty) return 'Required'; if (v != passwordController.text) return 'Passwords do not match'; return null; },
+
+                            const _FormLabel(text: "Full name"),
+                            AuthTextField(
+                              controller: fullNameController,
+                              hintText: "Manh Nguyen",
+                              validator: (v) =>
+                                  (v == null || v.isEmpty) ? 'Required' : null,
+                            ),
+                            const SizedBox(height: 12),
+
+                            const _FormLabel(text: "Email"),
+                            AuthTextField(
+                              controller: emailController,
+                              hintText: "mmanh@gmail.com",
+                              keyboardType: TextInputType.emailAddress,
+                              validator: (v) =>
+                                  (v == null || v.isEmpty) ? 'Required' : null,
+                            ),
+                            const SizedBox(height: 12),
+
+                            const _FormLabel(text: "Password"),
+                            AuthTextField(
+                              controller: passwordController,
+                              hintText: "**********",
+                              obscureText: obscurePassword,
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  obscurePassword
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                ),
+                                onPressed: () => setState(
+                                  () => obscurePassword = !obscurePassword,
+                                ),
                               ),
+                              validator: (v) {
+                                if (v == null || v.isEmpty) return 'Required';
+                                if (v.length < 6) return 'Password too short';
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 12),
+
+                            const _FormLabel(text: "Confirm Password"),
+                            AuthTextField(
+                              controller: confirmPasswordController,
+                              hintText: "**********",
+                              obscureText: obscureConfirm,
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  obscureConfirm
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                ),
+                                onPressed: () => setState(
+                                  () => obscureConfirm = !obscureConfirm,
+                                ),
+                              ),
+                              validator: (v) {
+                                if (v == null || v.isEmpty) return 'Required';
+                                if (v != passwordController.text)
+                                  return 'Passwords do not match';
+                                return null;
+                              },
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: TextButton(onPressed: () {}, child: Text(t.forgetPassword, style: const TextStyle(color: Color(0xFF394452)))),
+
+                      const SizedBox(height: 24),
+
+                      // Nút Register
+                      SizedBox(
+                        width: double.infinity,
+                        height: 52,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF4894FE),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            textStyle: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          onPressed: () {
+                            if (formKey.currentState?.validate() ?? false) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Registering...')),
+                              );
+                            }
+                          },
+                          child: const Text("Register"),
+                        ),
                       ),
-                      const SizedBox(height: 8),
-                      PrimaryButton(label: t.register, onPressed: () {
-                        if (formKey.currentState?.validate() ?? false) {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Registering...')));
-                        }
-                      }),
-                      const SizedBox(height: 12),
+
+                      const SizedBox(height: 16),
+
+                      // 🔻 ĐÃ DI CHUYỂN “Have an account?” xuống đây
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Text('${t.haveAccount} '),
-                          TextButton(onPressed: () { Navigator.of(context).pop(); }, child: Text(t.signIn, style: const TextStyle(color: Color(0xFF4894FE)))),
+                        children: const [
+                          Text(
+                            "Have an account?",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xFF394452),
+                            ),
+                          ),
+                          SizedBox(width: 4),
+                          Text(
+                            "Sign In",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xFF4894FE),
+                            ),
+                          ),
                         ],
                       ),
+                      const SizedBox(height: 12),
                     ],
                   ),
                 ),
               ),
-            );
-          },
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _LabeledField extends StatelessWidget {
-  final String label;
-  final Widget child;
-
-  const _LabeledField({required this.label, required this.child});
+class _FormLabel extends StatelessWidget {
+  final String text;
+  const _FormLabel({required this.text});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(left: 4.0, bottom: 6.0),
-          child: Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6.0, top: 2.0),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: Color(0xFF1B2430),
         ),
-        child,
-      ],
+      ),
     );
   }
 }
-
-
-

@@ -78,7 +78,6 @@ class CommonFooter extends StatelessWidget {
 
 class _FooterItem extends StatelessWidget {
   final String? imageAsset;
-  final IconData? icon;
   final String label;
   final bool isActive;
   final VoidCallback onTap;
@@ -102,14 +101,6 @@ class _FooterItem extends StatelessWidget {
               imageAsset!,
               width: Responsive.getFontSize(context, 34),
               height: Responsive.getFontSize(context, 34),
-              color: isActive
-                  ? AppColors.PRIMARY_COLOR
-                  : AppColors.TEXT_SECONDARY_COLOR,
-            )
-          else if (icon != null)
-            Icon(
-              icon!,
-              size: Responsive.getFontSize(context, 34),
               color: isActive
                   ? AppColors.PRIMARY_COLOR
                   : AppColors.TEXT_SECONDARY_COLOR,

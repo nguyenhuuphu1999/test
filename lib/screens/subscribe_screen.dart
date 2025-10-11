@@ -5,7 +5,7 @@ import 'package:vpncn2_app/constants/app_assets.dart';
 import 'package:vpncn2_app/utils/responsive.dart';
 import 'package:vpncn2_app/widgets/common_footer.dart';
 import 'package:vpncn2_app/widgets/common_header.dart';
-import 'package:vpncn2_app/widgets/expandable_plan_card.dart';
+import 'package:vpncn2_app/widgets/plan_card.dart';
 
 class SubscribeScreen extends StatefulWidget {
   const SubscribeScreen({super.key});
@@ -15,9 +15,6 @@ class SubscribeScreen extends StatefulWidget {
 }
 
 class _SubscribeScreenState extends State<SubscribeScreen> {
-  // Track expansion state for each row
-  final Map<int, bool> _rowExpansionStates = {};
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,12 +90,6 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
     );
   }
 
-  void _toggleRowExpansion(int rowIndex) {
-    setState(() {
-      _rowExpansionStates[rowIndex] = !(_rowExpansionStates[rowIndex] ?? false);
-    });
-  }
-
   void _handleBuyNow(BuildContext context, String planName) {
     // Show confirmation dialog
     showDialog(
@@ -135,35 +126,31 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     final crossAxisCount = _getCrossAxisCount(screenWidth);
     final plans = _getPlanData();
-    final childAspectRatio = _getChildAspectRatio(context, crossAxisCount);
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: crossAxisCount,
-        crossAxisSpacing: Responsive.width(context, 2),
-        mainAxisSpacing: Responsive.height(context, 2),
-        childAspectRatio: childAspectRatio,
-      ),
-      itemCount: plans.length,
-      itemBuilder: (context, index) {
-        final plan = plans[index];
-        final rowIndex = index ~/ crossAxisCount;
-        final isExpanded = _rowExpansionStates[rowIndex] ?? false;
+    // Calculate card width based on screen width and spacing
+    final spacing = Responsive.width(context, 2);
+    final availableWidth =
+        screenWidth - (Responsive.width(context, 4)); // padding
+    final cardWidth =
+        (availableWidth - (spacing * (crossAxisCount - 1))) / crossAxisCount;
 
-        return ExpandablePlanCard(
-          planName: plan['name'],
-          price: plan['price'],
-          dataAllowance: plan['dataAllowance'],
-          features: plan['features'],
-          hasHotSale: plan['hasHotSale'],
-          onBuyNow: () => _handleBuyNow(context, plan['name']),
-          isExpanded: isExpanded,
-          rowIndex: rowIndex,
-          onExpansionChanged: () => _toggleRowExpansion(rowIndex),
+    return Wrap(
+      spacing: spacing,
+      runSpacing: Responsive.height(context, 2),
+      alignment: WrapAlignment.center,
+      children: plans.map((plan) {
+        return SizedBox(
+          width: cardWidth,
+          child: PlanCard(
+            planName: plan['name'],
+            price: plan['price'],
+            dataAllowance: plan['dataAllowance'],
+            features: plan['features'],
+            hasHotSale: plan['hasHotSale'],
+            onBuyNow: () => _handleBuyNow(context, plan['name']),
+          ),
         );
-      },
+      }).toList(),
     );
   }
 
@@ -181,15 +168,6 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
       // Large desktop: 4 columns
       return 4;
     }
-  }
-
-  double _getChildAspectRatio(BuildContext context, int crossAxisCount) {
-    // Calculate aspect ratio based on screen width and fixed height (341px)
-    final screenWidth = MediaQuery.of(context).size.width;
-    final spacing = Responsive.width(context, 2); // 2% spacing between cards
-    final totalSpacing = spacing * (crossAxisCount - 1);
-    final cardWidth = (screenWidth - totalSpacing) / crossAxisCount;
-    return cardWidth / 341; // 341px is our fixed height
   }
 
   List<Map<String, dynamic>> _getPlanData() {
