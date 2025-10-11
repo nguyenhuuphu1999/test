@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:vpncn2_app/auth/reset_password_screen.dart';
 import 'package:vpncn2_app/l10n/generated/app_localizations.dart';
 import 'package:vpncn2_app/widgets/auth_text_field.dart';
 import 'package:vpncn2_app/widgets/primary_button.dart';
-import 'package:vpncn2_app/auth/reset_password_screen.dart';
 import 'package:vpncn2_app/widgets/auth_header.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -25,8 +25,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF2F6F8),
+      // cho phép body đẩy lên khi bàn phím mở
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -36,40 +39,70 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         ),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              AuthHeader(title: t.forgotTitle, subtitle: t.forgotSubtitle),
-              const SizedBox(height: 16),
-              Form(
-                key: formKey,
-                child: AuthTextField(
-                  controller: emailController,
-                  hintText: t.email,
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (v) =>
-                      (v == null || v.isEmpty) ? 'Required' : null,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+
+            return SingleChildScrollView(
+              // có thể cuộn khi màn hình ngắn / bàn phím mở
+              padding: EdgeInsets.only(bottom: bottomInset),
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              child: ConstrainedBox(
+                // giúp nội dung tối thiểu bằng chiều cao viewport để dễ căn
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24.0,
+                    vertical: 16.0,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      // Header
+                      AuthHeader(
+                        title: t.forgotTitle,
+                        subtitle: t.forgotSubtitle,
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Form
+                      Form(
+                        key: formKey,
+                        child: AuthTextField(
+                          controller: emailController,
+                          hintText: t.email,
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (v) =>
+                              (v == null || v.isEmpty) ? 'Required' : null,
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Đẩy nút xuống đáy khi đủ cao, vẫn cuộn được khi thiếu chỗ
+                      const Spacer(),
+
+                      PrimaryButton(
+                        label: t.sendResetLink,
+                        onPressed: () {
+                          if (formKey.currentState?.validate() ?? false) {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const ResetPasswordScreen(),
+                              ),
+                            );
+                          }
+                        },
+                        height: 52,
+                      ),
+
+                      const SizedBox(height: 12),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(height: 16),
-              PrimaryButton(
-                label: t.sendResetLink,
-                onPressed: () {
-                  if (formKey.currentState?.validate() ?? false) {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const ResetPasswordScreen(),
-                      ),
-                    );
-                  }
-                },
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );

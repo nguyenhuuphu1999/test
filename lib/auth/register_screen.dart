@@ -181,10 +181,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                       const SizedBox(height: 16),
 
-                      // 🔻 ĐÃ DI CHUYỂN “Have an account?” xuống đây
+                      // 🔻 ĐÃ DI CHUYỂN "Have an account?" xuống đây
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
+                        children: [
                           Text(
                             "Have an account?",
                             style: TextStyle(
@@ -194,12 +194,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                           ),
                           SizedBox(width: 4),
-                          Text(
-                            "Sign In",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xFF4894FE),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text(
+                              "Sign In",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xFF4894FE),
+                              ),
                             ),
                           ),
                         ],
