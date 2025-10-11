@@ -26,64 +26,68 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF2F6F8),
-      // cho phép body đẩy lên khi bàn phím mở
-      resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).maybePop(),
+    return GestureDetector(
+      onTap: () {
+        // Dismiss keyboard when tapping outside
+        FocusScope.of(context).unfocus();
+      },
+      behavior: HitTestBehavior.opaque,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF2F6F8),
+        // cho phép body đẩy lên khi bàn phím mở
+        resizeToAvoidBottomInset: true,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.of(context).maybePop(),
+          ),
         ),
-      ),
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+        body: SafeArea(
+          child: SingleChildScrollView(
+            // có thể cuộn khi màn hình ngắn / bàn phím mở
+            padding: EdgeInsets.only(
+              left: 24.0,
+              right: 24.0,
+              top: 16.0,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 16.0,
+            ),
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                // Header
+                AuthHeader(title: t.forgotTitle, subtitle: t.forgotSubtitle),
+                const SizedBox(height: 16),
 
-            return SingleChildScrollView(
-              // có thể cuộn khi màn hình ngắn / bàn phím mở
-              padding: EdgeInsets.only(bottom: bottomInset),
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              child: ConstrainedBox(
-                // giúp nội dung tối thiểu bằng chiều cao viewport để dễ căn
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24.0,
-                    vertical: 16.0,
-                  ),
+                // Form
+                Form(
+                  key: formKey,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
-                      // Header
-                      AuthHeader(
-                        title: t.forgotTitle,
-                        subtitle: t.forgotSubtitle,
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Form
-                      Form(
-                        key: formKey,
-                        child: AuthTextField(
-                          controller: emailController,
-                          hintText: t.email,
-                          keyboardType: TextInputType.emailAddress,
-                          validator: (v) =>
-                              (v == null || v.isEmpty) ? 'Required' : null,
-                        ),
+                      AuthTextField(
+                        controller: emailController,
+                        hintText: "Email Address",
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Email is required';
+                          }
+                          if (!RegExp(
+                            r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                          ).hasMatch(value.trim())) {
+                            return 'Invalid email format';
+                          }
+                          return null;
+                        },
                       ),
 
-                      const SizedBox(height: 20),
-
-                      // Đẩy nút xuống đáy khi đủ cao, vẫn cuộn được khi thiếu chỗ
-                      const Spacer(),
+                      const SizedBox(height: 24),
 
                       PrimaryButton(
-                        label: t.sendResetLink,
+                        label: "Send Reset Link",
                         onPressed: () {
                           if (formKey.currentState?.validate() ?? false) {
                             Navigator.of(context).push(
@@ -100,9 +104,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ],
                   ),
                 ),
-              ),
-            );
-          },
+              ],
+            ),
+          ),
         ),
       ),
     );
