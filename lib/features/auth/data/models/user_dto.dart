@@ -8,8 +8,8 @@ class UserDto {
   final String id;
   final String email;
   final String username;
-  final int role;
-  final int money;
+  final int? role;
+  final int? money;
   // Login response fields (optional for /auth/me response)
   final String? accessToken;
   final String? refreshToken;
@@ -29,8 +29,8 @@ class UserDto {
     required this.id,
     required this.email,
     required this.username,
-    required this.role,
-    required this.money,
+    this.role,
+    this.money,
     this.accessToken,
     this.refreshToken,
     this.expiresIn,

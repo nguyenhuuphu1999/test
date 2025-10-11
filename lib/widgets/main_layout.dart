@@ -47,7 +47,7 @@ class _HeaderCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Hi, Manhnt',
+                'Hi, Manhnt 134',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 20,

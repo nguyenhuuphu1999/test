@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vpncn2_app/widgets/home_content.dart';
 import 'package:vpncn2_app/widgets/devices_content.dart';
+import 'package:vpncn2_app/widgets/profile_content.dart';
 import 'package:vpncn2_app/constants/app_colors.dart';
 import 'package:vpncn2_app/constants/app_strings.dart';
 import 'package:vpncn2_app/utils/responsive.dart';
@@ -8,6 +9,8 @@ import 'package:vpncn2_app/screens/payment_screen.dart';
 import 'package:vpncn2_app/screens/subscribe_screen.dart';
 import 'package:vpncn2_app/screens/faq_screen.dart';
 import 'package:vpncn2_app/widgets/common_footer.dart';
+import 'package:vpncn2_app/services/user_service.dart';
+import 'package:vpncn2_app/features/auth/domain/entities/user.dart';
 
 class SmoothMainLayout extends StatefulWidget {
   final int initialIndex;
@@ -52,7 +55,7 @@ class _SmoothMainLayoutState extends State<SmoothMainLayout> {
                 children: const [
                   HomeContent(),
                   DevicesContent(),
-                  _PlaceholderContent(), // Placeholder for profile
+                  ProfileContent(), // Profile content with pull-to-refresh
                 ],
               ),
             ),
@@ -91,27 +94,37 @@ class _PersistentHeaderCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Flexible(
-                child: Text(
-                  AppStrings.greeting,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: Responsive.getFontSize(context, 20),
-                    fontFamily: 'ABeeZee',
-                    height: 0.05,
-                  ),
-                  overflow: TextOverflow.ellipsis,
+                child: ValueListenableBuilder<User?>(
+                  valueListenable: UserService.userNotifier,
+                  builder: (context, user, child) {
+                    return Text(
+                      'Hi, ${UserService.displayName}',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: Responsive.getFontSize(context, 20),
+                        fontFamily: 'ABeeZee',
+                        height: 0.05,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    );
+                  },
                 ),
               ),
               Flexible(
-                child: Text(
-                  AppStrings.balance,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: Responsive.getFontSize(context, 20),
-                    fontFamily: 'ABeeZee',
-                    height: 0.05,
-                  ),
-                  overflow: TextOverflow.ellipsis,
+                child: ValueListenableBuilder<User?>(
+                  valueListenable: UserService.userNotifier,
+                  builder: (context, user, child) {
+                    return Text(
+                      UserService.moneyDisplay,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: Responsive.getFontSize(context, 20),
+                        fontFamily: 'ABeeZee',
+                        height: 0.05,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    );
+                  },
                 ),
               ),
             ],

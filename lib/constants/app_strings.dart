@@ -1,6 +1,6 @@
 class AppStrings {
   // Header
-  static const String greeting = 'Hi, Manhnt';
+  static const String greeting = 'Hi, Manhnt 1243';
   static const String balance = '20\$';
 
   // Actions

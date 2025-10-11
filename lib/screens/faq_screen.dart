@@ -5,6 +5,7 @@ import 'package:vpncn2_app/constants/app_assets.dart';
 import 'package:vpncn2_app/utils/responsive.dart';
 import 'package:vpncn2_app/widgets/common_footer.dart';
 import 'package:vpncn2_app/widgets/common_header.dart';
+import 'package:vpncn2_app/services/user_service.dart';
 
 class FaqScreen extends StatefulWidget {
   const FaqScreen({super.key});
@@ -16,6 +17,26 @@ class FaqScreen extends StatefulWidget {
 class _FaqScreenState extends State<FaqScreen> {
   // Track expansion state for each FAQ item
   final Map<int, bool> _expansionStates = {};
+
+  Future<void> _onRefresh() async {
+    // Refresh user data
+    await UserService.getCurrentUser();
+
+    // Simulate refreshing FAQ data
+    await Future.delayed(const Duration(seconds: 1));
+
+    // You can add API calls here to refresh FAQ content
+    // For now, we'll just show a message
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('FAQ screen refreshed!'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 1),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,26 +58,30 @@ class _FaqScreenState extends State<FaqScreen> {
 
                   SizedBox(height: Responsive.height(context, 3)),
 
-                  // FAQ items
+                  // FAQ items with Pull-to-Refresh
                   Expanded(
-                    child: ListView(
-                      children: [
-                        _buildFaqItem(
-                          0,
-                          AppStrings.faqInstallIos,
-                          "To install Outline on iOS:\n\n1. Open App Store\n2. Search for 'Outline'\n3. Tap 'Get' to download\n4. Open the app and follow setup instructions\n5. Enter your server details when prompted",
-                        ),
-                        _buildFaqItem(
-                          1,
-                          AppStrings.faqInstallAndroid,
-                          "To install Outline for Android:\n\n1. Open Google Play Store\n2. Search for 'Outline'\n3. Tap 'Install' to download\n4. Launch the app after installation\n5. Configure your connection settings\n6. Connect to your VPN server",
-                        ),
-                        _buildFaqItem(
-                          2,
-                          AppStrings.faqCannotAccessWindows,
-                          "If you can't access on Windows:\n\n1. Check your internet connection\n2. Verify server credentials\n3. Disable Windows Firewall temporarily\n4. Run as Administrator\n5. Update Outline client to latest version\n6. Contact support if issues persist",
-                        ),
-                      ],
+                    child: RefreshIndicator(
+                      onRefresh: _onRefresh,
+                      child: ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        children: [
+                          _buildFaqItem(
+                            0,
+                            AppStrings.faqInstallIos,
+                            "To install Outline on iOS:\n\n1. Open App Store\n2. Search for 'Outline'\n3. Tap 'Get' to download\n4. Open the app and follow setup instructions\n5. Enter your server details when prompted",
+                          ),
+                          _buildFaqItem(
+                            1,
+                            AppStrings.faqInstallAndroid,
+                            "To install Outline for Android:\n\n1. Open Google Play Store\n2. Search for 'Outline'\n3. Tap 'Install' to download\n4. Launch the app after installation\n5. Configure your connection settings\n6. Connect to your VPN server",
+                          ),
+                          _buildFaqItem(
+                            2,
+                            AppStrings.faqCannotAccessWindows,
+                            "If you can't access on Windows:\n\n1. Check your internet connection\n2. Verify server credentials\n3. Disable Windows Firewall temporarily\n4. Run as Administrator\n5. Update Outline client to latest version\n6. Contact support if issues persist",
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],

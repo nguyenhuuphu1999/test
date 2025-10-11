@@ -7,6 +7,7 @@ import 'package:vpncn2_app/widgets/common_search_field.dart';
 import 'package:vpncn2_app/widgets/device_card.dart';
 import 'package:vpncn2_app/widgets/server_location_modal.dart';
 import 'package:vpncn2_app/widgets/vpn_package_modal.dart';
+import 'package:vpncn2_app/services/user_service.dart';
 
 class DevicesContent extends StatefulWidget {
   const DevicesContent({super.key});
@@ -47,6 +48,26 @@ class _DevicesContentState extends State<DevicesContent> {
     ];
   }
 
+  Future<void> _onRefresh() async {
+    // Refresh user data
+    await UserService.getCurrentUser();
+
+    // Simulate refreshing devices data
+    await Future.delayed(const Duration(seconds: 1));
+
+    // You can add API calls here to refresh devices
+    // For now, we'll just show a message
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Devices screen refreshed!'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 1),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -56,139 +77,155 @@ class _DevicesContentState extends State<DevicesContent> {
 
         SizedBox(height: Responsive.height(context, 3)),
 
-        // Devices List
+        // Devices List with Pull-to-Refresh
         Expanded(
-          child: devices.isEmpty
-              ? _buildEmptyState(context)
-              : ListView.builder(
-                  padding: EdgeInsets.only(
-                    top: Responsive.height(context, 2),
-                    bottom: Responsive.height(context, 2),
-                  ),
-                  itemCount: devices.length + 1, // +1 for Add button
-                  itemBuilder: (context, index) {
-                    if (index == devices.length) {
-                      // Add New Button
-                      return Padding(
-                        padding: EdgeInsets.only(
-                          top: Responsive.height(context, 2),
-                        ),
-                        child: Center(
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => const AddDeviceScreen(),
+          child: RefreshIndicator(
+            onRefresh: _onRefresh,
+            child: devices.isEmpty
+                ? _buildEmptyState(context)
+                : ListView.builder(
+                    physics:
+                        const AlwaysScrollableScrollPhysics(), // Enable pull-to-refresh
+                    padding: EdgeInsets.only(
+                      top: Responsive.height(context, 2),
+                      bottom: Responsive.height(context, 2),
+                    ),
+                    itemCount: devices.length + 1, // +1 for Add button
+                    itemBuilder: (context, index) {
+                      if (index == devices.length) {
+                        // Add New Button
+                        return Padding(
+                          padding: EdgeInsets.only(
+                            top: Responsive.height(context, 2),
+                          ),
+                          child: Center(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const AddDeviceScreen(),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                width: Responsive.getFontSize(context, 42),
+                                height: Responsive.getFontSize(context, 42),
+                                decoration: BoxDecoration(
+                                  color: AppColors.PRIMARY_COLOR,
+                                  shape: BoxShape.circle,
                                 ),
-                              );
-                            },
-                            child: Container(
-                              width: Responsive.getFontSize(context, 42),
-                              height: Responsive.getFontSize(context, 42),
-                              decoration: BoxDecoration(
-                                color: AppColors.PRIMARY_COLOR,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.add,
-                                color: Colors.white,
-                                size: Responsive.getFontSize(context, 24),
+                                child: Icon(
+                                  Icons.add,
+                                  color: Colors.white,
+                                  size: Responsive.getFontSize(context, 24),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    }
+                        );
+                      }
 
-                    final device = devices[index];
-                    return DeviceCard(
-                      deviceName: device['name'],
-                      ssidName: device['ssid'],
-                      isOnline: device['isOnline'],
-                      isVpnConnected: device['isVpnConnected'],
-                      onToggle: () {
-                        // Toggle VPN connection state
-                        setState(() {
-                          device['isVpnConnected'] = !device['isVpnConnected'];
-                        });
-                        print(
-                          'Toggle VPN for ${device['name']}: ${device['isVpnConnected']}',
-                        );
-                      },
-                      onExpand: () {
-                        // Handle expand logic (now handled internally)
-                        print('Expand ${device['name']}');
-                      },
-                      onChangeLocation: () {
-                        // Show change location modal
-                        _showChangeLocationModal(context, device['name']);
-                      },
-                      onSelectVpnPackage: () {
-                        // Show VPN package selection modal
-                        _showVpnPackageModal(
-                          context,
-                          device['name'],
-                          device['currentPackage'],
-                        );
-                      },
-                    );
-                  },
-                ),
+                      final device = devices[index];
+                      return DeviceCard(
+                        deviceName: device['name'],
+                        ssidName: device['ssid'],
+                        isOnline: device['isOnline'],
+                        isVpnConnected: device['isVpnConnected'],
+                        onToggle: () {
+                          // Toggle VPN connection state
+                          setState(() {
+                            device['isVpnConnected'] =
+                                !device['isVpnConnected'];
+                          });
+                          print(
+                            'Toggle VPN for ${device['name']}: ${device['isVpnConnected']}',
+                          );
+                        },
+                        onExpand: () {
+                          // Handle expand logic (now handled internally)
+                          print('Expand ${device['name']}');
+                        },
+                        onChangeLocation: () {
+                          // Show change location modal
+                          _showChangeLocationModal(context, device['name']);
+                        },
+                        onSelectVpnPackage: () {
+                          // Show VPN package selection modal
+                          _showVpnPackageModal(
+                            context,
+                            device['name'],
+                            device['currentPackage'],
+                          );
+                        },
+                      );
+                    },
+                  ),
+          ),
         ),
       ],
     );
   }
 
   Widget _buildEmptyState(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Empty State Message
-          Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: Responsive.width(context, 5),
-            ),
-            child: Text(
-              '${AppStrings.noDevicesYet}\n${AppStrings.clickToAddNew}',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: AppColors.TEXT_SECONDARY_COLOR,
-                fontSize: Responsive.getFontSize(context, 15),
-                fontFamily: 'Poppins',
-                height: 0,
-              ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 2,
-            ),
-          ),
-
-          SizedBox(height: Responsive.height(context, 7)),
-
-          // Add New Button
-          GestureDetector(
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const AddDeviceScreen(),
+    return RefreshIndicator(
+      onRefresh: _onRefresh,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height * 0.6,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Empty State Message
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: Responsive.width(context, 5),
+                  ),
+                  child: Text(
+                    '${AppStrings.noDevicesYet}\n${AppStrings.clickToAddNew}',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: AppColors.TEXT_SECONDARY_COLOR,
+                      fontSize: Responsive.getFontSize(context, 15),
+                      fontFamily: 'Poppins',
+                      height: 0,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                  ),
                 ),
-              );
-            },
-            child: Container(
-              width: Responsive.getFontSize(context, 42),
-              height: Responsive.getFontSize(context, 42),
-              decoration: BoxDecoration(
-                color: AppColors.PRIMARY_COLOR,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.add,
-                color: Colors.white,
-                size: Responsive.getFontSize(context, 24),
-              ),
+
+                SizedBox(height: Responsive.height(context, 7)),
+
+                // Add New Button
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const AddDeviceScreen(),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    width: Responsive.getFontSize(context, 42),
+                    height: Responsive.getFontSize(context, 42),
+                    decoration: BoxDecoration(
+                      color: AppColors.PRIMARY_COLOR,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.add,
+                      color: Colors.white,
+                      size: Responsive.getFontSize(context, 24),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

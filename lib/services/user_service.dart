@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import '../core/di/simple_injector.dart';
 import '../features/auth/domain/entities/user.dart';
 import '../features/auth/domain/repositories/auth_repository.dart';
@@ -6,6 +7,7 @@ import '../core/error/result.dart';
 class UserService {
   static User? _currentUser;
   static bool _isInitialized = false;
+  static final ValueNotifier<User?> _userNotifier = ValueNotifier<User?>(null);
 
   static Future<void> initialize() async {
     if (!_isInitialized) {
@@ -17,6 +19,9 @@ class UserService {
   // Get current user from cache
   static User? get currentUser => _currentUser;
 
+  // Get user notifier for listening to changes
+  static ValueNotifier<User?> get userNotifier => _userNotifier;
+
   // Get fresh user info from API
   static Future<Result<User>> getCurrentUser() async {
     await initialize();
@@ -24,7 +29,14 @@ class UserService {
     final result = await authRepository.getCurrentUser();
 
     result.when(
-      ok: (user) => _currentUser = user,
+      ok: (user) {
+        print('✅ UserService: Setting user: ${user.username}');
+        print('✅ UserService: User fullName: ${user.fullName}');
+        print('✅ UserService: User money: ${user.money}');
+        _currentUser = user;
+        _userNotifier.value = user; // Notify listeners
+        print('✅ UserService: Notifier value set');
+      },
       err: (_) {}, // Keep existing user if API fails
     );
 
@@ -34,11 +46,13 @@ class UserService {
   // Update current user (after login)
   static void setCurrentUser(User user) {
     _currentUser = user;
+    _userNotifier.value = user; // Notify listeners
   }
 
   // Clear current user (after logout)
   static void clearCurrentUser() {
     _currentUser = null;
+    _userNotifier.value = null; // Notify listeners
   }
 
   // Check if user is logged in

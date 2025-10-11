@@ -14,34 +14,56 @@ import '../../features/auth/domain/usecases/register_usecase.dart';
 final sl = GetIt.instance;
 
 Future<void> initSimpleDI() async {
-  // Platform info
-  final platformInfo = await PlatformInfo.load();
-  sl.registerSingleton(platformInfo);
+  // Platform info - only register if not already registered
+  if (!sl.isRegistered<PlatformInfo>()) {
+    final platformInfo = await PlatformInfo.load();
+    sl.registerSingleton(platformInfo);
+  }
 
-  // Register interceptors
-  sl.registerLazySingleton(() => CorrelationInterceptor());
-  sl.registerLazySingleton(() => DeviceInterceptor(sl<PlatformInfo>()));
-  
+  // Register interceptors - only if not already registered
+  if (!sl.isRegistered<CorrelationInterceptor>()) {
+    sl.registerLazySingleton(() => CorrelationInterceptor());
+  }
+
+  if (!sl.isRegistered<DeviceInterceptor>()) {
+    sl.registerLazySingleton(() => DeviceInterceptor(sl<PlatformInfo>()));
+  }
+
   // Create a temporary Dio for auth interceptor
-  final tempDio = Dio();
-  sl.registerLazySingleton(() => AuthInterceptor(dio: tempDio));
+  if (!sl.isRegistered<AuthInterceptor>()) {
+    final tempDio = Dio();
+    sl.registerLazySingleton(() => AuthInterceptor(dio: tempDio));
+  }
 
-  // Build final Dio client
-  final dio = buildDio(
-    authInterceptor: sl(),
-    correlationInterceptor: sl(),
-    deviceInterceptor: sl(),
-  );
+  // Build final Dio client - only if not already registered
+  if (!sl.isRegistered<Dio>()) {
+    final dio = buildDio(
+      authInterceptor: sl(),
+      correlationInterceptor: sl(),
+      deviceInterceptor: sl(),
+    );
 
-  // Register the final Dio client
-  sl.registerLazySingleton<Dio>(() => dio);
-  sl.registerLazySingleton(() => DioClient(dio));
+    // Register the final Dio client
+    sl.registerLazySingleton<Dio>(() => dio);
+    sl.registerLazySingleton(() => DioClient(dio));
+  }
 
-  // Auth feature
-  sl.registerLazySingleton(() => AuthApi(sl<DioClient>()));
-  sl.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(authApi: sl()),
-  );
-  sl.registerLazySingleton(() => LoginUseCase(sl<AuthRepository>()));
-  sl.registerLazySingleton(() => RegisterUseCase(sl<AuthRepository>()));
+  // Auth feature - only if not already registered
+  if (!sl.isRegistered<AuthApi>()) {
+    sl.registerLazySingleton(() => AuthApi(sl<DioClient>()));
+  }
+
+  if (!sl.isRegistered<AuthRepository>()) {
+    sl.registerLazySingleton<AuthRepository>(
+      () => AuthRepositoryImpl(authApi: sl()),
+    );
+  }
+
+  if (!sl.isRegistered<LoginUseCase>()) {
+    sl.registerLazySingleton(() => LoginUseCase(sl<AuthRepository>()));
+  }
+
+  if (!sl.isRegistered<RegisterUseCase>()) {
+    sl.registerLazySingleton(() => RegisterUseCase(sl<AuthRepository>()));
+  }
 }

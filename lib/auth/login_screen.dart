@@ -5,6 +5,7 @@ import 'package:vpncn2_app/l10n/generated/app_localizations.dart';
 import 'package:vpncn2_app/services/auth_service.dart';
 import 'package:vpncn2_app/services/user_service.dart';
 import 'package:vpncn2_app/core/error/result.dart';
+import 'package:vpncn2_app/widgets/smooth_main_layout.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -41,6 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         result.when(
           ok: (user) async {
+            print('🔑 Login successful!');
             // Login successful - get fresh user info
             try {
               final userInfoResult = await UserService.getCurrentUser();
@@ -53,10 +55,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   );
 
-                  // Navigate to home screen with fresh user data
-                  Navigator.of(
-                    context,
-                  ).pushNamedAndRemoveUntil('/home', (route) => false);
+                  // Navigate to home screen
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) => const SmoothMainLayout(),
+                    ),
+                  );
                 },
                 err: (failure) {
                   // Still navigate even if getCurrentUser fails
@@ -67,9 +71,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   );
 
-                  Navigator.of(
-                    context,
-                  ).pushNamedAndRemoveUntil('/home', (route) => false);
+                  // Navigate to home screen
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) => const SmoothMainLayout(),
+                    ),
+                  );
                 },
               );
             } catch (e) {
@@ -81,9 +88,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               );
 
-              Navigator.of(
-                context,
-              ).pushNamedAndRemoveUntil('/home', (route) => false);
+              // Navigate to home screen
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => const SmoothMainLayout(),
+                ),
+              );
             }
           },
           err: (failure) {

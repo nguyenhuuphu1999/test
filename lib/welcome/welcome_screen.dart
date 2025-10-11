@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:vpncn2_app/auth/login_screen.dart';
 import 'package:vpncn2_app/auth/register_screen.dart';
 import 'package:vpncn2_app/l10n/generated/app_localizations.dart';
+import 'package:vpncn2_app/screens/debug_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -124,6 +125,25 @@ class WelcomeScreen extends StatelessWidget {
                               ),
                             ),
                           ],
+                        ),
+
+                        // Debug button (remove this in production)
+                        const SizedBox(height: 20),
+                        Center(
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const DebugScreen(),
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              'Debug Info',
+                              style: TextStyle(color: Colors.red, fontSize: 12),
+                            ),
+                          ),
                         ),
                       ],
                     ),
