@@ -46,7 +46,7 @@ class CommonSearchField extends StatelessWidget {
       onChanged: onChanged,
       controller: controller,
       enabled: enabled,
-      backgroundColor: AppColors.surface,
+      backgroundColor: AppColors.SURFACE_COLOR,
     );
   }
 
@@ -63,7 +63,7 @@ class CommonSearchField extends StatelessWidget {
       onChanged: onChanged,
       controller: controller,
       enabled: enabled,
-      backgroundColor: AppColors.surfaceLight,
+      backgroundColor: AppColors.SURFACE_LIGHT_COLOR,
       width: 87, // 87% of screen width
     );
   }
@@ -84,7 +84,7 @@ class CommonSearchField extends StatelessWidget {
       onChanged: onChanged,
       controller: controller,
       enabled: enabled,
-      backgroundColor: backgroundColor ?? AppColors.surface,
+      backgroundColor: backgroundColor ?? AppColors.SURFACE_COLOR,
       width: width,
     );
   }
@@ -95,9 +95,9 @@ class CommonSearchField extends StatelessWidget {
       width: width != null ? Responsive.width(context, width!) : null,
       padding: padding ?? EdgeInsets.all(Responsive.width(context, 4)),
       decoration: BoxDecoration(
-        color: backgroundColor ?? AppColors.surface,
+        color: backgroundColor ?? AppColors.SURFACE_COLOR,
         borderRadius: borderRadius ?? BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border, width: 1),
+        border: Border.all(color: AppColors.BORDER_COLOR, width: 1),
       ),
       child: Row(
         children: [
@@ -105,7 +105,7 @@ class CommonSearchField extends StatelessWidget {
           prefixIcon ??
               Icon(
                 Icons.search,
-                color: AppColors.textHint,
+                color: AppColors.TEXT_HINT_COLOR,
                 size: Responsive.getFontSize(context, 20),
               ),
 
@@ -120,7 +120,7 @@ class CommonSearchField extends StatelessWidget {
               style:
                   textStyle ??
                   TextStyle(
-                    color: AppColors.textPrimary,
+                    color: AppColors.TEXT_PRIMARY_COLOR,
                     fontSize: Responsive.getFontSize(context, 15),
                     fontFamily: 'Poppins',
                   ),
@@ -129,7 +129,7 @@ class CommonSearchField extends StatelessWidget {
                 hintStyle:
                     hintStyle ??
                     TextStyle(
-                      color: AppColors.textHint,
+                      color: AppColors.TEXT_HINT_COLOR,
                       fontSize: Responsive.getFontSize(context, 15),
                       fontFamily: 'Poppins',
                     ),

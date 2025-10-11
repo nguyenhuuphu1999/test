@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vpncn2_app/widgets/key_item_tile.dart';
 import 'package:vpncn2_app/widgets/common_search_field.dart';
-import 'package:vpncn2_app/constants/app_colors.dart';
-import 'package:vpncn2_app/constants/app_strings.dart';
-import 'package:vpncn2_app/utils/responsive.dart';
 
 class HomeContent extends StatelessWidget {
   const HomeContent({super.key});
@@ -24,7 +21,7 @@ class HomeContent extends StatelessWidget {
             itemBuilder: (context, index) {
               final keyItem = _keyItems[index];
               return Padding(
-                padding: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.only(bottom: 5),
                 child: KeyItemTile(
                   name: keyItem.name,
                   quotaText: keyItem.quota,

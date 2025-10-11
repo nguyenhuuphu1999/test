@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:vpncn2_app/constants/app_colors.dart';
 import 'package:vpncn2_app/constants/app_strings.dart';
 import 'package:vpncn2_app/utils/responsive.dart';
+import 'package:vpncn2_app/widgets/common_footer.dart';
 
 class AddDeviceScreen extends StatefulWidget {
   const AddDeviceScreen({super.key});
@@ -159,7 +160,7 @@ class _AddDeviceScreenState extends State<AddDeviceScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Device added successfully!'),
-        backgroundColor: AppColors.success,
+        backgroundColor: AppColors.SUCCESS_COLOR,
       ),
     );
     Navigator.of(context).pop();
@@ -168,144 +169,182 @@ class _AddDeviceScreenState extends State<AddDeviceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.BACKGROUND_COLOR,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppColors.BACKGROUND_COLOR,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          icon: const Icon(
+            Icons.arrow_back,
+            color: AppColors.TEXT_PRIMARY_COLOR,
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
           AppStrings.addNewDevice,
           style: TextStyle(
-            color: AppColors.textPrimary,
+            color: AppColors.TEXT_PRIMARY_COLOR,
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
         ),
         centerTitle: false,
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: Responsive.getPadding(context),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: Responsive.height(context, 3)),
+      body: Column(
+        children: [
+          Expanded(
+            child: SafeArea(
+              child: Padding(
+                padding: Responsive.getPadding(context),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: Responsive.height(context, 3)),
 
-              // Device MAC Field
-              const Text(
-                AppStrings.deviceMac,
-                style: TextStyle(
-                  color: AppColors.textPrimary,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              SizedBox(height: Responsive.height(context, 1)),
+                    // Device MAC Field
+                    const Text(
+                      AppStrings.deviceMac,
+                      style: TextStyle(
+                        color: AppColors.TEXT_PRIMARY_COLOR,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(height: Responsive.height(context, 1)),
 
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.border, width: 1),
-                ),
-                child: TextField(
-                  controller: _macController,
-                  focusNode: _macFocusNode,
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 16,
-                  ),
-                  decoration: const InputDecoration(
-                    hintText: 'XX:XX:XX:XX:XX:XX',
-                    hintStyle: TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 16,
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.SURFACE_COLOR,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.BORDER_COLOR,
+                          width: 1,
+                        ),
+                      ),
+                      child: TextField(
+                        controller: _macController,
+                        focusNode: _macFocusNode,
+                        style: const TextStyle(
+                          color: AppColors.TEXT_PRIMARY_COLOR,
+                          fontSize: 16,
+                        ),
+                        decoration: const InputDecoration(
+                          hintText: 'XX:XX:XX:XX:XX:XX',
+                          hintStyle: TextStyle(
+                            color: AppColors.TEXT_SECONDARY_COLOR,
+                            fontSize: 16,
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 16,
+                          ),
+                        ),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                            RegExp(r'[0-9A-Fa-f:]'),
+                          ),
+                          LengthLimitingTextInputFormatter(
+                            17,
+                          ), // MAC with colons
+                        ],
+                        textCapitalization: TextCapitalization.characters,
+                      ),
                     ),
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 16,
+
+                    SizedBox(height: Responsive.height(context, 4)),
+
+                    // Set the name Field
+                    const Text(
+                      AppStrings.setTheName,
+                      style: TextStyle(
+                        color: AppColors.TEXT_PRIMARY_COLOR,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  ),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(RegExp(r'[0-9A-Fa-f:]')),
-                    LengthLimitingTextInputFormatter(17), // MAC with colons
+                    SizedBox(height: Responsive.height(context, 1)),
+
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.SURFACE_COLOR,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.BORDER_COLOR,
+                          width: 1,
+                        ),
+                      ),
+                      child: TextField(
+                        controller: _nameController,
+                        focusNode: _nameFocusNode,
+                        style: const TextStyle(
+                          color: AppColors.TEXT_PRIMARY_COLOR,
+                          fontSize: 16,
+                        ),
+                        decoration: const InputDecoration(
+                          hintText: AppStrings.router01,
+                          hintStyle: TextStyle(
+                            color: AppColors.TEXT_SECONDARY_COLOR,
+                            fontSize: 16,
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const Spacer(),
+
+                    // Add Device Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: ElevatedButton(
+                        onPressed: _validateAndAddDevice,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.PRIMARY_COLOR,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          AppStrings.addDevice,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height: Responsive.height(context, 2)),
                   ],
-                  textCapitalization: TextCapitalization.characters,
                 ),
               ),
-
-              SizedBox(height: Responsive.height(context, 4)),
-
-              // Set the name Field
-              const Text(
-                AppStrings.setTheName,
-                style: TextStyle(
-                  color: AppColors.textPrimary,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              SizedBox(height: Responsive.height(context, 1)),
-
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.border, width: 1),
-                ),
-                child: TextField(
-                  controller: _nameController,
-                  focusNode: _nameFocusNode,
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 16,
-                  ),
-                  decoration: const InputDecoration(
-                    hintText: AppStrings.router01,
-                    hintStyle: TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 16,
-                    ),
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 16,
-                    ),
-                  ),
-                ),
-              ),
-
-              const Spacer(),
-
-              // Add Device Button
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: _validateAndAddDevice,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    AppStrings.addDevice,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-                ),
-              ),
-
-              SizedBox(height: Responsive.height(context, 2)),
-            ],
+            ),
           ),
-        ),
+
+          // Common Footer
+          CommonFooter(
+            activeIndex: 1, // Cloud is active on add device screen
+            onTabChanged: (index) {
+              switch (index) {
+                case 0:
+                case 1:
+                  Navigator.pop(context);
+                  break;
+                case 2:
+                  // TODO: Navigate to profile screen
+                  break;
+              }
+            },
+          ),
+        ],
       ),
     );
   }

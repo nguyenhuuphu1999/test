@@ -48,7 +48,7 @@ class _ExpandableKeyItemState extends State<ExpandableKeyItem> {
         : const Color(0xFF2F6BFF);
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
+      margin: const EdgeInsets.symmetric(vertical: 2.5),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),

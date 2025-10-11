@@ -183,7 +183,6 @@ class _BottomItem extends StatelessWidget {
   final VoidCallback? onTap;
 
   const _BottomItem({
-    this.icon,
     this.imageAsset,
     required this.label,
     this.active = false,

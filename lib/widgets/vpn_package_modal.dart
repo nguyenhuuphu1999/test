@@ -43,7 +43,7 @@ class VpnPackageModal extends StatelessWidget {
     return Container(
       height: Responsive.height(context, 70),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AppColors.SURFACE_COLOR,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
@@ -54,7 +54,7 @@ class VpnPackageModal extends StatelessWidget {
             width: Responsive.width(context, 15),
             height: Responsive.height(context, 0.5),
             decoration: BoxDecoration(
-              color: AppColors.border,
+              color: AppColors.BORDER_COLOR,
               borderRadius: BorderRadius.circular(10),
             ),
           ),
@@ -66,7 +66,7 @@ class VpnPackageModal extends StatelessWidget {
               children: [
                 Icon(
                   Icons.security,
-                  color: AppColors.primary,
+                  color: AppColors.PRIMARY_COLOR,
                   size: Responsive.getFontSize(context, 24),
                 ),
                 SizedBox(width: Responsive.width(context, 3)),
@@ -75,7 +75,7 @@ class VpnPackageModal extends StatelessWidget {
                   style: TextStyle(
                     fontSize: Responsive.getFontSize(context, 18),
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: AppColors.TEXT_PRIMARY_COLOR,
                   ),
                 ),
                 const Spacer(),
@@ -88,12 +88,12 @@ class VpnPackageModal extends StatelessWidget {
                   child: Container(
                     padding: EdgeInsets.all(Responsive.width(context, 2)),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
+                      color: AppColors.PRIMARY_COLOR.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
                       Icons.shopping_cart,
-                      color: AppColors.primary,
+                      color: AppColors.PRIMARY_COLOR,
                       size: Responsive.getFontSize(context, 20),
                     ),
                   ),
@@ -103,7 +103,7 @@ class VpnPackageModal extends StatelessWidget {
                   onTap: () => Navigator.pop(context),
                   child: Icon(
                     Icons.close,
-                    color: AppColors.textSecondary,
+                    color: AppColors.TEXT_SECONDARY_COLOR,
                     size: Responsive.getFontSize(context, 24),
                   ),
                 ),
@@ -118,17 +118,17 @@ class VpnPackageModal extends StatelessWidget {
             ),
             padding: EdgeInsets.all(Responsive.width(context, 3)),
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
+              color: AppColors.PRIMARY_COLOR.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: AppColors.primary.withValues(alpha: 0.3),
+                color: AppColors.PRIMARY_COLOR.withValues(alpha: 0.3),
               ),
             ),
             child: Row(
               children: [
                 Icon(
                   Icons.check_circle,
-                  color: AppColors.primary,
+                  color: AppColors.PRIMARY_COLOR,
                   size: Responsive.getFontSize(context, 20),
                 ),
                 SizedBox(width: Responsive.width(context, 2)),
@@ -141,7 +141,7 @@ class VpnPackageModal extends StatelessWidget {
                         style: TextStyle(
                           fontSize: Responsive.getFontSize(context, 12),
                           fontWeight: FontWeight.w500,
-                          color: AppColors.primary,
+                          color: AppColors.PRIMARY_COLOR,
                         ),
                       ),
                       Text(
@@ -149,7 +149,7 @@ class VpnPackageModal extends StatelessWidget {
                         style: TextStyle(
                           fontSize: Responsive.getFontSize(context, 14),
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+                          color: AppColors.TEXT_PRIMARY_COLOR,
                         ),
                       ),
                     ],
@@ -187,13 +187,13 @@ class VpnPackageModal extends StatelessWidget {
                       padding: EdgeInsets.all(Responsive.width(context, 4)),
                       decoration: BoxDecoration(
                         color: isCurrentPackage
-                            ? AppColors.primary.withValues(alpha: 0.1)
-                            : AppColors.surface,
+                            ? AppColors.PRIMARY_COLOR.withValues(alpha: 0.1)
+                            : AppColors.SURFACE_COLOR,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: isCurrentPackage
-                              ? AppColors.primary
-                              : AppColors.border,
+                              ? AppColors.PRIMARY_COLOR
+                              : AppColors.BORDER_COLOR,
                           width: isCurrentPackage ? 2 : 1,
                         ),
                       ),
@@ -205,15 +205,15 @@ class VpnPackageModal extends StatelessWidget {
                             height: Responsive.getFontSize(context, 40),
                             decoration: BoxDecoration(
                               color: isCurrentPackage
-                                  ? AppColors.primary
-                                  : AppColors.surfaceLight,
+                                  ? AppColors.PRIMARY_COLOR
+                                  : AppColors.SURFACE_LIGHT_COLOR,
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
                               Icons.vpn_lock,
                               color: isCurrentPackage
                                   ? Colors.white
-                                  : AppColors.textSecondary,
+                                  : AppColors.TEXT_SECONDARY_COLOR,
                               size: Responsive.getFontSize(context, 20),
                             ),
                           ),
@@ -234,8 +234,8 @@ class VpnPackageModal extends StatelessWidget {
                                     ),
                                     fontWeight: FontWeight.w600,
                                     color: isCurrentPackage
-                                        ? AppColors.primary
-                                        : AppColors.textPrimary,
+                                        ? AppColors.PRIMARY_COLOR
+                                        : AppColors.TEXT_PRIMARY_COLOR,
                                   ),
                                 ),
                                 SizedBox(
@@ -270,12 +270,12 @@ class VpnPackageModal extends StatelessWidget {
                             ),
                             decoration: BoxDecoration(
                               color: isCurrentPackage
-                                  ? AppColors.primary
-                                  : AppColors.surfaceLight,
+                                  ? AppColors.PRIMARY_COLOR
+                                  : AppColors.SURFACE_LIGHT_COLOR,
                               borderRadius: BorderRadius.circular(12),
                               border: isCurrentPackage
                                   ? null
-                                  : Border.all(color: AppColors.border),
+                                  : Border.all(color: AppColors.BORDER_COLOR),
                             ),
                             child: Text(
                               package['status'],
@@ -284,7 +284,7 @@ class VpnPackageModal extends StatelessWidget {
                                 fontWeight: FontWeight.w600,
                                 color: isCurrentPackage
                                     ? Colors.white
-                                    : AppColors.textPrimary,
+                                    : AppColors.TEXT_PRIMARY_COLOR,
                               ),
                             ),
                           ),
@@ -311,14 +311,14 @@ class VpnPackageModal extends StatelessWidget {
         Icon(
           icon,
           size: Responsive.getFontSize(context, 12),
-          color: AppColors.textSecondary,
+          color: AppColors.TEXT_SECONDARY_COLOR,
         ),
         SizedBox(width: Responsive.width(context, 1)),
         Text(
           text,
           style: TextStyle(
             fontSize: Responsive.getFontSize(context, 12),
-            color: AppColors.textSecondary,
+            color: AppColors.TEXT_SECONDARY_COLOR,
           ),
         ),
       ],

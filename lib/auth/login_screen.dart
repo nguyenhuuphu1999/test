@@ -67,8 +67,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 )!.usernameOrEmail,
                                 keyboardType: TextInputType.emailAddress,
                                 validator: (value) {
-                                  if (value == null || value.trim().isEmpty)
+                                  if (value == null || value.trim().isEmpty) {
                                     return 'Please enter email or username';
+                                  }
                                   return null;
                                 },
                               ),
@@ -93,10 +94,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                                 validator: (value) {
-                                  if (value == null || value.isEmpty)
+                                  if (value == null || value.isEmpty) {
                                     return 'Please enter password';
-                                  if (value.length < 6)
+                                  }
+                                  if (value.length < 6) {
                                     return 'Password too short';
+                                  }
                                   return null;
                                 },
                               ),

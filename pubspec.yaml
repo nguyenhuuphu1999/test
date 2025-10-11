@@ -75,6 +75,9 @@ flutter:
     - asset/images/paypal-logo.png
     - asset/images/alipay.png
     - asset/images/wechat-pay.png
+    - asset/images/qr-alipay.png
+    - asset/images/qr-wechat-pay.png
+    - asset/images/next.png
   generate: true
 
   # An image asset can refer to one or more resolution-specific "variants", see

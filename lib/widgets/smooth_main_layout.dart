@@ -5,21 +5,32 @@ import 'package:vpncn2_app/constants/app_colors.dart';
 import 'package:vpncn2_app/constants/app_strings.dart';
 import 'package:vpncn2_app/utils/responsive.dart';
 import 'package:vpncn2_app/screens/payment_screen.dart';
+import 'package:vpncn2_app/screens/subscribe_screen.dart';
+import 'package:vpncn2_app/screens/faq_screen.dart';
+import 'package:vpncn2_app/widgets/common_footer.dart';
 
 class SmoothMainLayout extends StatefulWidget {
-  const SmoothMainLayout({super.key});
+  final int initialIndex;
+
+  const SmoothMainLayout({super.key, this.initialIndex = 0});
 
   @override
   State<SmoothMainLayout> createState() => _SmoothMainLayoutState();
 }
 
 class _SmoothMainLayoutState extends State<SmoothMainLayout> {
-  int _currentIndex = 0;
+  late int _currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.BACKGROUND_COLOR,
       body: Container(
         padding: EdgeInsets.only(
           top:
@@ -48,10 +59,10 @@ class _SmoothMainLayoutState extends State<SmoothMainLayout> {
           ],
         ),
       ),
-      // Bottom Navigation
-      bottomNavigationBar: _BottomNavigation(
+      // Common Footer
+      bottomNavigationBar: CommonFooter(
         activeIndex: _currentIndex,
-        onTap: (index) {
+        onTabChanged: (index) {
           setState(() {
             _currentIndex = index;
           });
@@ -70,7 +81,7 @@ class _PersistentHeaderCard extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.all(Responsive.width(context, 6)),
       decoration: BoxDecoration(
-        color: AppColors.primary,
+        color: AppColors.PRIMARY_COLOR,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
@@ -119,8 +130,24 @@ class _PersistentHeaderCard extends StatelessWidget {
                   ),
                 ),
               ),
-              _HeaderAction(icon: Icons.help_outline, label: AppStrings.faq),
-              _HeaderAction(icon: Icons.business, label: AppStrings.buy),
+              _HeaderAction(
+                icon: Icons.help_outline,
+                label: AppStrings.faq,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const FaqScreen()),
+                ),
+              ),
+              _HeaderAction(
+                icon: Icons.business,
+                label: AppStrings.buy,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SubscribeScreen(),
+                  ),
+                ),
+              ),
             ],
           ),
         ],
@@ -151,7 +178,7 @@ class _HeaderAction extends StatelessWidget {
             ),
             child: Icon(
               icon,
-              color: AppColors.primary,
+              color: AppColors.PRIMARY_COLOR,
               size: Responsive.getFontSize(context, 24),
             ),
           ),
@@ -175,105 +202,6 @@ class _HeaderAction extends StatelessWidget {
   }
 }
 
-class _BottomNavigation extends StatelessWidget {
-  final int activeIndex;
-  final ValueChanged<int> onTap;
-
-  const _BottomNavigation({required this.activeIndex, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(
-        top: Responsive.height(context, 2),
-        left: Responsive.width(context, 10),
-        right: Responsive.width(context, 6),
-        bottom: Responsive.height(context, 2),
-      ),
-      decoration: const BoxDecoration(color: AppColors.surface),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          _BottomItem(
-            imageAsset: 'asset/images/home.png',
-            label: '',
-            active: activeIndex == 0,
-            onTap: () => onTap(0),
-          ),
-          _BottomItem(
-            imageAsset: 'asset/images/cloud.png',
-            label: '',
-            active: activeIndex == 1,
-            onTap: () => onTap(1),
-          ),
-          _BottomItem(
-            imageAsset: 'asset/images/user.png',
-            label: '',
-            active: activeIndex == 2,
-            onTap: () => onTap(2),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _BottomItem extends StatelessWidget {
-  final IconData? icon;
-  final String? imageAsset;
-  final String label;
-  final bool active;
-  final VoidCallback? onTap;
-
-  const _BottomItem({
-    this.icon,
-    this.imageAsset,
-    required this.label,
-    this.active = false,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final Color color = active ? AppColors.primary : AppColors.disabled;
-    final double iconSize = Responsive.getFontSize(context, 34);
-
-    Widget content = Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        if (imageAsset != null)
-          Image.asset(
-            imageAsset!,
-            width: iconSize,
-            height: iconSize,
-            color: color,
-          )
-        else if (icon != null)
-          Icon(icon, color: color, size: iconSize),
-        if (label.isNotEmpty)
-          Flexible(
-            child: Text(
-              label,
-              style: TextStyle(
-                color: color,
-                fontSize: Responsive.getFontSize(context, 12),
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-      ],
-    );
-
-    if (onTap != null) {
-      return GestureDetector(onTap: onTap, child: content);
-    }
-
-    return content;
-  }
-}
-
 class _PlaceholderContent extends StatelessWidget {
   const _PlaceholderContent();
 
@@ -285,7 +213,7 @@ class _PlaceholderContent extends StatelessWidget {
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: Responsive.getFontSize(context, 18),
-          color: AppColors.textSecondary,
+          color: AppColors.TEXT_SECONDARY_COLOR,
         ),
         overflow: TextOverflow.ellipsis,
       ),

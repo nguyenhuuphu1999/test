@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vpncn2_app/constants/app_assets.dart';
 
 class AuthHeader extends StatelessWidget {
   final String title;
@@ -11,23 +12,39 @@ class AuthHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Builder(builder: (context) {
-          final double logoWidth = MediaQuery.of(context).size.width * 0.5;
-          return Center(
-            child: Image.asset(
-              'asset/images/logo-vpncn2.png',
-              width: logoWidth,
-              fit: BoxFit.contain,
-            ),
-          );
-        }),
+        Builder(
+          builder: (context) {
+            final double logoWidth = MediaQuery.of(context).size.width * 0.5;
+            return Center(
+              child: Image.asset(
+                AppAssets.logoVpncn2,
+                width: logoWidth,
+                fit: BoxFit.contain,
+              ),
+            );
+          },
+        ),
         const SizedBox(height: 12),
-        Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Color(0xFF1B2430))),
+        Text(
+          title,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF1B2430),
+          ),
+        ),
         const SizedBox(height: 6),
-        Text(subtitle, textAlign: TextAlign.center, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: Color(0xFF394452))),
+        Text(
+          subtitle,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            color: Color(0xFF394452),
+          ),
+        ),
       ],
     );
   }
 }
-
-

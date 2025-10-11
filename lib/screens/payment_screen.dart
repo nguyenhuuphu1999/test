@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:vpncn2_app/constants/app_colors.dart';
 import 'package:vpncn2_app/constants/app_strings.dart';
+import 'package:vpncn2_app/constants/app_assets.dart';
 import 'package:vpncn2_app/utils/responsive.dart';
+import 'package:vpncn2_app/screens/mb_bank_payment_screen.dart';
+import 'package:vpncn2_app/screens/other_payment_methods_screen.dart';
+import 'package:vpncn2_app/widgets/common_footer.dart';
+import 'package:vpncn2_app/widgets/common_header.dart';
+import 'package:vpncn2_app/widgets/amount_input_dialog.dart';
 
 class PaymentScreen extends StatelessWidget {
   const PaymentScreen({super.key});
@@ -9,120 +15,100 @@ class PaymentScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        leading: GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: Icon(
-            Icons.arrow_back_ios,
-            color: AppColors.textPrimary,
-            size: Responsive.getFontSize(context, 20),
-          ),
-        ),
-        title: Text(
-          AppStrings.payment,
-          style: TextStyle(
-            fontSize: Responsive.getFontSize(context, 18),
-            fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        centerTitle: true,
+      backgroundColor: AppColors.BACKGROUND_COLOR,
+      appBar: CommonHeader(
+        title: AppStrings.payment,
+        onBackPressed: () => Navigator.pop(context),
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: Responsive.width(context, 5)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: Responsive.height(context, 2)),
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(
+                horizontal: Responsive.width(context, 5),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: Responsive.height(context, 2)),
 
-            // Manual Payment Methods Section
-            Text(
-              AppStrings.manualPaymentMethods,
-              style: TextStyle(
-                fontSize: Responsive.getFontSize(context, 16),
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                  // Manual Payment Methods Section
+                  Text(
+                    AppStrings.manualPaymentMethods,
+                    style: TextStyle(
+                      fontSize: Responsive.getFontSize(context, 16),
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.TEXT_PRIMARY_COLOR,
+                    ),
+                  ),
+                  SizedBox(height: Responsive.height(context, 2)),
+
+                  _buildPaymentMethodGroup(context, [
+                    _PaymentMethodItem(
+                      name: AppStrings.wechatPay,
+                      logoAsset: AppAssets.wechatPay,
+                      onTap: () => _handlePaymentMethodTap(
+                        context,
+                        AppStrings.wechatPay,
+                      ),
+                    ),
+                    _PaymentMethodItem(
+                      name: AppStrings.alipay,
+                      logoAsset: AppAssets.alipay,
+                      onTap: () =>
+                          _handlePaymentMethodTap(context, AppStrings.alipay),
+                    ),
+                  ]),
+
+                  SizedBox(height: Responsive.height(context, 3)),
+
+                  // Online Payment Methods Section
+                  Text(
+                    AppStrings.onlinePaymentMethods,
+                    style: TextStyle(
+                      fontSize: Responsive.getFontSize(context, 16),
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.TEXT_PRIMARY_COLOR,
+                    ),
+                  ),
+                  SizedBox(height: Responsive.height(context, 2)),
+
+                  _buildPaymentMethodGroup(context, [
+                    _PaymentMethodItem(
+                      name: AppStrings.applePay,
+                      logoAsset: AppAssets.applePay,
+                      onTap: () =>
+                          _handlePaymentMethodTap(context, AppStrings.applePay),
+                    ),
+                    _PaymentMethodItem(
+                      name: AppStrings.mbBank,
+                      logoAsset: AppAssets.mbBank,
+                      onTap: () =>
+                          _handlePaymentMethodTap(context, AppStrings.mbBank),
+                    ),
+                    _PaymentMethodItem(
+                      name: AppStrings.paypal,
+                      logoAsset: AppAssets.paypal,
+                      onTap: () =>
+                          _handlePaymentMethodTap(context, AppStrings.paypal),
+                    ),
+                  ]),
+
+                  SizedBox(height: Responsive.height(context, 3)),
+                ],
               ),
             ),
-            SizedBox(height: Responsive.height(context, 2)),
+          ),
 
-            _buildPaymentMethodGroup(context, [
-              _PaymentMethodItem(
-                name: AppStrings.wechatPay,
-                logoAsset: 'asset/images/wechat-pay.png',
-                onTap: () =>
-                    _handlePaymentMethodTap(context, AppStrings.wechatPay),
-              ),
-              _PaymentMethodItem(
-                name: AppStrings.alipay,
-                logoAsset: 'asset/images/alipay.png',
-                onTap: () =>
-                    _handlePaymentMethodTap(context, AppStrings.alipay),
-              ),
-            ]),
-
-            SizedBox(height: Responsive.height(context, 3)),
-
-            // Online Payment Methods Section
-            Text(
-              AppStrings.onlinePaymentMethods,
-              style: TextStyle(
-                fontSize: Responsive.getFontSize(context, 16),
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            SizedBox(height: Responsive.height(context, 2)),
-
-            _buildPaymentMethodGroup(context, [
-              _PaymentMethodItem(
-                name: AppStrings.applePay,
-                logoAsset: 'asset/images/apple-pay.png',
-                onTap: () =>
-                    _handlePaymentMethodTap(context, AppStrings.applePay),
-              ),
-              _PaymentMethodItem(
-                name: AppStrings.mbBank,
-                logoAsset: 'asset/images/Logo_MB.png',
-                onTap: () =>
-                    _handlePaymentMethodTap(context, AppStrings.mbBank),
-              ),
-              _PaymentMethodItem(
-                name: AppStrings.paypal,
-                logoAsset: 'asset/images/paypal-logo.png',
-                onTap: () =>
-                    _handlePaymentMethodTap(context, AppStrings.paypal),
-              ),
-            ]),
-
-            SizedBox(height: Responsive.height(context, 3)),
-
-            // Process Payment Section
-            Text(
-              AppStrings.processPayment,
-              style: TextStyle(
-                fontSize: Responsive.getFontSize(context, 16),
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            SizedBox(height: Responsive.height(context, 1)),
-
-            Text(
-              AppStrings.paymentMethodDescription,
-              style: TextStyle(
-                fontSize: Responsive.getFontSize(context, 14),
-                fontWeight: FontWeight.w400,
-                color: AppColors.textSecondary,
-              ),
-            ),
-
-            SizedBox(height: Responsive.height(context, 4)),
-          ],
-        ),
+          // Common Footer
+          CommonFooter(
+            activeIndex: -1, // No active tab on payment screen
+            context: context,
+            onTabChanged: (index) {
+              // This won't be called since we're using context navigation
+            },
+          ),
+        ],
       ),
     );
   }
@@ -134,11 +120,11 @@ class PaymentScreen extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(Responsive.width(context, 4)),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AppColors.SURFACE_COLOR,
         borderRadius: BorderRadius.circular(
           Responsive.getFontSize(context, 12),
         ),
-        border: Border.all(color: AppColors.border, width: 1),
+        border: Border.all(color: AppColors.BORDER_COLOR, width: 1),
       ),
       child: Column(
         children: items.asMap().entries.map((entry) {
@@ -157,26 +143,51 @@ class PaymentScreen extends StatelessWidget {
     );
   }
 
-  void _handlePaymentMethodTap(BuildContext context, String methodName) {
-    // TODO: Implement payment method selection logic
+  void _handlePaymentMethodTap(BuildContext context, String methodName) async {
     print('Selected payment method: $methodName');
 
-    // Show a simple dialog for now
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Payment Method Selected'),
-          content: Text('You selected: $methodName'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('OK'),
-            ),
-          ],
+    if (methodName == AppStrings.mbBank) {
+      // Show amount input dialog first
+      final amount = await showDialog<String>(
+        context: context,
+        builder: (context) => const AmountInputDialog(),
+      );
+
+      if (amount != null && amount.isNotEmpty) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MbBankPaymentScreen(amount: amount),
+          ),
         );
-      },
-    );
+      }
+    } else if (methodName == AppStrings.wechatPay ||
+        methodName == AppStrings.alipay) {
+      // Navigate to other payment methods screen for WeChat Pay and Alipay
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const OtherPaymentMethodsScreen(),
+        ),
+      );
+    } else {
+      // Show a simple dialog for other payment methods
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Payment Method Selected'),
+            content: Text('You selected: $methodName'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 }
 
@@ -201,7 +212,7 @@ class _PaymentMethodItem extends StatelessWidget {
           horizontal: Responsive.width(context, 2),
         ),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: AppColors.SURFACE_COLOR,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -212,7 +223,7 @@ class _PaymentMethodItem extends StatelessWidget {
               height: Responsive.width(context, 12),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.border, width: 1),
+                border: Border.all(color: AppColors.BORDER_COLOR, width: 1),
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
@@ -229,7 +240,7 @@ class _PaymentMethodItem extends StatelessWidget {
                 style: TextStyle(
                   fontSize: Responsive.getFontSize(context, 15),
                   fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary,
+                  color: AppColors.TEXT_PRIMARY_COLOR,
                 ),
               ),
             ),
@@ -237,7 +248,7 @@ class _PaymentMethodItem extends StatelessWidget {
             // Arrow icon
             Icon(
               Icons.arrow_forward_ios,
-              color: AppColors.textSecondary,
+              color: AppColors.TEXT_SECONDARY_COLOR,
               size: Responsive.getFontSize(context, 16),
             ),
           ],

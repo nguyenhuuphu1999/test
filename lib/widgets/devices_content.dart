@@ -86,7 +86,7 @@ class _DevicesContentState extends State<DevicesContent> {
                               width: Responsive.getFontSize(context, 42),
                               height: Responsive.getFontSize(context, 42),
                               decoration: BoxDecoration(
-                                color: AppColors.primary,
+                                color: AppColors.PRIMARY_COLOR,
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
@@ -153,7 +153,7 @@ class _DevicesContentState extends State<DevicesContent> {
               '${AppStrings.noDevicesYet}\n${AppStrings.clickToAddNew}',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: AppColors.textSecondary,
+                color: AppColors.TEXT_SECONDARY_COLOR,
                 fontSize: Responsive.getFontSize(context, 15),
                 fontFamily: 'Poppins',
                 height: 0,
@@ -178,7 +178,7 @@ class _DevicesContentState extends State<DevicesContent> {
               width: Responsive.getFontSize(context, 42),
               height: Responsive.getFontSize(context, 42),
               decoration: BoxDecoration(
-                color: AppColors.primary,
+                color: AppColors.PRIMARY_COLOR,
                 shape: BoxShape.circle,
               ),
               child: Icon(

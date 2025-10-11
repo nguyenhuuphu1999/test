@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vpncn2_app/constants/app_assets.dart';
 
 class InfoRow extends StatelessWidget {
   final String label;
@@ -50,7 +51,7 @@ class InfoRow extends StatelessWidget {
             GestureDetector(
               onTap: onChange,
               child: Image.asset(
-                'asset/images/arrows.png',
+                AppAssets.arrowsIcon,
                 width: 16,
                 height: 16,
                 color: const Color(0xFF4894FE),

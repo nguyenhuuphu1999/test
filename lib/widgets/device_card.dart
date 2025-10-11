@@ -34,19 +34,19 @@ class _DeviceCardState extends State<DeviceCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(bottom: Responsive.height(context, 2)),
+      margin: EdgeInsets.only(bottom: 5),
       padding: EdgeInsets.all(Responsive.width(context, 4)),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AppColors.SURFACE_COLOR,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.3),
+          color: AppColors.PRIMARY_COLOR.withValues(alpha: 0.3),
           width: 1,
           style: BorderStyle.solid,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.border.withValues(alpha: 0.1),
+            color: AppColors.BORDER_COLOR.withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -63,7 +63,9 @@ class _DeviceCardState extends State<DeviceCard> {
                 width: Responsive.getFontSize(context, 43),
                 height: Responsive.getFontSize(context, 43),
                 decoration: BoxDecoration(
-                  color: widget.isOnline ? AppColors.primary : AppColors.error,
+                  color: widget.isOnline
+                      ? AppColors.PRIMARY_COLOR
+                      : AppColors.ERROR_COLOR,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -85,7 +87,7 @@ class _DeviceCardState extends State<DeviceCard> {
                       style: TextStyle(
                         fontSize: Responsive.getFontSize(context, 14),
                         fontWeight: FontWeight.w400,
-                        color: AppColors.textPrimary,
+                        color: AppColors.TEXT_PRIMARY_COLOR,
                       ),
                     ),
                     SizedBox(height: Responsive.height(context, 0.5)),
@@ -94,7 +96,7 @@ class _DeviceCardState extends State<DeviceCard> {
                       style: TextStyle(
                         fontSize: Responsive.getFontSize(context, 10),
                         fontWeight: FontWeight.w400,
-                        color: AppColors.textSecondary,
+                        color: AppColors.TEXT_SECONDARY_COLOR,
                       ),
                     ),
                     SizedBox(height: Responsive.height(context, 0.5)),
@@ -103,7 +105,7 @@ class _DeviceCardState extends State<DeviceCard> {
                       style: TextStyle(
                         fontSize: Responsive.getFontSize(context, 10),
                         fontWeight: FontWeight.w400,
-                        color: AppColors.textSecondary,
+                        color: AppColors.TEXT_SECONDARY_COLOR,
                       ),
                     ),
                   ],
@@ -119,8 +121,8 @@ class _DeviceCardState extends State<DeviceCard> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(30),
                     color: widget.isVpnConnected
-                        ? AppColors.primary
-                        : AppColors.border,
+                        ? AppColors.PRIMARY_COLOR
+                        : AppColors.BORDER_COLOR,
                   ),
                   child: Stack(
                     children: [
@@ -138,7 +140,9 @@ class _DeviceCardState extends State<DeviceCard> {
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.border.withValues(alpha: 0.3),
+                                color: AppColors.BORDER_COLOR.withValues(
+                                  alpha: 0.3,
+                                ),
                                 blurRadius: 2,
                                 offset: const Offset(0, 1),
                               ),
@@ -164,7 +168,7 @@ class _DeviceCardState extends State<DeviceCard> {
                   width: Responsive.getFontSize(context, 24),
                   height: Responsive.getFontSize(context, 24),
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceLight,
+                    color: AppColors.SURFACE_LIGHT_COLOR,
                     shape: BoxShape.circle,
                   ),
                   child: AnimatedRotation(
@@ -172,7 +176,7 @@ class _DeviceCardState extends State<DeviceCard> {
                     duration: const Duration(milliseconds: 200),
                     child: Icon(
                       Icons.keyboard_arrow_down,
-                      color: AppColors.textSecondary,
+                      color: AppColors.TEXT_SECONDARY_COLOR,
                       size: Responsive.getFontSize(context, 16),
                     ),
                   ),
@@ -250,10 +254,10 @@ class _DeviceCardState extends State<DeviceCard> {
                                   vertical: Responsive.height(context, 1.5),
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.surface,
+                                  color: AppColors.SURFACE_COLOR,
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
-                                    color: AppColors.border,
+                                    color: AppColors.BORDER_COLOR,
                                     width: 1,
                                   ),
                                 ),
@@ -267,8 +271,8 @@ class _DeviceCardState extends State<DeviceCard> {
                                     ),
                                     fontWeight: FontWeight.w700,
                                     color: widget.isOnline
-                                        ? AppColors.textPrimary
-                                        : AppColors.disabled,
+                                        ? AppColors.TEXT_PRIMARY_COLOR
+                                        : AppColors.DISABLED_COLOR,
                                   ),
                                 ),
                               ),
@@ -289,8 +293,8 @@ class _DeviceCardState extends State<DeviceCard> {
                                 ),
                                 decoration: BoxDecoration(
                                   color: widget.isOnline
-                                      ? AppColors.primary
-                                      : AppColors.disabled,
+                                      ? AppColors.PRIMARY_COLOR
+                                      : AppColors.DISABLED_COLOR,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
@@ -304,7 +308,7 @@ class _DeviceCardState extends State<DeviceCard> {
                                     fontWeight: FontWeight.w700,
                                     color: widget.isOnline
                                         ? Colors.white
-                                        : AppColors.textSecondary,
+                                        : AppColors.TEXT_SECONDARY_COLOR,
                                   ),
                                 ),
                               ),
@@ -329,7 +333,7 @@ class _DeviceCardState extends State<DeviceCard> {
         style: TextStyle(
           fontSize: Responsive.getFontSize(context, 12),
           fontWeight: FontWeight.w400,
-          color: AppColors.textPrimary,
+          color: AppColors.TEXT_PRIMARY_COLOR,
         ),
       ),
     );
@@ -343,7 +347,7 @@ class _DeviceCardState extends State<DeviceCard> {
         style: TextStyle(
           fontSize: Responsive.getFontSize(context, 12),
           fontWeight: FontWeight.w400,
-          color: AppColors.textSecondary,
+          color: AppColors.TEXT_SECONDARY_COLOR,
         ),
       ),
     );
