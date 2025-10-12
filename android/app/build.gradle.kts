@@ -118,15 +118,9 @@ afterEvaluate {
 }
 
 dependencies {
+    implementation(files("libs/mobileproxy.aar"))
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
-
-    // Cordova dependencies for official Outline compatibility
-    implementation(project(":CordovaLib"))
     
-    // Official Outline dependencies (100% match) - tun2socks contains all Go runtime
-    implementation("org.getoutline.client:tun2socks:0.0.1")
-    
-    // implementation("io.sentry:sentry-android:2.0.2") // Disabled - requires DSN configuration
     implementation("org.apache.commons:commons-collections4:4.4")
     implementation("androidx.annotation:annotation:1.9.1")
 }

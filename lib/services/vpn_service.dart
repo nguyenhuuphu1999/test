@@ -48,7 +48,7 @@ class VpnService {
   Future<void> initialize() async {
     _initializeRealVpn();
 
-    // ONLY initialize REAL Native VPN Service - NO FALLBACKS, NO SIMULATION
+    // ONLY initialize REAL Native VPN Service - NO FALLBACKS
     await _nativeVpnService.initialize();
     debugPrint('✅ REAL Native VPN Service initialized - NO SIMULATION');
   }
@@ -63,9 +63,11 @@ class VpnService {
       debugPrint('🔐 Checking VPN permission...');
       final vpnPermissionOk = await checkVpnPermission();
       if (!vpnPermissionOk) {
-        debugPrint('❌ VPN permission not granted');
+        debugPrint(
+          'ℹ️ VPN permission dialog opened. Please grant permission and try connecting again.',
+        );
         throw Exception(
-          'VPN permission is required. Please grant VPN permission in Android settings.',
+          'VPN permission dialog opened. Please grant permission and try connecting again.',
         );
       }
       debugPrint('✅ VPN permission granted');
@@ -107,10 +109,8 @@ class VpnService {
       if (isRealVpn) {
         debugPrint('✅ REAL VPN tunnel established successfully');
       } else {
-        debugPrint('❌ VPN tunnel establishment failed - NO MOCK FALLBACK!');
-        throw Exception(
-          'VPN tunnel establishment failed - no mock fallback available',
-        );
+        debugPrint('❌ VPN tunnel establishment failed');
+        throw Exception('VPN tunnel establishment failed');
       }
 
       debugPrint('✅ VPN connection successful via Outline SDK');

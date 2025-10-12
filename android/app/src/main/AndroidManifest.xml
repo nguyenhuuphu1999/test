@@ -1,34 +1,36 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.vpncn2_app">
 
-    <!-- Network + Foreground -->
+    <!-- Permissions cần thiết -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <!-- Foreground service (Android 9-) -->
+
+    <!-- Nếu app chạy foreground service: -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <!-- Foreground service types (Android 14+) -->
+    <!-- Android 13+ (API 33+) nên khai báo type bạn dùng: dataSync -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
-    <!-- Notifications (Android 13+) nếu có foreground notification -->
+
+    <!-- Thông báo (Android 13+). Không bắt buộc nhưng khuyến nghị -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <!-- VPN Service permissions -->
-    <uses-permission android:name="android.permission.BIND_VPN_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+    <!-- Tự khởi động sau boot (nếu bạn có BootReceiver) -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- ❌ KHÔNG khai báo ở đây:
+         <uses-permission android:name="android.permission.BIND_VPN_SERVICE" />
+         <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+    -->
 
     <application
         android:name="${applicationName}"
         android:label="vpncn2_app"
         android:icon="@mipmap/ic_launcher"
         android:enableOnBackInvokedCallback="true">
-        
-        <!-- Disable Sentry SDK -->
-        <meta-data
-            android:name="io.sentry.dsn"
-            android:value="" />
-        <meta-data
-            android:name="io.sentry.auto-init"
-            android:value="false" />
+
+        <!-- Sentry off -->
+        <meta-data android:name="io.sentry.dsn" android:value=""/>
+        <meta-data android:name="io.sentry.auto-init" android:value="false"/>
 
         <activity
             android:name=".MainActivity"
@@ -48,36 +50,22 @@
             </intent-filter>
         </activity>
 
-        <!-- VPN Tunnel Service (Kotlin) -->
+        <!-- VPN Service -->
         <service
-            android:name=".VpnTunnelService"
+            android:name=".MyVpnService"
+            android:permission="android.permission.BIND_VPN_SERVICE"
             android:exported="false"
-            android:foregroundServiceType="connectedDevice"
-            android:permission="android.permission.BIND_VPN_SERVICE">
+            android:foregroundServiceType="dataSync"
+            android:stopWithTask="false">
             <intent-filter>
                 <action android:name="android.net.VpnService" />
             </intent-filter>
         </service>
-        
-        <!-- VPN Service Starter (Java) -->
-        <receiver
-            android:name="com.example.vpncn2_app.vpn.VpnServiceStarter"
-            android:enabled="true"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
-            </intent-filter>
-        </receiver>
 
-        <meta-data
-            android:name="flutterEmbedding"
-            android:value="2" />
+        <meta-data android:name="flutterEmbedding" android:value="2" />
     </application>
 
-    <!-- Package visibility cho Process Text (Flutter engine) -->
+    <!-- Optional queries -->
     <queries>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT" />

@@ -83,7 +83,7 @@ class OutlineSdkService {
         debugPrint('🔗 Using fileName from ossId/awsId: $configSource');
       } else {
         configSource = key.accessUrl;
-        debugPrint('🔗 Using accessUrl (fallback): $configSource');
+        debugPrint('🔗 Using accessUrl: $configSource');
       }
 
       // Trường hợp đã là ss:// -> dùng luôn
@@ -106,7 +106,7 @@ class OutlineSdkService {
         return configSource;
       }
 
-      // Fallback: build ss:// từ key
+      // Build ss:// from key
       final encodedPassword = Uri.encodeComponent(key.password);
       return 'ss://${key.method}:$encodedPassword@${key.serverName}:${key.port}';
     } catch (e) {
@@ -187,12 +187,12 @@ class OutlineSdkService {
           }
         } catch (e) {
           debugPrint('❌ REAL Outline SDK fetch failed: $e');
-          // Fallback: build ss:// directly from key
+          // Build ss:// directly from key
           final encodedPassword = Uri.encodeComponent(key.password);
           transport =
               'ss://${key.method}:$encodedPassword@${key.serverName}:${key.port}';
           debugPrint(
-            '🔄 Using fallback transport from key: ${transport.substring(0, 30)}...',
+            '🔄 Using transport from key: ${transport.substring(0, 30)}...',
           );
         }
 
@@ -207,7 +207,7 @@ class OutlineSdkService {
       // Lấy server/port để test DNS/TCP/UDP
       debugPrint('🔍 Testing connectivity with native platform channel...');
       String server = _extractServerFromTransport(transport);
-      int port = _extractPortFromTransport(transport, fallback: key.port);
+      int port = _extractPortFromTransport(transport, defaultPort: key.port);
       if (server.isEmpty) server = key.serverName;
 
       debugPrint('📋 Final server config - Server: $server, Port: $port');
@@ -347,12 +347,12 @@ class OutlineSdkService {
     }
   }
 
-  int _extractPortFromTransport(String transport, {int? fallback}) {
+  int _extractPortFromTransport(String transport, {int? defaultPort}) {
     try {
       final uri = Uri.parse(transport);
       if (uri.hasPort && uri.port > 0) return uri.port;
     } catch (_) {}
-    return fallback ?? 443;
+    return defaultPort ?? 443;
   }
 
   /// Fetch URL through Outline transport (with optional bypass)
@@ -461,7 +461,7 @@ class OutlineSdkService {
         }
       }
 
-      // Fallback to serverName if it looks like an IP
+      // Use serverName if it looks like an IP
       if (RegExp(
         r'^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$',
       ).hasMatch(key.serverName)) {

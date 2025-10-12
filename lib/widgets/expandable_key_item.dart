@@ -5,6 +5,7 @@ import 'package:vpncn2_app/widgets/key_details_expansion.dart';
 import 'package:vpncn2_app/services/vpn_service.dart';
 import 'package:vpncn2_app/services/outline_sdk_service.dart';
 import 'package:vpncn2_app/features/keys/domain/entities/key.dart' as KeyEntity;
+import 'package:vpncn2_app/services/outline_brigde.dart';
 
 class ExpandableKeyItem extends StatefulWidget {
   final String name;
@@ -63,12 +64,28 @@ class _ExpandableKeyItemState extends State<ExpandableKeyItem> {
     });
 
     try {
-      final success = await _vpnService.connectWithKey(widget.keyData!);
-
-      if (success) {
+      final vpnPermissionOk = await OutlineBridge.ensureVpnPermission();
+      if (!vpnPermissionOk) {
+        debugPrint(
+          'ℹ️ VPN permission dialog opened. Please grant permission and try connecting again.',
+        );
+        throw Exception(
+          'ℹ️ VPN permission dialog opened. Please grant permission and try connecting again.',
+        );
+      }
+      // final success = await _vpnService.connectWithKey(widget.keyData!);
+      final ok = await OutlineBridge.start(
+        serverHost: widget.keyData!.serverName,
+        serverPort: widget.keyData!.port,
+        method: widget.keyData!.method,
+        password: widget.keyData!.password,
+        remarks: widget.keyData!.name,
+      );
+      debugPrint('🔍 Outline Bridge start: $ok');
+      if (ok) {
         if (mounted) {
           // Test VPN connection with Outline SDK
-          _testVpnConnectionWithOutline();
+          // _testVpnConnectionWithOutline();
         }
       } else {
         if (mounted) {
@@ -81,6 +98,7 @@ class _ExpandableKeyItemState extends State<ExpandableKeyItem> {
         }
       }
     } catch (e) {
+      debugPrint('🔍 Outline Bridge start error: $e');
       if (mounted) {
         String errorMessage = 'Lỗi kết nối VPN';
 
@@ -93,7 +111,7 @@ class _ExpandableKeyItemState extends State<ExpandableKeyItem> {
               'VPN service không khả dụng.\nPlugin có thể chưa được cài đặt đúng cách.';
         } else if (e.toString().contains('quyền VPN') ||
             e.toString().contains('VPN permission')) {
-          _showVpnPermissionDialog();
+          // _showVpnPermissionDialog();
           return; // Don't show snackbar, show dialog instead
         } else {
           errorMessage = 'Lỗi kết nối VPN: ${e.toString()}';
