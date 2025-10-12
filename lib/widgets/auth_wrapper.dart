@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vpncn2_app/core/storage/token_store.dart';
 import 'package:vpncn2_app/services/user_service.dart';
+import 'package:vpncn2_app/services/auth_service.dart';
 import 'package:vpncn2_app/welcome/welcome_screen.dart';
 import 'package:vpncn2_app/widgets/smooth_main_layout.dart';
 
@@ -39,14 +40,48 @@ class _AuthWrapperState extends State<AuthWrapper> {
           _isLoading = false;
         });
       } else {
-        // No token, show welcome screen
-        setState(() {
-          _isAuthenticated = false;
-          _isLoading = false;
-        });
+        // No token, try auto login with default credentials
+        print('🔑 No token found, attempting auto login...');
+        await _attemptAutoLogin();
       }
     } catch (e) {
-      // Error occurred, show welcome screen
+      // Error occurred, try auto login as fallback
+      print('❌ Error checking auth status, attempting auto login: $e');
+      await _attemptAutoLogin();
+    }
+  }
+
+  Future<void> _attemptAutoLogin() async {
+    try {
+      print('🔑 Attempting auto login with phunguyen10/12345678...');
+      
+      final result = await AuthService.login('phunguyen10', '12345678');
+      
+      result.when(
+        ok: (user) async {
+          print('✅ Auto login successful! Welcome ${user.fullName}');
+          
+          // Load user data
+          await _loadUserDataInBackground();
+          
+          // Navigate to home
+          setState(() {
+            _isAuthenticated = true;
+            _isLoading = false;
+          });
+        },
+        err: (failure) {
+          print('❌ Auto login failed: ${failure.message}');
+          // Auto login failed, show welcome screen
+          setState(() {
+            _isAuthenticated = false;
+            _isLoading = false;
+          });
+        },
+      );
+    } catch (e) {
+      print('❌ Auto login error: $e');
+      // Auto login failed, show welcome screen
       setState(() {
         _isAuthenticated = false;
         _isLoading = false;

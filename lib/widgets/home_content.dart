@@ -3,6 +3,7 @@ import 'package:vpncn2_app/widgets/key_item_tile.dart';
 import 'package:vpncn2_app/widgets/common_search_field.dart';
 import 'package:vpncn2_app/services/user_service.dart';
 import 'package:vpncn2_app/services/keys_service.dart';
+import 'package:vpncn2_app/services/vpn_service.dart';
 import 'package:vpncn2_app/features/keys/domain/entities/key.dart' as KeyEntity;
 
 class HomeContent extends StatefulWidget {
@@ -19,7 +20,16 @@ class _HomeContentState extends State<HomeContent> {
   @override
   void initState() {
     super.initState();
+    _initializeVpn();
     _loadKeys();
+  }
+
+  Future<void> _initializeVpn() async {
+    try {
+      await VpnService().initialize();
+    } catch (e) {
+      debugPrint('Failed to initialize VPN service: $e');
+    }
   }
 
   Future<void> _loadKeys() async {
@@ -109,6 +119,7 @@ class _HomeContentState extends State<HomeContent> {
                           name: key.name,
                           quotaText: '${quotaGB}GB',
                           remainDays: remainDays > 0 ? remainDays : 0,
+                          keyData: key, // Pass the key data for VPN connection
                           onServerLocationChanged: (code, country) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(

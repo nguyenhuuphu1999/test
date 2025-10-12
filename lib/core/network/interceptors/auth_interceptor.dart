@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import '../../storage/token_store.dart';
+import '../../../services/auto_logout_service.dart';
+import 'package:flutter/material.dart';
 
 class AuthInterceptor extends Interceptor {
   final Dio dio;
@@ -24,31 +26,15 @@ class AuthInterceptor extends Interceptor {
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     // Handle 401 errors - token expired or invalid
     if (err.response?.statusCode == 401) {
-      // Clear invalid tokens
-      await TokenStore.clearTokens();
+      debugPrint('🔴 401 Unauthorized - Auto logout triggered');
 
-      // TODO: Implement refresh token flow if needed
-      // For now, we just clear the tokens and let the user re-login
+      // Perform complete logout with navigation
+      await AutoLogoutService.performAutoLogout(
+        reason: 'Unauthorized (401)',
+        showMessage: true,
+      );
     }
 
     handler.next(err);
-  }
-
-  // Optional: Implement refresh token flow
-  Future<bool> _refreshToken() async {
-    try {
-      final refreshToken = await TokenStore.refreshToken;
-      if (refreshToken == null) return false;
-
-      // TODO: Call refresh token endpoint
-      // final response = await dio.post('/auth/refresh', data: {'refresh_token': refreshToken});
-      // await TokenStore.saveTokens(accessToken: response.data['access_token']);
-
-      return true;
-    } catch (e) {
-      // Refresh failed, clear all tokens
-      await TokenStore.clearTokens();
-      return false;
-    }
   }
 }

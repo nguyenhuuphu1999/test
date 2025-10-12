@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import '../error/failures.dart';
 
 class ApiErrorMapper {
@@ -22,6 +23,9 @@ class ApiErrorMapper {
         final data = error.response?.data;
 
         if (statusCode == 401) {
+          debugPrint('🔴 API Error Mapper: 401 Unauthorized detected');
+          debugPrint('📄 Response data: $data');
+          // Auto-logout will be handled by AuthInterceptor
           return const Failure.auth(message: 'Unauthorized');
         }
 

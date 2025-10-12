@@ -1,7 +1,7 @@
 plugins {
     id("com.android.application")
-    id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    id("org.jetbrains.kotlin.android")
+    // Flutter Gradle Plugin phải apply sau Android & Kotlin
     id("dev.flutter.flutter-gradle-plugin")
 }
 
@@ -10,35 +10,123 @@ android {
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
-    }
-
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.vpncn2_app"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        // minSdk 29 for CordovaLib compatibility
+        minSdk = 29
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        multiDexEnabled = true
     }
 
-    buildTypes {
-        release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    
+    // Suppress deprecation warnings
+    tasks.withType<JavaCompile> {
+        options.compilerArgs.addAll(listOf("-Xlint:-deprecation", "-Xlint:-options"))
+    }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_17.toString()
+        freeCompilerArgs += listOf("-Xsuppress-version-warnings")
+    }
+
+    // Đảm bảo ABI khớp .so trong AAR
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("x86_64", "armeabi-v7a", "arm64-v8a")
+            isUniversalApk = true
+        }
+    }
+
+     buildTypes {
+         release {
+             // ký tạm bằng debug cho chạy nhanh
+             signingConfig = signingConfigs.getByName("debug")
+             isMinifyEnabled = false
+             isShrinkResources = false
+             ndk {
+                 abiFilters += listOf("x86_64", "armeabi-v7a", "arm64-v8a")
+             }
+         }
+         debug {
+             isMinifyEnabled = false
+             isShrinkResources = false
+             ndk {
+                 abiFilters += listOf("x86_64", "armeabi-v7a", "arm64-v8a")
+             }
+         }
+     }
+     
+     // Disable duplicate class checking for Go runtime conflicts
+     lint {
+         checkReleaseBuilds = false
+     }
+
+    // Để AAR load JNI libs ổn định
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+        resources {
+            excludes += setOf("META-INF/*")
+        }
+        // Exclude duplicate Go classes
+        pickFirsts += setOf(
+            "go/Seq.class",
+            "go/Seq\$GoObject.class",
+            "go/Seq\$GoRef.class",
+            "go/Seq\$GoRefQueue.class",
+            "go/Seq\$GoRefQueue\$1.class",
+            "go/Seq\$Proxy.class",
+            "go/Seq\$Ref.class",
+            "go/Seq\$RefMap.class",
+            "go/Seq\$RefTracker.class",
+            "go/Universe.class",
+            "go/Universe\$proxyerror.class",
+            "go/error.class"
+        )
+    }
+
+    sourceSets {
+        getByName("main") {
+            // nếu bạn có .so rải riêng, có thể thêm ở đây
+            jniLibs.srcDirs("src/main/jniLibs", "libs/jni")
         }
     }
 }
 
 flutter {
     source = "../.."
+}
+
+// Add local maven repository for Outline dependencies
+repositories {
+    maven {
+        url = uri("../local-maven-repo")
+    }
+}
+
+// Disable duplicate class checking for Go runtime conflicts
+afterEvaluate {
+    tasks.findByName("checkDebugDuplicateClasses")?.enabled = false
+}
+
+dependencies {
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
+    // Cordova dependencies for official Outline compatibility
+    implementation(project(":CordovaLib"))
+    
+    // Official Outline dependencies (100% match) - tun2socks contains all Go runtime
+    implementation("org.getoutline.client:tun2socks:0.0.1")
+    
+    // implementation("io.sentry:sentry-android:2.0.2") // Disabled - requires DSN configuration
+    implementation("org.apache.commons:commons-collections4:4.4")
+    implementation("androidx.annotation:annotation:1.9.1")
 }

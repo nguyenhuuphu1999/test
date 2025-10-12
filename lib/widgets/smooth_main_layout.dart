@@ -8,6 +8,7 @@ import 'package:vpncn2_app/utils/responsive.dart';
 import 'package:vpncn2_app/screens/payment_screen.dart';
 import 'package:vpncn2_app/screens/subscribe_screen.dart';
 import 'package:vpncn2_app/screens/faq_screen.dart';
+import 'package:vpncn2_app/screens/vpn_screen.dart';
 import 'package:vpncn2_app/widgets/common_footer.dart';
 import 'package:vpncn2_app/services/user_service.dart';
 import 'package:vpncn2_app/features/auth/domain/entities/user.dart';
@@ -159,6 +160,14 @@ class _PersistentHeaderCard extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (context) => const SubscribeScreen(),
                   ),
+                ),
+              ),
+              _HeaderAction(
+                icon: Icons.vpn_key,
+                label: 'VPN',
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const VpnScreen()),
                 ),
               ),
             ],

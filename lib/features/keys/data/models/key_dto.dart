@@ -21,6 +21,8 @@ class KeyDto with _$KeyDto {
     required int dataExpand,
     required ServerInfo serverId,
     required UserInfo userId,
+    OssInfo? ossId,
+    AwsInfo? awsId,
     required String account,
     required String startDate,
     required String endDate,
@@ -55,6 +57,9 @@ extension KeyDtoX on KeyDto {
       status: status,
       createdAt: DateTime.tryParse(createdAt) ?? DateTime.now(),
       updatedAt: DateTime.tryParse(updatedAt) ?? DateTime.now(),
+      ossId: ossId?.ossId,
+      fileName: ossId?.fileName ?? awsId?.fileName,
+      prefix: ossId?.prefix ?? awsId?.prefix,
     );
   }
 }
@@ -83,4 +88,32 @@ class UserInfo with _$UserInfo {
 
   factory UserInfo.fromJson(Map<String, dynamic> json) =>
       _$UserInfoFromJson(json);
+}
+
+@freezed
+class OssInfo with _$OssInfo {
+  const factory OssInfo({
+    @JsonKey(name: '_id') required String id,
+    required String ossId,
+    required String fileName,
+    required String prefix,
+    required int status,
+  }) = _OssInfo;
+
+  factory OssInfo.fromJson(Map<String, dynamic> json) =>
+      _$OssInfoFromJson(json);
+}
+
+@freezed
+class AwsInfo with _$AwsInfo {
+  const factory AwsInfo({
+    @JsonKey(name: '_id') required String id,
+    required String awsId,
+    required String fileName,
+    required String prefix,
+    required int status,
+  }) = _AwsInfo;
+
+  factory AwsInfo.fromJson(Map<String, dynamic> json) =>
+      _$AwsInfoFromJson(json);
 }

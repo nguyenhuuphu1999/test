@@ -25,5 +25,8 @@ class Key with _$Key {
     required int status,
     required DateTime createdAt,
     required DateTime updatedAt,
+    String? ossId,
+    String? fileName,
+    String? prefix,
   }) = _Key;
 }

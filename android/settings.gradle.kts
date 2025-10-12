@@ -24,3 +24,5 @@ plugins {
 }
 
 include(":app")
+include(":CordovaLib")
+project(":CordovaLib").projectDir = file("CordovaLib")

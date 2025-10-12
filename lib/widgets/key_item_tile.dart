@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vpncn2_app/widgets/expandable_key_item.dart';
+import 'package:vpncn2_app/features/keys/domain/entities/key.dart' as KeyEntity;
 
 class KeyItemTile extends StatelessWidget {
   final String name;
@@ -8,6 +9,7 @@ class KeyItemTile extends StatelessWidget {
   final bool expired;
   final VoidCallback? onConnect;
   final Function(String code, String country)? onServerLocationChanged;
+  final KeyEntity.Key? keyData; // Add key data for VPN connection
 
   const KeyItemTile({
     super.key,
@@ -17,6 +19,7 @@ class KeyItemTile extends StatelessWidget {
     this.expired = false,
     this.onConnect,
     this.onServerLocationChanged,
+    this.keyData,
   });
 
   @override
@@ -28,6 +31,7 @@ class KeyItemTile extends StatelessWidget {
       expired: expired,
       onConnect: onConnect,
       onServerLocationChanged: onServerLocationChanged,
+      keyData: keyData,
     );
   }
 }

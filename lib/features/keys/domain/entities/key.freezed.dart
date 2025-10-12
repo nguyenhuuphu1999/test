@@ -37,6 +37,9 @@ mixin _$Key {
   int get status => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
   DateTime get updatedAt => throw _privateConstructorUsedError;
+  String? get ossId => throw _privateConstructorUsedError;
+  String? get fileName => throw _privateConstructorUsedError;
+  String? get prefix => throw _privateConstructorUsedError;
 
   /// Create a copy of Key
   /// with the given fields replaced by the non-null parameter values.
@@ -70,6 +73,9 @@ abstract class $KeyCopyWith<$Res> {
     int status,
     DateTime createdAt,
     DateTime updatedAt,
+    String? ossId,
+    String? fileName,
+    String? prefix,
   });
 }
 
@@ -107,6 +113,9 @@ class _$KeyCopyWithImpl<$Res, $Val extends Key> implements $KeyCopyWith<$Res> {
     Object? status = null,
     Object? createdAt = null,
     Object? updatedAt = null,
+    Object? ossId = freezed,
+    Object? fileName = freezed,
+    Object? prefix = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -190,6 +199,18 @@ class _$KeyCopyWithImpl<$Res, $Val extends Key> implements $KeyCopyWith<$Res> {
                 ? _value.updatedAt
                 : updatedAt // ignore: cast_nullable_to_non_nullable
                       as DateTime,
+            ossId: freezed == ossId
+                ? _value.ossId
+                : ossId // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            fileName: freezed == fileName
+                ? _value.fileName
+                : fileName // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            prefix: freezed == prefix
+                ? _value.prefix
+                : prefix // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -223,6 +244,9 @@ abstract class _$$KeyImplCopyWith<$Res> implements $KeyCopyWith<$Res> {
     int status,
     DateTime createdAt,
     DateTime updatedAt,
+    String? ossId,
+    String? fileName,
+    String? prefix,
   });
 }
 
@@ -257,6 +281,9 @@ class __$$KeyImplCopyWithImpl<$Res> extends _$KeyCopyWithImpl<$Res, _$KeyImpl>
     Object? status = null,
     Object? createdAt = null,
     Object? updatedAt = null,
+    Object? ossId = freezed,
+    Object? fileName = freezed,
+    Object? prefix = freezed,
   }) {
     return _then(
       _$KeyImpl(
@@ -340,6 +367,18 @@ class __$$KeyImplCopyWithImpl<$Res> extends _$KeyCopyWithImpl<$Res, _$KeyImpl>
             ? _value.updatedAt
             : updatedAt // ignore: cast_nullable_to_non_nullable
                   as DateTime,
+        ossId: freezed == ossId
+            ? _value.ossId
+            : ossId // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        fileName: freezed == fileName
+            ? _value.fileName
+            : fileName // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        prefix: freezed == prefix
+            ? _value.prefix
+            : prefix // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -369,6 +408,9 @@ class _$KeyImpl implements _Key {
     required this.status,
     required this.createdAt,
     required this.updatedAt,
+    this.ossId,
+    this.fileName,
+    this.prefix,
   });
 
   @override
@@ -411,10 +453,16 @@ class _$KeyImpl implements _Key {
   final DateTime createdAt;
   @override
   final DateTime updatedAt;
+  @override
+  final String? ossId;
+  @override
+  final String? fileName;
+  @override
+  final String? prefix;
 
   @override
   String toString() {
-    return 'Key(id: $id, keyId: $keyId, name: $name, password: $password, port: $port, method: $method, accessUrl: $accessUrl, enable: $enable, enableByAdmin: $enableByAdmin, dataLimit: $dataLimit, dataUsage: $dataUsage, dataExpand: $dataExpand, serverLocation: $serverLocation, serverName: $serverName, account: $account, startDate: $startDate, endDate: $endDate, status: $status, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Key(id: $id, keyId: $keyId, name: $name, password: $password, port: $port, method: $method, accessUrl: $accessUrl, enable: $enable, enableByAdmin: $enableByAdmin, dataLimit: $dataLimit, dataUsage: $dataUsage, dataExpand: $dataExpand, serverLocation: $serverLocation, serverName: $serverName, account: $account, startDate: $startDate, endDate: $endDate, status: $status, createdAt: $createdAt, updatedAt: $updatedAt, ossId: $ossId, fileName: $fileName, prefix: $prefix)';
   }
 
   @override
@@ -452,7 +500,11 @@ class _$KeyImpl implements _Key {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt));
+                other.updatedAt == updatedAt) &&
+            (identical(other.ossId, ossId) || other.ossId == ossId) &&
+            (identical(other.fileName, fileName) ||
+                other.fileName == fileName) &&
+            (identical(other.prefix, prefix) || other.prefix == prefix));
   }
 
   @override
@@ -478,6 +530,9 @@ class _$KeyImpl implements _Key {
     status,
     createdAt,
     updatedAt,
+    ossId,
+    fileName,
+    prefix,
   ]);
 
   /// Create a copy of Key
@@ -511,6 +566,9 @@ abstract class _Key implements Key {
     required final int status,
     required final DateTime createdAt,
     required final DateTime updatedAt,
+    final String? ossId,
+    final String? fileName,
+    final String? prefix,
   }) = _$KeyImpl;
 
   @override
@@ -553,6 +611,12 @@ abstract class _Key implements Key {
   DateTime get createdAt;
   @override
   DateTime get updatedAt;
+  @override
+  String? get ossId;
+  @override
+  String? get fileName;
+  @override
+  String? get prefix;
 
   /// Create a copy of Key
   /// with the given fields replaced by the non-null parameter values.

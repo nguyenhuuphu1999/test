@@ -3,6 +3,11 @@ allprojects {
         google()
         mavenCentral()
     }
+    
+    // Suppress warnings across all projects
+    tasks.withType<JavaCompile> {
+        options.compilerArgs.addAll(listOf("-Xlint:-deprecation", "-Xlint:-options"))
+    }
 }
 
 val newBuildDir: Directory =
@@ -15,9 +20,10 @@ subprojects {
     val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
     project.layout.buildDirectory.value(newSubprojectBuildDir)
 }
-subprojects {
-    project.evaluationDependsOn(":app")
-}
+// Remove circular dependency that can cause build issues
+// subprojects {
+//     project.evaluationDependsOn(":app")
+// }
 
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)

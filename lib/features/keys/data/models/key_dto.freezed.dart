@@ -36,6 +36,8 @@ mixin _$KeyDto {
   int get dataExpand => throw _privateConstructorUsedError;
   ServerInfo get serverId => throw _privateConstructorUsedError;
   UserInfo get userId => throw _privateConstructorUsedError;
+  OssInfo? get ossId => throw _privateConstructorUsedError;
+  AwsInfo? get awsId => throw _privateConstructorUsedError;
   String get account => throw _privateConstructorUsedError;
   String get startDate => throw _privateConstructorUsedError;
   String get endDate => throw _privateConstructorUsedError;
@@ -72,6 +74,8 @@ abstract class $KeyDtoCopyWith<$Res> {
     int dataExpand,
     ServerInfo serverId,
     UserInfo userId,
+    OssInfo? ossId,
+    AwsInfo? awsId,
     String account,
     String startDate,
     String endDate,
@@ -82,6 +86,8 @@ abstract class $KeyDtoCopyWith<$Res> {
 
   $ServerInfoCopyWith<$Res> get serverId;
   $UserInfoCopyWith<$Res> get userId;
+  $OssInfoCopyWith<$Res>? get ossId;
+  $AwsInfoCopyWith<$Res>? get awsId;
 }
 
 /// @nodoc
@@ -113,6 +119,8 @@ class _$KeyDtoCopyWithImpl<$Res, $Val extends KeyDto>
     Object? dataExpand = null,
     Object? serverId = null,
     Object? userId = null,
+    Object? ossId = freezed,
+    Object? awsId = freezed,
     Object? account = null,
     Object? startDate = null,
     Object? endDate = null,
@@ -178,6 +186,14 @@ class _$KeyDtoCopyWithImpl<$Res, $Val extends KeyDto>
                 ? _value.userId
                 : userId // ignore: cast_nullable_to_non_nullable
                       as UserInfo,
+            ossId: freezed == ossId
+                ? _value.ossId
+                : ossId // ignore: cast_nullable_to_non_nullable
+                      as OssInfo?,
+            awsId: freezed == awsId
+                ? _value.awsId
+                : awsId // ignore: cast_nullable_to_non_nullable
+                      as AwsInfo?,
             account: null == account
                 ? _value.account
                 : account // ignore: cast_nullable_to_non_nullable
@@ -226,6 +242,34 @@ class _$KeyDtoCopyWithImpl<$Res, $Val extends KeyDto>
       return _then(_value.copyWith(userId: value) as $Val);
     });
   }
+
+  /// Create a copy of KeyDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $OssInfoCopyWith<$Res>? get ossId {
+    if (_value.ossId == null) {
+      return null;
+    }
+
+    return $OssInfoCopyWith<$Res>(_value.ossId!, (value) {
+      return _then(_value.copyWith(ossId: value) as $Val);
+    });
+  }
+
+  /// Create a copy of KeyDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $AwsInfoCopyWith<$Res>? get awsId {
+    if (_value.awsId == null) {
+      return null;
+    }
+
+    return $AwsInfoCopyWith<$Res>(_value.awsId!, (value) {
+      return _then(_value.copyWith(awsId: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -251,6 +295,8 @@ abstract class _$$KeyDtoImplCopyWith<$Res> implements $KeyDtoCopyWith<$Res> {
     int dataExpand,
     ServerInfo serverId,
     UserInfo userId,
+    OssInfo? ossId,
+    AwsInfo? awsId,
     String account,
     String startDate,
     String endDate,
@@ -263,6 +309,10 @@ abstract class _$$KeyDtoImplCopyWith<$Res> implements $KeyDtoCopyWith<$Res> {
   $ServerInfoCopyWith<$Res> get serverId;
   @override
   $UserInfoCopyWith<$Res> get userId;
+  @override
+  $OssInfoCopyWith<$Res>? get ossId;
+  @override
+  $AwsInfoCopyWith<$Res>? get awsId;
 }
 
 /// @nodoc
@@ -293,6 +343,8 @@ class __$$KeyDtoImplCopyWithImpl<$Res>
     Object? dataExpand = null,
     Object? serverId = null,
     Object? userId = null,
+    Object? ossId = freezed,
+    Object? awsId = freezed,
     Object? account = null,
     Object? startDate = null,
     Object? endDate = null,
@@ -358,6 +410,14 @@ class __$$KeyDtoImplCopyWithImpl<$Res>
             ? _value.userId
             : userId // ignore: cast_nullable_to_non_nullable
                   as UserInfo,
+        ossId: freezed == ossId
+            ? _value.ossId
+            : ossId // ignore: cast_nullable_to_non_nullable
+                  as OssInfo?,
+        awsId: freezed == awsId
+            ? _value.awsId
+            : awsId // ignore: cast_nullable_to_non_nullable
+                  as AwsInfo?,
         account: null == account
             ? _value.account
             : account // ignore: cast_nullable_to_non_nullable
@@ -405,6 +465,8 @@ class _$KeyDtoImpl implements _KeyDto {
     required this.dataExpand,
     required this.serverId,
     required this.userId,
+    this.ossId,
+    this.awsId,
     required this.account,
     required this.startDate,
     required this.endDate,
@@ -446,6 +508,10 @@ class _$KeyDtoImpl implements _KeyDto {
   @override
   final UserInfo userId;
   @override
+  final OssInfo? ossId;
+  @override
+  final AwsInfo? awsId;
+  @override
   final String account;
   @override
   final String startDate;
@@ -460,7 +526,7 @@ class _$KeyDtoImpl implements _KeyDto {
 
   @override
   String toString() {
-    return 'KeyDto(id: $id, keyId: $keyId, name: $name, password: $password, port: $port, method: $method, accessUrl: $accessUrl, enable: $enable, enableByAdmin: $enableByAdmin, dataLimit: $dataLimit, dataUsage: $dataUsage, dataExpand: $dataExpand, serverId: $serverId, userId: $userId, account: $account, startDate: $startDate, endDate: $endDate, status: $status, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'KeyDto(id: $id, keyId: $keyId, name: $name, password: $password, port: $port, method: $method, accessUrl: $accessUrl, enable: $enable, enableByAdmin: $enableByAdmin, dataLimit: $dataLimit, dataUsage: $dataUsage, dataExpand: $dataExpand, serverId: $serverId, userId: $userId, ossId: $ossId, awsId: $awsId, account: $account, startDate: $startDate, endDate: $endDate, status: $status, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -489,6 +555,8 @@ class _$KeyDtoImpl implements _KeyDto {
             (identical(other.serverId, serverId) ||
                 other.serverId == serverId) &&
             (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.ossId, ossId) || other.ossId == ossId) &&
+            (identical(other.awsId, awsId) || other.awsId == awsId) &&
             (identical(other.account, account) || other.account == account) &&
             (identical(other.startDate, startDate) ||
                 other.startDate == startDate) &&
@@ -518,6 +586,8 @@ class _$KeyDtoImpl implements _KeyDto {
     dataExpand,
     serverId,
     userId,
+    ossId,
+    awsId,
     account,
     startDate,
     endDate,
@@ -556,6 +626,8 @@ abstract class _KeyDto implements KeyDto {
     required final int dataExpand,
     required final ServerInfo serverId,
     required final UserInfo userId,
+    final OssInfo? ossId,
+    final AwsInfo? awsId,
     required final String account,
     required final String startDate,
     required final String endDate,
@@ -595,6 +667,10 @@ abstract class _KeyDto implements KeyDto {
   ServerInfo get serverId;
   @override
   UserInfo get userId;
+  @override
+  OssInfo? get ossId;
+  @override
+  AwsInfo? get awsId;
   @override
   String get account;
   @override
@@ -1050,5 +1126,491 @@ abstract class _UserInfo implements UserInfo {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$UserInfoImplCopyWith<_$UserInfoImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+OssInfo _$OssInfoFromJson(Map<String, dynamic> json) {
+  return _OssInfo.fromJson(json);
+}
+
+/// @nodoc
+mixin _$OssInfo {
+  @JsonKey(name: '_id')
+  String get id => throw _privateConstructorUsedError;
+  String get ossId => throw _privateConstructorUsedError;
+  String get fileName => throw _privateConstructorUsedError;
+  String get prefix => throw _privateConstructorUsedError;
+  int get status => throw _privateConstructorUsedError;
+
+  /// Serializes this OssInfo to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of OssInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $OssInfoCopyWith<OssInfo> get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $OssInfoCopyWith<$Res> {
+  factory $OssInfoCopyWith(OssInfo value, $Res Function(OssInfo) then) =
+      _$OssInfoCopyWithImpl<$Res, OssInfo>;
+  @useResult
+  $Res call({
+    @JsonKey(name: '_id') String id,
+    String ossId,
+    String fileName,
+    String prefix,
+    int status,
+  });
+}
+
+/// @nodoc
+class _$OssInfoCopyWithImpl<$Res, $Val extends OssInfo>
+    implements $OssInfoCopyWith<$Res> {
+  _$OssInfoCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of OssInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? ossId = null,
+    Object? fileName = null,
+    Object? prefix = null,
+    Object? status = null,
+  }) {
+    return _then(
+      _value.copyWith(
+            id: null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                      as String,
+            ossId: null == ossId
+                ? _value.ossId
+                : ossId // ignore: cast_nullable_to_non_nullable
+                      as String,
+            fileName: null == fileName
+                ? _value.fileName
+                : fileName // ignore: cast_nullable_to_non_nullable
+                      as String,
+            prefix: null == prefix
+                ? _value.prefix
+                : prefix // ignore: cast_nullable_to_non_nullable
+                      as String,
+            status: null == status
+                ? _value.status
+                : status // ignore: cast_nullable_to_non_nullable
+                      as int,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$OssInfoImplCopyWith<$Res> implements $OssInfoCopyWith<$Res> {
+  factory _$$OssInfoImplCopyWith(
+    _$OssInfoImpl value,
+    $Res Function(_$OssInfoImpl) then,
+  ) = __$$OssInfoImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({
+    @JsonKey(name: '_id') String id,
+    String ossId,
+    String fileName,
+    String prefix,
+    int status,
+  });
+}
+
+/// @nodoc
+class __$$OssInfoImplCopyWithImpl<$Res>
+    extends _$OssInfoCopyWithImpl<$Res, _$OssInfoImpl>
+    implements _$$OssInfoImplCopyWith<$Res> {
+  __$$OssInfoImplCopyWithImpl(
+    _$OssInfoImpl _value,
+    $Res Function(_$OssInfoImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of OssInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? ossId = null,
+    Object? fileName = null,
+    Object? prefix = null,
+    Object? status = null,
+  }) {
+    return _then(
+      _$OssInfoImpl(
+        id: null == id
+            ? _value.id
+            : id // ignore: cast_nullable_to_non_nullable
+                  as String,
+        ossId: null == ossId
+            ? _value.ossId
+            : ossId // ignore: cast_nullable_to_non_nullable
+                  as String,
+        fileName: null == fileName
+            ? _value.fileName
+            : fileName // ignore: cast_nullable_to_non_nullable
+                  as String,
+        prefix: null == prefix
+            ? _value.prefix
+            : prefix // ignore: cast_nullable_to_non_nullable
+                  as String,
+        status: null == status
+            ? _value.status
+            : status // ignore: cast_nullable_to_non_nullable
+                  as int,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$OssInfoImpl implements _OssInfo {
+  const _$OssInfoImpl({
+    @JsonKey(name: '_id') required this.id,
+    required this.ossId,
+    required this.fileName,
+    required this.prefix,
+    required this.status,
+  });
+
+  factory _$OssInfoImpl.fromJson(Map<String, dynamic> json) =>
+      _$$OssInfoImplFromJson(json);
+
+  @override
+  @JsonKey(name: '_id')
+  final String id;
+  @override
+  final String ossId;
+  @override
+  final String fileName;
+  @override
+  final String prefix;
+  @override
+  final int status;
+
+  @override
+  String toString() {
+    return 'OssInfo(id: $id, ossId: $ossId, fileName: $fileName, prefix: $prefix, status: $status)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$OssInfoImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.ossId, ossId) || other.ossId == ossId) &&
+            (identical(other.fileName, fileName) ||
+                other.fileName == fileName) &&
+            (identical(other.prefix, prefix) || other.prefix == prefix) &&
+            (identical(other.status, status) || other.status == status));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, id, ossId, fileName, prefix, status);
+
+  /// Create a copy of OssInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$OssInfoImplCopyWith<_$OssInfoImpl> get copyWith =>
+      __$$OssInfoImplCopyWithImpl<_$OssInfoImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$OssInfoImplToJson(this);
+  }
+}
+
+abstract class _OssInfo implements OssInfo {
+  const factory _OssInfo({
+    @JsonKey(name: '_id') required final String id,
+    required final String ossId,
+    required final String fileName,
+    required final String prefix,
+    required final int status,
+  }) = _$OssInfoImpl;
+
+  factory _OssInfo.fromJson(Map<String, dynamic> json) = _$OssInfoImpl.fromJson;
+
+  @override
+  @JsonKey(name: '_id')
+  String get id;
+  @override
+  String get ossId;
+  @override
+  String get fileName;
+  @override
+  String get prefix;
+  @override
+  int get status;
+
+  /// Create a copy of OssInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$OssInfoImplCopyWith<_$OssInfoImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+AwsInfo _$AwsInfoFromJson(Map<String, dynamic> json) {
+  return _AwsInfo.fromJson(json);
+}
+
+/// @nodoc
+mixin _$AwsInfo {
+  @JsonKey(name: '_id')
+  String get id => throw _privateConstructorUsedError;
+  String get awsId => throw _privateConstructorUsedError;
+  String get fileName => throw _privateConstructorUsedError;
+  String get prefix => throw _privateConstructorUsedError;
+  int get status => throw _privateConstructorUsedError;
+
+  /// Serializes this AwsInfo to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of AwsInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $AwsInfoCopyWith<AwsInfo> get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $AwsInfoCopyWith<$Res> {
+  factory $AwsInfoCopyWith(AwsInfo value, $Res Function(AwsInfo) then) =
+      _$AwsInfoCopyWithImpl<$Res, AwsInfo>;
+  @useResult
+  $Res call({
+    @JsonKey(name: '_id') String id,
+    String awsId,
+    String fileName,
+    String prefix,
+    int status,
+  });
+}
+
+/// @nodoc
+class _$AwsInfoCopyWithImpl<$Res, $Val extends AwsInfo>
+    implements $AwsInfoCopyWith<$Res> {
+  _$AwsInfoCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of AwsInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? awsId = null,
+    Object? fileName = null,
+    Object? prefix = null,
+    Object? status = null,
+  }) {
+    return _then(
+      _value.copyWith(
+            id: null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                      as String,
+            awsId: null == awsId
+                ? _value.awsId
+                : awsId // ignore: cast_nullable_to_non_nullable
+                      as String,
+            fileName: null == fileName
+                ? _value.fileName
+                : fileName // ignore: cast_nullable_to_non_nullable
+                      as String,
+            prefix: null == prefix
+                ? _value.prefix
+                : prefix // ignore: cast_nullable_to_non_nullable
+                      as String,
+            status: null == status
+                ? _value.status
+                : status // ignore: cast_nullable_to_non_nullable
+                      as int,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$AwsInfoImplCopyWith<$Res> implements $AwsInfoCopyWith<$Res> {
+  factory _$$AwsInfoImplCopyWith(
+    _$AwsInfoImpl value,
+    $Res Function(_$AwsInfoImpl) then,
+  ) = __$$AwsInfoImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({
+    @JsonKey(name: '_id') String id,
+    String awsId,
+    String fileName,
+    String prefix,
+    int status,
+  });
+}
+
+/// @nodoc
+class __$$AwsInfoImplCopyWithImpl<$Res>
+    extends _$AwsInfoCopyWithImpl<$Res, _$AwsInfoImpl>
+    implements _$$AwsInfoImplCopyWith<$Res> {
+  __$$AwsInfoImplCopyWithImpl(
+    _$AwsInfoImpl _value,
+    $Res Function(_$AwsInfoImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of AwsInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? awsId = null,
+    Object? fileName = null,
+    Object? prefix = null,
+    Object? status = null,
+  }) {
+    return _then(
+      _$AwsInfoImpl(
+        id: null == id
+            ? _value.id
+            : id // ignore: cast_nullable_to_non_nullable
+                  as String,
+        awsId: null == awsId
+            ? _value.awsId
+            : awsId // ignore: cast_nullable_to_non_nullable
+                  as String,
+        fileName: null == fileName
+            ? _value.fileName
+            : fileName // ignore: cast_nullable_to_non_nullable
+                  as String,
+        prefix: null == prefix
+            ? _value.prefix
+            : prefix // ignore: cast_nullable_to_non_nullable
+                  as String,
+        status: null == status
+            ? _value.status
+            : status // ignore: cast_nullable_to_non_nullable
+                  as int,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$AwsInfoImpl implements _AwsInfo {
+  const _$AwsInfoImpl({
+    @JsonKey(name: '_id') required this.id,
+    required this.awsId,
+    required this.fileName,
+    required this.prefix,
+    required this.status,
+  });
+
+  factory _$AwsInfoImpl.fromJson(Map<String, dynamic> json) =>
+      _$$AwsInfoImplFromJson(json);
+
+  @override
+  @JsonKey(name: '_id')
+  final String id;
+  @override
+  final String awsId;
+  @override
+  final String fileName;
+  @override
+  final String prefix;
+  @override
+  final int status;
+
+  @override
+  String toString() {
+    return 'AwsInfo(id: $id, awsId: $awsId, fileName: $fileName, prefix: $prefix, status: $status)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$AwsInfoImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.awsId, awsId) || other.awsId == awsId) &&
+            (identical(other.fileName, fileName) ||
+                other.fileName == fileName) &&
+            (identical(other.prefix, prefix) || other.prefix == prefix) &&
+            (identical(other.status, status) || other.status == status));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, id, awsId, fileName, prefix, status);
+
+  /// Create a copy of AwsInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$AwsInfoImplCopyWith<_$AwsInfoImpl> get copyWith =>
+      __$$AwsInfoImplCopyWithImpl<_$AwsInfoImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$AwsInfoImplToJson(this);
+  }
+}
+
+abstract class _AwsInfo implements AwsInfo {
+  const factory _AwsInfo({
+    @JsonKey(name: '_id') required final String id,
+    required final String awsId,
+    required final String fileName,
+    required final String prefix,
+    required final int status,
+  }) = _$AwsInfoImpl;
+
+  factory _AwsInfo.fromJson(Map<String, dynamic> json) = _$AwsInfoImpl.fromJson;
+
+  @override
+  @JsonKey(name: '_id')
+  String get id;
+  @override
+  String get awsId;
+  @override
+  String get fileName;
+  @override
+  String get prefix;
+  @override
+  int get status;
+
+  /// Create a copy of AwsInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$AwsInfoImplCopyWith<_$AwsInfoImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

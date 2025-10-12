@@ -21,6 +21,12 @@ _$KeyDtoImpl _$$KeyDtoImplFromJson(Map<String, dynamic> json) => _$KeyDtoImpl(
   dataExpand: (json['dataExpand'] as num).toInt(),
   serverId: ServerInfo.fromJson(json['serverId'] as Map<String, dynamic>),
   userId: UserInfo.fromJson(json['userId'] as Map<String, dynamic>),
+  ossId: json['ossId'] == null
+      ? null
+      : OssInfo.fromJson(json['ossId'] as Map<String, dynamic>),
+  awsId: json['awsId'] == null
+      ? null
+      : AwsInfo.fromJson(json['awsId'] as Map<String, dynamic>),
   account: json['account'] as String,
   startDate: json['startDate'] as String,
   endDate: json['endDate'] as String,
@@ -45,6 +51,8 @@ Map<String, dynamic> _$$KeyDtoImplToJson(_$KeyDtoImpl instance) =>
       'dataExpand': instance.dataExpand,
       'serverId': instance.serverId,
       'userId': instance.userId,
+      'ossId': instance.ossId,
+      'awsId': instance.awsId,
       'account': instance.account,
       'startDate': instance.startDate,
       'endDate': instance.endDate,
@@ -83,4 +91,40 @@ Map<String, dynamic> _$$UserInfoImplToJson(_$UserInfoImpl instance) =>
       'username': instance.username,
       'role': instance.role,
       'money': instance.money,
+    };
+
+_$OssInfoImpl _$$OssInfoImplFromJson(Map<String, dynamic> json) =>
+    _$OssInfoImpl(
+      id: json['_id'] as String,
+      ossId: json['ossId'] as String,
+      fileName: json['fileName'] as String,
+      prefix: json['prefix'] as String,
+      status: (json['status'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$$OssInfoImplToJson(_$OssInfoImpl instance) =>
+    <String, dynamic>{
+      '_id': instance.id,
+      'ossId': instance.ossId,
+      'fileName': instance.fileName,
+      'prefix': instance.prefix,
+      'status': instance.status,
+    };
+
+_$AwsInfoImpl _$$AwsInfoImplFromJson(Map<String, dynamic> json) =>
+    _$AwsInfoImpl(
+      id: json['_id'] as String,
+      awsId: json['awsId'] as String,
+      fileName: json['fileName'] as String,
+      prefix: json['prefix'] as String,
+      status: (json['status'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$$AwsInfoImplToJson(_$AwsInfoImpl instance) =>
+    <String, dynamic>{
+      '_id': instance.id,
+      'awsId': instance.awsId,
+      'fileName': instance.fileName,
+      'prefix': instance.prefix,
+      'status': instance.status,
     };
