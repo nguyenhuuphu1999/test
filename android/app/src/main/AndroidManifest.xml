@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.vpncn2_app">
 
@@ -6,21 +7,16 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-    <!-- Nếu app chạy foreground service: -->
+    <!-- Foreground Service -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <!-- Android 13+ (API 33+) nên khai báo type bạn dùng: dataSync -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
-    <!-- Thông báo (Android 13+). Không bắt buộc nhưng khuyến nghị -->
+    <!-- Thông báo (Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <!-- Tự khởi động sau boot (nếu bạn có BootReceiver) -->
+    <!-- Tự khởi động sau boot -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-
-    <!-- ❌ KHÔNG khai báo ở đây:
-         <uses-permission android:name="android.permission.BIND_VPN_SERVICE" />
-         <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
-    -->
 
     <application
         android:name="${applicationName}"
@@ -36,7 +32,6 @@
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
-            android:taskAffinity=""
             android:theme="@style/LaunchTheme"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize"
@@ -54,13 +49,25 @@
         <service
             android:name=".MyVpnService"
             android:permission="android.permission.BIND_VPN_SERVICE"
-            android:exported="false"
+            android:exported="true"
             android:foregroundServiceType="dataSync"
             android:stopWithTask="false">
             <intent-filter>
                 <action android:name="android.net.VpnService" />
             </intent-filter>
         </service>
+
+        <!-- Boot Receiver: tự khởi động lại VPN sau khi máy boot -->
+        <receiver
+            android:name=".BootReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:directBootAware="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
 
         <meta-data android:name="flutterEmbedding" android:value="2" />
     </application>

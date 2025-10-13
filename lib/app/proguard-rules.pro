@@ -11,3 +11,7 @@
 # OkHttp warnings
 -dontwarn okhttp3.**
 -dontwarn okio.**
+
+-keep class mobileproxy.** { *; }
+-keep class go.** { *; }      # gomobile sinh gói go.*
+-dontwarn go.**

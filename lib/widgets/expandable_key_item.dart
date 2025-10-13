@@ -74,6 +74,8 @@ class _ExpandableKeyItemState extends State<ExpandableKeyItem> {
         );
       }
       // final success = await _vpnService.connectWithKey(widget.keyData!);
+      await OutlineBridge.stop();
+      debugPrint('🔍 Outline Bridge start: $widget');
       final ok = await OutlineBridge.start(
         serverHost: widget.keyData!.serverName,
         serverPort: widget.keyData!.port,
@@ -97,6 +99,9 @@ class _ExpandableKeyItemState extends State<ExpandableKeyItem> {
           );
         }
       }
+
+      final status = await OutlineBridge.status();
+      debugPrint('🔍 Outline Bridge status: $status');
     } catch (e) {
       debugPrint('🔍 Outline Bridge start error: $e');
       if (mounted) {
