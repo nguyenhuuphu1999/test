@@ -1,5 +1,5 @@
 -keep class go.** { *; }
--keep class mobileproxy.** { *; }
+-keep class outline-go-tun2socks.** { *; }
 -keep class org.golang.** { *; }
 
 -keepclasseswithmembers class * {

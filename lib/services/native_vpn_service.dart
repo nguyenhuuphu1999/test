@@ -1,238 +1,408 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../models/ss_conf.dart';
-import '../utils/v2ray_config.dart';
-import '../features/keys/domain/entities/key.dart' as KeyEntity;
-import 'keys_service.dart';
+import 'package:vpncn2_app/l10n/generated/app_localizations.dart';
+import 'package:vpncn2_app/models/key_details.dart';
+import 'package:vpncn2_app/widgets/key_details_expansion.dart';
+import 'package:vpncn2_app/features/keys/domain/entities/key.dart' as KeyEntity;
+import 'package:vpncn2_app/services/outline_brigde.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/io_client.dart';
 
-/// Native VPN Service using platform channels for real VPN connection
-class NativeVpnService {
-  static const MethodChannel _channel = MethodChannel('vpncn2/vpn_service');
-  static const EventChannel _statusChannel = EventChannel('vpncn2/vpn_status');
+class ExpandableKeyItem extends StatefulWidget {
+  final String name;
+  final String quotaText;
+  final int? remainDays;
+  final bool expired;
+  final VoidCallback? onConnect;
+  final Function(String code, String country)? onServerLocationChanged;
+  final KeyEntity.Key? keyData;
 
-  static final NativeVpnService _instance = NativeVpnService._internal();
-  factory NativeVpnService() => _instance;
-  NativeVpnService._internal();
+  const ExpandableKeyItem({
+    super.key,
+    required this.name,
+    required this.quotaText,
+    this.remainDays,
+    this.expired = false,
+    this.onConnect,
+    this.onServerLocationChanged,
+    this.keyData,
+  });
 
-  final ValueNotifier<String> _statusNotifier = ValueNotifier<String>(
-    'disconnected',
-  );
-  KeyEntity.Key? _connectedKey;
+  @override
+  State<ExpandableKeyItem> createState() => _ExpandableKeyItemState();
+}
 
-  // Getters
-  ValueNotifier<String> get statusNotifier => _statusNotifier;
-  KeyEntity.Key? get connectedKey => _connectedKey;
-  bool get isConnected => _statusNotifier.value == 'connected';
+class _ExpandableKeyItemState extends State<ExpandableKeyItem> {
+  bool _isExpanded = false;
+  late KeyDetails _keyDetails;
 
-  /// Initialize native VPN service
-  Future<void> initialize() async {
-    try {
-      debugPrint('🔧 Initializing Native VPN Service...');
+  // Trạng thái “đã kết nối qua proxy nội bộ”
+  bool _connected = false;
+  bool _isConnecting = false;
+  String? _proxyAddress; // ví dụ "127.0.0.1:54321"
+  IOClient? _ioClientForProxy; // HTTP client đi qua proxy
 
-      // Set up status listener
-      _statusChannel.receiveBroadcastStream().listen(
-        (status) {
-          debugPrint('📡 VPN Status update: $status');
-          _statusNotifier.value = status.toString();
-
-          if (status == 'disconnected') {
-            _connectedKey = null;
-            _clearConnectedKey();
-          }
-        },
-        onError: (error) {
-          debugPrint('❌ VPN Status error: $error');
-          _statusNotifier.value = 'error';
-        },
-      );
-
-      // Initialize native VPN service
-      await _channel.invokeMethod('initialize');
-      debugPrint('✅ Native VPN Service initialized');
-    } catch (e) {
-      debugPrint('❌ Native VPN Service initialization failed: $e');
-      rethrow;
-    }
-  }
-
-  /// Connect to VPN using a specific key
-  Future<bool> connectWithKey(KeyEntity.Key key) async {
-    try {
-      debugPrint('🔧 Native VPN: Connecting with key ${key.name}');
-
-      // Stop current connection if any
-      if (isConnected) {
-        await disconnect();
-      }
-
-      // Create Shadowsocks config from key data
-      final ssConfig = await _createSsConfigFromKey(key);
-      final config = buildXrayConfigFromSs(ssConfig);
-
-      debugPrint('📄 VPN Config: ${config.substring(0, 100)}...');
-
-      // Request VPN permission
-      final granted = await _requestVpnPermission();
-      if (!granted) {
-        throw Exception('Bạn đã từ chối quyền VPN');
-      }
-
-      // Start VPN connection
-      final result = await _channel.invokeMethod('startVpn', {
-        'remark': key.name,
-        'config': config,
-        'keyId': key.id,
-      });
-
-      if (result == true) {
-        _connectedKey = key;
-        _statusNotifier.value = 'connected';
-        await _saveConnectedKey(key);
-        debugPrint('✅ Native VPN: Connection successful');
-        return true;
-      } else {
-        debugPrint('❌ Native VPN: Connection failed');
-        // Ensure we're disconnected on failure
-        _statusNotifier.value = 'disconnected';
-        _connectedKey = null;
-        return false;
-      }
-    } catch (e) {
-      debugPrint('❌ Native VPN: Connection error: $e');
-      // Ensure we're disconnected on error
-      _statusNotifier.value = 'error';
-      _connectedKey = null;
-      return false;
-    }
-  }
-
-  /// Disconnect VPN
-  Future<void> disconnect() async {
-    try {
-      debugPrint('🔧 Native VPN: Disconnecting...');
-
-      await _channel.invokeMethod('stopVpn');
-
-      _statusNotifier.value = 'disconnected';
-      _connectedKey = null;
-      await _clearConnectedKey();
-      debugPrint('✅ Native VPN: Disconnected');
-    } catch (e) {
-      debugPrint('⚠️ Native VPN: Disconnect error: $e');
-      // Still update status even if disconnect fails
-      _statusNotifier.value = 'disconnected';
-      _connectedKey = null;
-    }
-  }
-
-  /// Request VPN permission
-  Future<bool> _requestVpnPermission() async {
-    try {
-      final result = await _channel.invokeMethod('requestPermission');
-      return result == true;
-    } catch (e) {
-      debugPrint('❌ VPN Permission request failed: $e');
-      return false;
-    }
-  }
-
-  /// Create Shadowsocks config from key data
-  Future<SsConf> _createSsConfigFromKey(KeyEntity.Key key) async {
-    String server;
-
-    if (key.accessUrl.isNotEmpty) {
-      try {
-        final uri = Uri.parse(key.accessUrl);
-        server = uri.host;
-      } catch (e) {
-        server = key.serverName.isNotEmpty
-            ? key.serverName
-            : 'server.vpncn2.net';
-      }
-    } else {
-      server = key.serverName.isNotEmpty ? key.serverName : 'server.vpncn2.net';
-    }
-
-    return SsConf(
-      server: server,
-      serverPort: key.port,
-      password: key.password,
-      method: key.method,
-      prefix: null,
+  @override
+  void initState() {
+    super.initState();
+    _keyDetails = KeyDetails.fromKeyItem(
+      widget.name,
+      widget.quotaText,
+      widget.remainDays ?? 0,
+      expired: widget.expired,
     );
   }
 
-  /// Save connected key info
-  Future<void> _saveConnectedKey(KeyEntity.Key key) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('connected_key_id', key.id);
-    debugPrint('💾 Native VPN: Saved connected key ID: ${key.id}');
-  }
+  Future<void> _handleConnect() async {
+    if (widget.keyData == null) {
+      _toast('Không thể kết nối: Thiếu thông tin key', isError: true);
+      return;
+    }
+    if (_connected) return;
 
-  /// Clear connected key info
-  Future<void> _clearConnectedKey() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('connected_key_id');
-    debugPrint('🗑️ Native VPN: Cleared connected key info');
-  }
+    setState(() => _isConnecting = true);
 
-  /// Load previously connected key info from API
-  Future<KeyEntity.Key?> loadConnectedKeyInfo() async {
-    final prefs = await SharedPreferences.getInstance();
-    final keyId = prefs.getString('connected_key_id');
+    try {
+      // 1) Start local proxy (không VPN)
+      // - preferSmart=false: dùng config tĩnh (ví dụ "split:3")
+      // - bạn có thể chuyển sang preferSmart=true và truyền strategiesYaml nếu muốn
+      final res = await OutlineBridge.startLocalProxy(
+        preferSmart: false,
+        config: 'split:3',
+        bindHost: '127.0.0.1',
+        port: 0, // hệ thống tự cấp cổng rảnh
+      );
 
-    if (keyId != null) {
-      try {
-        debugPrint('🔍 Native VPN: Loading connected key info for ID: $keyId');
-
-        // Use KeysService directly
-        final result = await KeysService.getKeys(status: 1, pageSize: 100);
-
-        return result.when(
-          ok: (keys) {
-            final connectedKey = keys.firstWhere(
-              (key) => key.id == keyId,
-              orElse: () => throw Exception('Key not found'),
-            );
-
-            debugPrint(
-              '✅ Native VPN: Found connected key: ${connectedKey.name}',
-            );
-            return connectedKey;
-          },
-          err: (failure) {
-            debugPrint('❌ Native VPN: Failed to load keys: ${failure.message}');
-            return null;
-          },
-        );
-      } catch (e) {
-        debugPrint('❌ Native VPN: Error loading connected key: $e');
-        return null;
+      if (!res.ok || res.address == null) {
+        throw Exception('Start local proxy failed: ${res.error}');
       }
-    }
 
-    return null;
+      _proxyAddress = res.address; // "127.0.0.1:<port>"
+
+      // 2) Tạo IOClient đi qua proxy để mọi request HTTP của app đi “đúng như hình”
+      _ioClientForProxy = await OutlineBridge.createHttpClientViaProxy(
+        _proxyAddress!,
+      );
+
+      // 3) (Android) Áp dụng proxy cho tất cả WebView trong app
+      await OutlineBridge.applyWebViewProxy(_proxyAddress!);
+
+      setState(() {
+        _connected = true;
+      });
+
+      // Optional callback
+      widget.onConnect?.call();
+      _toast('Đã kết nối qua proxy nội bộ: $_proxyAddress');
+    } catch (e) {
+      _toast('Lỗi kết nối: $e', isError: true);
+    } finally {
+      if (mounted) setState(() => _isConnecting = false);
+    }
   }
 
-  /// Check if a specific key is currently connected
-  bool isKeyConnected(KeyEntity.Key key) {
-    return _connectedKey?.id == key.id && isConnected;
+  Future<void> _handleDisconnect() async {
+    if (!_connected) return;
+    setState(() => _isConnecting = true);
+
+    try {
+      // Clear WebView proxy và stop proxy nội bộ
+      await OutlineBridge.clearWebViewProxy();
+      await OutlineBridge.stopLocalProxy();
+
+      _ioClientForProxy?.close();
+      _ioClientForProxy = null;
+      _proxyAddress = null;
+
+      setState(() {
+        _connected = false;
+      });
+      _toast('Đã ngắt kết nối');
+    } catch (e) {
+      _toast('Lỗi ngắt kết nối: $e', isError: true);
+    } finally {
+      if (mounted) setState(() => _isConnecting = false);
+    }
   }
 
-  /// Get connection status for UI
-  String getConnectionStatusText() {
-    switch (_statusNotifier.value) {
-      case 'connected':
-        return 'Đã kết nối';
-      case 'connecting':
-        return 'Đang kết nối...';
-      case 'disconnected':
-        return 'Chưa kết nối';
-      case 'error':
-        return 'Lỗi kết nối';
-      default:
-        return 'Không xác định';
+  /// Kiểm tra traffic đi qua proxy bằng cách gọi IP echo service qua IOClient
+  Future<void> _testProxyTraffic() async {
+    if (!_connected || _proxyAddress == null) {
+      _toast('Chưa kết nối proxy', isError: true);
+      return;
     }
+
+    // Hiển thị loading nhỏ
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const AlertDialog(
+        content: Row(
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(width: 16),
+            Text('Đang kiểm tra traffic qua proxy...'),
+          ],
+        ),
+      ),
+    );
+
+    try {
+      final client =
+          _ioClientForProxy ??
+          await OutlineBridge.createHttpClientViaProxy(_proxyAddress!);
+      final resp = await client.get(
+        Uri.parse('https://api.ipify.org?format=json'),
+      );
+      if (mounted) Navigator.of(context).pop();
+
+      if (resp.statusCode == 200) {
+        final ip = json.decode(resp.body)['ip'];
+        _showResultDialog(
+          title: '✅ Proxy đang hoạt động',
+          content: 'Public IP qua proxy: $ip',
+        );
+      } else {
+        _showResultDialog(
+          title: '❌ Proxy lỗi',
+          content: 'HTTP ${resp.statusCode}: ${resp.body}',
+          error: true,
+        );
+      }
+    } catch (e) {
+      if (mounted) Navigator.of(context).pop();
+      _showResultDialog(
+        title: '❌ Proxy lỗi',
+        content: e.toString(),
+        error: true,
+      );
+    }
+  }
+
+  void _showResultDialog({
+    required String title,
+    required String content,
+    bool error = false,
+  }) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _toast(String msg, {bool isError = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg),
+        backgroundColor: isError ? Colors.red : Colors.green,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    // dọn tài nguyên
+    OutlineBridge.clearWebViewProxy();
+    OutlineBridge.stopLocalProxy();
+    _ioClientForProxy?.close();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
+    final Color dotColor = widget.expired
+        ? const Color(0xFFFA3D3D)
+        : const Color(0xFF2F6BFF);
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 2.5),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x11000000),
+            blurRadius: 10,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Header row
+          GestureDetector(
+            onTap: () => setState(() => _isExpanded = !_isExpanded),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              child: Row(
+                children: [
+                  // icon
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF0F0F0),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Stack(
+                      children: [
+                        const Center(
+                          child: Icon(
+                            Icons.key,
+                            color: Color(0xFF4894FE),
+                            size: 24,
+                          ),
+                        ),
+                        if (!widget.expired)
+                          Positioned(
+                            right: 4,
+                            top: 4,
+                            child: Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                color: dotColor,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  // info
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.name,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF1B2430),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          widget.expired
+                              ? t.expired
+                              : t.remainDays(
+                                  widget.remainDays?.toString() ?? '0',
+                                ),
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: widget.expired
+                                ? const Color(0xFFFA3D3D)
+                                : const Color(0xFF9AA6B2),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // quota
+                  Text(
+                    widget.quotaText,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFF394452),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+
+                  // Nút Connect/Disconnect (không còn phụ thuộc VpnService)
+                  Column(
+                    children: [
+                      TextButton(
+                        onPressed: _isConnecting
+                            ? null
+                            : (_connected ? _handleDisconnect : _handleConnect),
+                        child: _isConnecting
+                            ? const SizedBox(
+                                width: 12,
+                                height: 12,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Color(0xFF4894FE),
+                                  ),
+                                ),
+                              )
+                            : Text(
+                                _connected ? 'Disconnect' : t.connect,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w400,
+                                  color: _connected
+                                      ? Colors.red
+                                      : const Color(0xFF4894FE),
+                                ),
+                              ),
+                      ),
+                      if (_connected)
+                        TextButton(
+                          onPressed: _testProxyTraffic,
+                          child: const Text(
+                            '🔍 Test Proxy Traffic',
+                            style: TextStyle(
+                              color: Colors.orange,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+
+                  const SizedBox(width: 8),
+                  Icon(
+                    _isExpanded
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down,
+                    color: const Color(0xFF4894FE),
+                    size: 24,
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          if (_isExpanded)
+            KeyDetailsExpansion(
+              keyDetails: _keyDetails,
+              onServerLocationChanged: (code, country) {
+                setState(() {
+                  _keyDetails = KeyDetails(
+                    name: _keyDetails.name,
+                    packageName: _keyDetails.packageName,
+                    startDate: _keyDetails.startDate,
+                    endDate: _keyDetails.endDate,
+                    serverLocation: code,
+                    outlineLink: _keyDetails.outlineLink,
+                    alternateLink: _keyDetails.alternateLink,
+                    quotaText: _keyDetails.quotaText,
+                    remainDays: _keyDetails.remainDays,
+                    expired: _keyDetails.expired,
+                  );
+                });
+                widget.onServerLocationChanged?.call(code, country);
+              },
+            ),
+        ],
+      ),
+    );
   }
 }

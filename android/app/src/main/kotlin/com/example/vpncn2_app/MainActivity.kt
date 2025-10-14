@@ -1,634 +1,445 @@
+
+// package com.example.vpncn2_app
+
+// import android.app.ActivityManager
+// import android.content.Context
+// import android.content.Intent
+// import android.net.VpnService
+// import android.os.Build
+// import android.util.Log
+// import androidx.annotation.NonNull
+// import androidx.webkit.ProxyConfig
+// import androidx.webkit.ProxyController
+// import io.flutter.embedding.android.FlutterActivity
+// import io.flutter.embedding.engine.FlutterEngine
+// import io.flutter.plugin.common.MethodCall
+// import io.flutter.plugin.common.MethodChannel
+// import mobileproxy.Mobileproxy
+// import mobileproxy.Proxy
+
+// class MainActivity : FlutterActivity() {
+
+//     private val TAG = "MainActivityVPN"
+//     private val OUTLINE_SDK_CHANNEL = "outline_sdk" // start/stop proxy
+//     private val WEBVIEW_PROXY_CHANNEL = "webview_proxy" // set/clear WebView proxy
+//     private val VPN_SERVICE_CHANNEL = "vpncn2/vpn_service" // xin quyền + start VPN
+
+//     private var proxy: Proxy? = null
+//     private var vpnPermissionResult: MethodChannel.Result? = null
+//     private val REQUEST_VPN_PERMISSION = 1001
+
+//     // --- Hardcode SS config từ bạn (SIP008-like) ---
+//     // ssconf://oss.vpncn2.net/vpncn2key/20251012-m150-manhnguyen-yjdu.json#m150-Ramzi-251012-2
+//     // Nội dung JSON:
+//     // {"server":"150.136.131.140","server_port":443,"password":"OXCaAErI4aLdoKa0BdgIDN","method":"chacha20-ietf-poly1305","prefix":"\u0016\u0003\u0001\u0000¨\u0001\u0001"}
+//     private val SS_SERVER = "150.136.131.140"
+//     private val SS_PORT = 443
+//     private val SS_PASSWORD = "OXCaAErI4aLdoKa0BdgIDN"
+//     private val SS_METHOD = "chacha20-ietf-poly1305"
+//     // prefix là binary ClientHello TLS (được encode trong JSON). Để đơn giản, mình giữ nguyên dạng raw string.
+//     private val SS_PREFIX = "\u0016\u0003\u0001\u0000¨\u0001\u0001"
+
+//     override fun configureFlutterEngine(@NonNull engine: FlutterEngine) {
+//         super.configureFlutterEngine(engine)
+
+//         // ---- 1) Local proxy (MobileProxy) ----
+//         MethodChannel(engine.dartExecutor.binaryMessenger, OUTLINE_SDK_CHANNEL)
+//             .setMethodCallHandler { call, result ->
+//                 when (call.method) {
+//                     "startLocalProxy" -> startLocalProxy(call, result)
+//                     "stopLocalProxy" -> stopLocalProxy(result)
+//                     "ping" -> result.success("pong")
+//                     else -> result.notImplemented()
+//                 }
+//             }
+
+//         // ---- 2) WebView proxy override ----
+//         MethodChannel(engine.dartExecutor.binaryMessenger, WEBVIEW_PROXY_CHANNEL)
+//             .setMethodCallHandler { call, result ->
+//                 when (call.method) {
+//                     "setWebViewProxy" -> {
+//                         val address = call.argument<String>("address")
+//                             ?: return@setMethodCallHandler result.error("ARG", "address required", null)
+//                         setWebViewProxy(address, onApplied = {
+//                             Log.d(TAG, "WebView proxy applied to $address")
+//                             result.success(true)
+//                         })
+//                     }
+//                     "clearWebViewProxy" -> {
+//                         clearWebViewProxy {
+//                             Log.d(TAG, "WebView proxy cleared")
+//                             result.success(true)
+//                         }
+//                     }
+//                     else -> result.notImplemented()
+//                 }
+//             }
+
+//         // ---- 3) VPN permission + start VPN ----
+//         MethodChannel(engine.dartExecutor.binaryMessenger, VPN_SERVICE_CHANNEL)
+//             .setMethodCallHandler { call, result ->
+//                 when (call.method) {
+//                     "requestPermission" -> requestVpnPermission(result)
+
+//                     // Giữ method cũ để tương thích nếu bạn muốn truyền tham số từ Dart
+//                     "startVpn" -> {
+//                         Log.d(TAG, "startVpn (dynamic) invoked")
+//                         startVpnDynamic(call, result)
+//                     }
+
+//                     // Method mới: hard-code cấu hình SS của bạn để test ngay
+//                     "startVpnHardcoded" -> {
+//                         Log.d(TAG, "startVpnHardcoded invoked")
+//                         startVpnHardcoded(result)
+//                     }
+
+//                     else -> result.notImplemented()
+//                 }
+//             }
+//     }
+
+//     // ================= VPN permission =================
+//     private fun requestVpnPermission(result: MethodChannel.Result) {
+//         try {
+//             val intent = VpnService.prepare(this)
+//             if (intent == null) {
+//                 Log.d(TAG, "VPN permission already granted")
+//                 result.success(true)
+//             } else {
+//                 Log.d(TAG, "Requesting VPN permission...")
+//                 vpnPermissionResult = result
+//                 @Suppress("DEPRECATION")
+//                 startActivityForResult(intent, REQUEST_VPN_PERMISSION)
+//             }
+//         } catch (e: Exception) {
+//             Log.e(TAG, "requestVpnPermission error", e)
+//             result.error("VPN_ERROR", "Failed to request VPN permission: ${e.message}", null)
+//         }
+//     }
+
+//     @Deprecated("Deprecated in Java")
+//     override fun onActivityResult(requestCode: Int, resultCode: Int, data: android.content.Intent?) {
+//         super.onActivityResult(requestCode, resultCode, data)
+//         if (requestCode == REQUEST_VPN_PERMISSION) {
+//             val ok = (resultCode == RESULT_OK)
+//             Log.d(TAG, "onActivityResult: VPN permission = $ok")
+//             vpnPermissionResult?.success(ok)
+//             vpnPermissionResult = null
+//         }
+//     }
+
+//     // ================== START VPN (dynamic - giữ lại) ==================
+//     private fun startVpnDynamic(call: MethodCall, result: MethodChannel.Result) {
+//         // Nếu bạn vẫn muốn truyền tham số từ Dart, dùng method này.
+//         // Nhưng với Shadowsocks, khuyến nghị truyền đúng SS extras như startVpnHardcoded bên dưới.
+//         try {
+//             if (!isVpnPermissionGranted()) {
+//                 Log.w(TAG, "startVpnDynamic: VPN permission not granted")
+//                 return result.error("VPN_PERM", "VPN permission not granted. Call requestPermission first.", null)
+//             }
+//             if (isServiceRunning(MyVpnService::class.java)) {
+//                 Log.d(TAG, "startVpnDynamic: service already running, ignore")
+//                 return result.success(true)
+//             }
+
+//             val socks = call.argument<String>("socks_upstream")
+//             val perApp = call.argument<Boolean>("per_app") ?: false
+
+//             val svc = Intent(this, MyVpnService::class.java).apply {
+//                 putExtra("per_app", perApp)
+//                 // Giữ nguyên để tương thích nếu service của bạn vẫn đọc SOCKS:
+//                 if (!socks.isNullOrBlank()) {
+//                     putExtra("socks_upstream", socks)
+//                 }
+//                 // Khuyến nghị: thêm keys SS (nếu service đã hỗ trợ)
+//                 call.argument<String>("ss_server")?.let { putExtra("ss_server", it) }
+//                 call.argument<Int>("ss_port")?.let { putExtra("ss_port", it) }
+//                 call.argument<String>("ss_password")?.let { putExtra("ss_password", it) }
+//                 call.argument<String>("ss_method")?.let { putExtra("ss_method", it) }
+//                 call.argument<String>("ss_prefix")?.let { putExtra("ss_prefix", it) }
+//                 putExtra("mode", if (call.hasArgument("ss_server")) "shadowsocks" else "socks")
+//                 action = "ACTION_START_VPN"
+//             }
+
+//             Log.i(TAG, "startVpnDynamic -> start service | per_app=$perApp, socks=$socks")
+//             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+//                 startForegroundService(svc) else startService(svc)
+
+//             result.success(true)
+//         } catch (e: Exception) {
+//             Log.e(TAG, "startVpnDynamic error", e)
+//             result.error("VPN_ERROR", "Failed to start VPN: ${e.message}", null)
+//         }
+//     }
+
+//     // ================== START VPN (HARDCODED - test ngay) ==================
+//     private fun startVpnHardcoded(result: MethodChannel.Result) {
+//         try {
+//             if (!isVpnPermissionGranted()) {
+//                 Log.w(TAG, "startVpnHardcoded: VPN permission not granted")
+//                 return result.error("VPN_PERM", "VPN permission not granted. Call requestPermission first.", null)
+//             }
+//             if (isServiceRunning(MyVpnService::class.java)) {
+//                 Log.d(TAG, "startVpnHardcoded: service already running, ignore")
+//                 return result.success(true)
+//             }
+
+//             // Nếu service của bạn vẫn yêu cầu "socks_upstream", có thể đặt placeholder (không dùng):
+//             val placeholderSocks = "socks5://127.0.0.1:1080"
+
+//             val svc = Intent(this, MyVpnService::class.java).apply {
+//                 action = "ACTION_START_VPN"
+//                 putExtra("per_app", false)
+//                 // giữ để tương thích (nếu Service đang đọc khoá này)
+//                 putExtra("socks_upstream", placeholderSocks)
+
+//                 // Shadowsocks (SIP008-ish)
+//                 putExtra("mode", "shadowsocks")
+//                 putExtra("ss_server", SS_SERVER)
+//                 putExtra("ss_port", SS_PORT)
+//                 putExtra("ss_password", SS_PASSWORD)
+//                 putExtra("ss_method", SS_METHOD)
+//                 putExtra("ss_prefix", SS_PREFIX)
+//             }
+
+//             Log.i(TAG, "startVpnHardcoded -> start service with SS: $SS_SERVER:$SS_PORT, method=$SS_METHOD")
+//             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+//                 startForegroundService(svc) else startService(svc)
+
+//             result.success(true)
+//         } catch (e: Exception) {
+//             Log.e(TAG, "startVpnHardcoded error", e)
+//             result.error("VPN_ERROR", "Failed to start VPN: ${e.message}", null)
+//         }
+//     }
+
+//     private fun isVpnPermissionGranted(): Boolean {
+//         // Nếu chưa từng request hoặc user từ chối -> VpnService.prepare != null
+//         return VpnService.prepare(this) == null
+//     }
+
+//     private fun isServiceRunning(serviceClass: Class<*>): Boolean {
+//         val am = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+//         @Suppress("DEPRECATION")
+//         val list = am.getRunningServices(Int.MAX_VALUE)
+//         for (info in list) {
+//             if (serviceClass.name == info.service.className) {
+//                 return true
+//             }
+//         }
+//         return false
+//     }
+
+//     // ================= Local proxy (MobileProxy) giữ nguyên như bạn =================
+//     // ... (không thay đổi các hàm startLocalProxy/stopLocalProxy và webview helpers)
+//      // ================= Local proxy (MobileProxy) =================
+//      private fun startLocalProxy(call: MethodCall, result: MethodChannel.Result) {
+//         try {
+//             val preferSmart = call.argument<Boolean>("preferSmart") ?: false
+//             val bindHost = call.argument<String>("bindHost") ?: "127.0.0.1"
+//             val portArg = call.argument<Int>("port") ?: 0
+//             val port = if (portArg < 0) 0 else portArg
+
+//             val dialer =
+//                     if (preferSmart) {
+//                         val yaml =
+//                                 call.argument<String>("strategiesYaml")
+//                                         ?: error("strategiesYaml is required when preferSmart=true")
+//                         val tests =
+//                                 Mobileproxy.newListFromLines(
+//                                         call.argument<String>("testDomains")
+//                                                 ?: "www.youtube.com\ni.ytimg.com"
+//                                 )
+//                         Mobileproxy.newSmartStreamDialer(
+//                                 tests,
+//                                 yaml,
+//                                 Mobileproxy.newStderrLogWriter()
+//                         )
+//                     } else {
+//                         val config = call.argument<String>("config") ?: "split:3"
+//                         Mobileproxy.newStreamDialerFromConfig(config)
+//                     }
+
+//             if (proxy == null) {
+//                 val bind = if (port == 0) "$bindHost:0" else "$bindHost:$port"
+//                 proxy = Mobileproxy.runProxy(bind, dialer)
+//             }
+
+//             val addr = proxy!!.address() // ví dụ 127.0.0.1:54321
+//             result.success(
+//                     mapOf(
+//                             "success" to true,
+//                             "address" to addr,
+//                             "host" to proxy!!.host(),
+//                             "port" to proxy!!.port()
+//                     )
+//             )
+//         } catch (e: Exception) {
+//             Log.e("MainActivity", "startLocalProxy error", e)
+//             result.success(mapOf("success" to false, "error" to (e.message ?: "unknown")))
+//         }
+//     }
+
+//     private fun stopLocalProxy(result: MethodChannel.Result) {
+//         try {
+//             proxy?.stop(1)
+//             proxy = null
+//             result.success(true)
+//         } catch (e: Exception) {
+//             Log.e("MainActivity", "stopLocalProxy error", e)
+//             result.error("PROXY_ERROR", "Failed: ${e.message}", null)
+//         }
+//     }
+
+//         // ================= WebView proxy helpers =================
+//     private fun setWebViewProxy(address: String, onApplied: () -> Unit) {
+//         // address dạng "host:port"
+//         val cfg = ProxyConfig.Builder().addProxyRule(address).build()
+
+//         // Không block UI: cung cấp callback khi áp dụng xong
+//         ProxyController.getInstance()
+//                 .setProxyOverride(
+//                         cfg,
+//                         { runOnUiThread { /* executor context */} },
+//                         {
+//                             runOnUiThread {
+//                                 // bắt buộc: WebView nên khởi tạo/refresh SAU khi proxy áp dụng
+//                                 onApplied()
+//                             }
+//                         }
+//                 )
+//     }
+    
+//     private fun clearWebViewProxy(onCleared: () -> Unit) {
+//         ProxyController.getInstance()
+//                 .clearProxyOverride(
+//                         { runOnUiThread { /* executor */} },
+//                         { runOnUiThread { onCleared() } }
+//                 )
+//     }
+    
+//     override fun onDestroy() {
+//         try {
+//             proxy?.stop(1)
+//         } catch (_: Exception) {}
+//         proxy = null
+//         super.onDestroy()
+//     }
+// }
+
+
+// android/app/src/main/kotlin/your/package/MainActivity.kt
 package com.example.vpncn2_app
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
+import android.app.Activity
 import android.content.Intent
-import android.net.VpnService
-import android.os.Build
-import android.os.ParcelFileDescriptor
-import android.util.Log
-import androidx.annotation.NonNull
+import android.os.Bundle
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
-import io.flutter.plugin.common.EventChannel
-import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
-import java.util.Random
-import mobileproxy.Mobileproxy
-import mobileproxy.Proxy
+import android.net.VpnService
 
 class MainActivity : FlutterActivity() {
-    private val OUTLINE_BRIDGE_CHANNEL = "com/example/vpncn2_app"
-    private val VPN_SERVICE_CHANNEL = "vpncn2/vpn_service"
-    private val VPN_STATUS_CHANNEL = "vpncn2/vpn_status"
-    private val OUTLINE_SDK_CHANNEL = "outline_sdk"
+    private val CHANNEL = "vpn_channel"
+    private val REQ_VPN = 1001
+    private var vpnServicePlugin: VpnServicePlugin? = null
+    private var outlineSdkPlugin: OutlineSdkPlugin? = null
+    private var webViewProxyPlugin: WebViewProxyPlugin? = null
 
-    private var proxy: Proxy? = null
-    private var proxyAddress: String? = null
+    private var pendingHost: String? = null
+    private var pendingPort: Int? = null
+    private var pendingUdp: Boolean = true
+    private var pendingStart = false
+    private var methodResult: MethodChannel.Result? = null
 
-    private var vpnPermissionResult: MethodChannel.Result? = null
-    private val REQUEST_VPN_PERMISSION = 1001
-
-    private lateinit var vpnStatusEventChannel: EventChannel
-    private var vpnStatusHandler: VpnStatusStreamHandler? = null
-
-    override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
+    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        
+        // Register VpnServicePlugin for vpncn2/vpn_service channel
+        vpnServicePlugin = VpnServicePlugin()
+        flutterEngine.plugins.add(vpnServicePlugin!!)
+        
+                // Register OutlineSdkPlugin for outline_sdk channel
+                outlineSdkPlugin = OutlineSdkPlugin()
+                flutterEngine.plugins.add(outlineSdkPlugin!!)
 
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, OUTLINE_BRIDGE_CHANNEL)
-                .setMethodCallHandler { call, result ->
-                    when (call.method) {
-                        "startOutlineProxy" -> startOutlineProxy(call, result)
-                        "stopOutlineProxy", "stopOutline" -> stopOutlineProxy(result)
-                        "getStatus" -> getStatus(result)
-                        else -> result.notImplemented()
+                // Register WebViewProxyPlugin for webview_proxy channel
+                webViewProxyPlugin = WebViewProxyPlugin()
+                flutterEngine.plugins.add(webViewProxyPlugin!!)
+
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "start" -> {
+                    val host = call.argument<String>("host")
+                    val port = call.argument<Int>("port")
+                    val udp = call.argument<Boolean>("udp") ?: true
+                    if (host.isNullOrBlank() || port == null) {
+                        result.success(false)
+                        return@setMethodCallHandler
+                    }
+                    methodResult = result
+                    pendingHost = host
+                    pendingPort = port
+                    pendingUdp = udp
+                    pendingStart = true
+
+                    val intent = VpnService.prepare(this)
+                    if (intent != null) {
+                        // Hiện consent dialog
+                        startActivityForResult(intent, REQ_VPN)
+                    } else {
+                        // Đã có quyền, xử lý ngay
+                        onActivityResult(REQ_VPN, Activity.RESULT_OK, null)
                     }
                 }
 
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, VPN_SERVICE_CHANNEL)
-                .setMethodCallHandler { call, result ->
-                    when (call.method) {
-                        "initialize" -> initializeVpnService(result)
-                        "requestPermission" -> requestVpnPermission(result)
-                        "startVpn" -> startVpn(result)
-                        "stopVpn" -> stopVpn(result)
-                        else -> result.notImplemented()
+                "stop" -> {
+                    val i = Intent(this, MyVpnService::class.java).apply {
+                        action = MyVpnService.ACTION_DISCONNECT
                     }
+                    startService(i)
+                    result.success(null)
                 }
 
-        vpnStatusHandler = VpnStatusStreamHandler()
-        vpnStatusEventChannel =
-                EventChannel(flutterEngine.dartExecutor.binaryMessenger, VPN_STATUS_CHANNEL)
-        vpnStatusEventChannel.setStreamHandler(vpnStatusHandler)
-
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, OUTLINE_SDK_CHANNEL)
-                .setMethodCallHandler { call, result ->
-                    when (call.method) {
-                        "ping" -> ping(result)
-                        "outlineInit" -> outlineInit(result)
-                        "connectWithKey" -> connectWithKey(call, result)
-                        "disconnectViaSdk" -> disconnectViaSdk(call, result)
-                        "requestVpnPermission" -> requestVpnPermission(result)
-                        "testConnectivity" -> testConnectivity(call, result)
-                        "getVpnServerIp" -> getVpnServerIp(call, result)
-                        "startLocalProxy" -> startLocalProxy(call, result)
-                        "stopLocalProxy" -> stopLocalProxy(result)
-                        else -> result.notImplemented()
-                    }
+                "isConnected" -> {
+                    result.success(MyVpnService.isConnected)
                 }
-    }
 
-    // ---------------- Proxy (local) ----------------
-    private fun startOutlineProxy(call: MethodCall, result: MethodChannel.Result) {
-        try {
-            Log.d("MainActivity", "🔧 Starting outline proxy")
-            val key = call.argument<String>("key") ?: throw IllegalArgumentException("Missing key")
-            val portStr = call.argument<String>("port") ?: "1080"
-            var port = portStr.toIntOrNull() ?: 1080
-            if (port < 1024) port = 1080
-
-            Log.d("MainActivity", "🔧 Starting outline proxy on port $port")
-            proxy =
-                    Mobileproxy.runProxy(
-                            "127.0.0.1:$port",
-                            Mobileproxy.newStreamDialerFromConfig(key)
-                    )
-            proxyAddress = proxy?.address()
-            Log.d("MainActivity", "🔧 Result run proxy: $proxyAddress")
-            result.success("$proxyAddress")
-        } catch (e: Exception) {
-            Log.e("MainActivity", "Failed to start proxy", e)
-            result.error("PROXY_ERROR", "Failed to start proxy: ${e.message}", null)
-        }
-    }
-
-    private fun stopOutlineProxy(result: MethodChannel.Result) {
-        try {
-            proxy?.stop(0)
-            proxy = null
-            proxyAddress = null
-            result.success("Proxy stopped")
-        } catch (e: Exception) {
-            Log.e("MainActivity", "Failed to stop proxy", e)
-            result.error("PROXY_ERROR", "Failed to stop proxy: ${e.message}", null)
-        }
-    }
-
-    private fun getStatus(result: MethodChannel.Result) {
-        result.success(if (proxy != null) "running" else "stopped")
-    }
-
-    // ---------------- VPN (VpnService) ----------------
-    private fun initializeVpnService(result: MethodChannel.Result) {
-        try {
-            Log.d("MainActivity", "🔧 Initializing VPN service...")
-            result.success(true)
-        } catch (e: Exception) {
-            Log.e("MainActivity", "VPN service initialization failed", e)
-            result.error("VPN_ERROR", "Failed to initialize VPN service: ${e.message}", null)
-        }
-    }
-
-    private fun requestVpnPermission(result: MethodChannel.Result) {
-        try {
-            val intent = VpnService.prepare(this)
-            if (intent == null) {
-                result.success(true)
-            } else {
-                vpnPermissionResult = result
-                startActivityForResult(intent, REQUEST_VPN_PERMISSION)
+                else -> result.notImplemented()
             }
-        } catch (e: Exception) {
-            Log.e("MainActivity", "requestVpnPermission error", e)
-            result.error("VPN_ERROR", "Failed to request VPN permission: ${e.message}", null)
-        }
-    }
-
-    // private fun startVpn(result: MethodChannel.Result) {
-    //     try {
-    //         val intent = VpnService.prepare(this)
-    //         if (intent != null) {
-    //             result.error("VPN_PERMISSION_REQUIRED", "VPN permission not granted", null)
-    //             return
-    //         }
-    //         val svc = Intent(this, MyVpnService::class.java).apply {
-    //             proxyAddress?.let { putExtra("localSocks", it) }
-    //         }
-    //         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(svc) else
-    // startService(svc)
-    //         vpnStatusHandler?.sendStatus("connected")
-    //         result.success(true)
-    //     } catch (e: Exception) {
-    //         Log.e("MainActivity", "Failed to start VPN", e)
-    //         result.error("VPN_ERROR", "Failed to start VPN: ${e.message}", null)
-    //     }
-    // }
-    private fun startVpn(result: MethodChannel.Result) {
-        try {
-            val intent = VpnService.prepare(this)
-            if (intent != null) {
-                result.error("VPN_PERMISSION_REQUIRED", "VPN permission not granted", null)
-                return
-            }
-
-            // ví dụ upstream SOCKS5:
-            val socksUpstream = "127.0.0.1:1080" // THAY bằng upstream thật của bạn
-            val svc =
-                    Intent(this, MyVpnService::class.java).apply {
-                        putExtra("socks_upstream", socksUpstream)
-                        // (tuỳ chọn) chỉ app này qua VPN:
-                        putExtra("per_app", true)
-                    }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(svc)
-            else startService(svc)
-            result.success(true)
-        } catch (e: Exception) {
-            Log.e("MainActivity", "Failed to start VPN", e)
-            result.error("VPN_ERROR", "Failed to start VPN: ${e.message}", null)
-        }
-    }
-
-    private fun stopVpn(result: MethodChannel.Result) {
-        try {
-            stopService(Intent(this, MyVpnService::class.java))
-            vpnStatusHandler?.sendStatus("disconnected")
-            result.success(true)
-        } catch (e: Exception) {
-            Log.e("MainActivity", "Failed to stop VPN", e)
-            result.error("VPN_ERROR", "Failed to stop VPN: ${e.message}", null)
-        }
-    }
-
-    // ---------------- Outline SDK methods ----------------
-    private fun ping(result: MethodChannel.Result) {
-        result.success("pong")
-    }
-
-    private fun outlineInit(result: MethodChannel.Result) {
-        try {
-            result.success("""{"success": true, "message": "Outline SDK initialized"}""")
-        } catch (e: Exception) {
-            result.success("""{"success": false, "error": "${e.message}"}""")
-        }
-    }
-
-    private fun connectWithKey(call: MethodCall, result: MethodChannel.Result) {
-        try {
-            val keyString = call.argument<String>("key") ?: ""
-            val portString = call.argument<String>("port") ?: "443" // remote port
-            val localSocks =
-                    call.argument<String>("localSocks")
-                            ?: proxyAddress // ✅ nhận từ Flutter, fallback proxyAddress
-
-            Log.d(
-                    "MainActivity",
-                    "🔑 Connecting with key: $keyString, remotePort: $portString, localSocks=$localSocks"
-            )
-
-            val keyData =
-                    hashMapOf<String, Any>("key" to keyString, "port" to portString).apply {
-                        if (!localSocks.isNullOrEmpty()) put("localSocks", localSocks!!)
-                    }
-
-            val svc =
-                    Intent(this, MyVpnService::class.java).apply {
-                        putExtra("key_data", keyData)
-                        if (!localSocks.isNullOrEmpty()) putExtra("localSocks", localSocks)
-                    }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(svc)
-            else startService(svc)
-
-            result.success("""{"success": true}""")
-        } catch (e: Exception) {
-            Log.e("MainActivity", "connectWithKey error", e)
-            result.success("""{"success": false, "error": "${e.message}"}""")
-        }
-    }
-
-    private fun disconnectViaSdk(call: MethodCall, result: MethodChannel.Result) {
-        try {
-            stopService(Intent(this, MyVpnService::class.java))
-            result.success(true)
-        } catch (e: Exception) {
-            Log.e("MainActivity", "disconnectViaSdk", e)
-            result.error("SDK_ERROR", "Failed: ${e.message}", null)
-        }
-    }
-
-    private fun testConnectivity(call: MethodCall, result: MethodChannel.Result) {
-        try {
-            result.success(
-                    """{"success": true, "tcpResult": {"success": true, "duration": 150}, "udpResult": {"success": true, "duration": 120}, "transport": "tcp"}"""
-            )
-        } catch (e: Exception) {
-            result.success(
-                    """{"success": false, "tcpResult": {"success": false, "error": "${e.message}"}, "udpResult": {"success": false, "error": "${e.message}"}, "transport": "tcp"}"""
-            )
-        }
-    }
-
-    private fun getVpnServerIp(call: MethodCall, result: MethodChannel.Result) {
-        try {
-            result.success("192.168.1.100")
-        } catch (e: Exception) {
-            Log.e("MainActivity", "getVpnServerIp", e)
-            result.error("SDK_ERROR", "Failed: ${e.message}", null)
-        }
-    }
-
-    private fun startLocalProxy(call: MethodCall, result: MethodChannel.Result) {
-        try {
-            val key = call.argument<String>("key") ?: throw IllegalArgumentException("Missing key")
-            var port = Random().nextInt(1024) + 1024
-            proxy =
-                    Mobileproxy.runProxy(
-                            "127.0.0.1:$port",
-                            Mobileproxy.newStreamDialerFromConfig(key)
-                    )
-            proxyAddress = proxy?.address()
-            result.success("""{"success": true, "localPort": $port, "address": "$proxyAddress"}""")
-        } catch (e: Exception) {
-            result.success("""{"success": false, "error": "${e.message}"}""")
-        }
-    }
-
-    private fun stopLocalProxy(result: MethodChannel.Result) {
-        try {
-            proxy?.stop(0)
-            proxy = null
-            proxyAddress = null
-            result.success(true)
-        } catch (e: Exception) {
-            Log.e("MainActivity", "stopLocalProxy", e)
-            result.error("PROXY_ERROR", "Failed: ${e.message}", null)
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_VPN_PERMISSION) {
-            val ok = (resultCode == RESULT_OK)
-            vpnPermissionResult?.success(ok)
-            vpnPermissionResult = null
+        
+        // Handle VPN permission result from VpnServicePlugin
+        if (vpnServicePlugin?.onActivityResult(requestCode, resultCode, data) == true) {
+            return
         }
-    }
+        
+        if (requestCode == REQ_VPN) {
+            val r = methodResult
+            methodResult = null
 
-    override fun onDestroy() {
-        proxy?.stop(0)
-        proxy = null
-        super.onDestroy()
-    }
-}
+            if (resultCode == Activity.RESULT_OK && pendingStart) {
+                val host = pendingHost ?: return
+                val port = pendingPort ?: return
+                val udp = pendingUdp
 
-// ---------------- VpnService (cùng file) ----------------
-class MyVpnService : VpnService() {
-    private var tunPfd: ParcelFileDescriptor? = null
-    private var socksUpstream: String? = null
-    private var perAppOnly: Boolean = true
-    private var tun2socksStarted = false
-
-    override fun onCreate() {
-        super.onCreate()
-        startAsForeground()
-        Log.d("MyVpnService", "onCreate")
-    }
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d("MyVpnService", "onStartCommand flags=$flags startId=$startId")
-
-        socksUpstream = intent?.getStringExtra("socks_upstream")
-        perAppOnly = intent?.getBooleanExtra("per_app", true) ?: true
-
-        if (socksUpstream.isNullOrBlank()) {
-            Log.e("MyVpnService", "❌ Missing socks_upstream. Stop.")
-            stopSelf()
-            return START_NOT_STICKY
-        }
-
-        try {
-            // 1) Build VPN
-            val b =
-                    Builder()
-                            .setSession("vpncn2")
-                            .setMtu(1280)
-                            .addAddress("10.0.0.2", 32)
-                            .addDnsServer("1.1.1.1")
-                            .addDnsServer("8.8.8.8")
-                            .addRoute("0.0.0.0", 0)
-
-            if (perAppOnly) {
-                try {
-                    b.addAllowedApplication(packageName)
-                } catch (e: Exception) {
-                    Log.w("MyVpnService", "addAllowedApplication failed: ${e.message}", e)
-                }
-            }
-            // nếu muốn chặn 1 số app, dùng addDisallowedApplication()
-
-            tunPfd?.close()
-            tunPfd = b.establish()
-            if (tunPfd == null) {
-                Log.e("MyVpnService", "❌ establish() failed")
-                return START_NOT_STICKY
-            }
-            Log.d("MyVpnService", "✅ TUN established fd=${tunPfd!!.fd}")
-
-            // 2) Start tun2socks
-            val ok = startTun2Socks(tunPfd!!, socksUpstream!!)
-            tun2socksStarted = ok
-            if (!ok) {
-                Log.e(
-                        "MyVpnService",
-                        "❌ tun2socks start failed (missing AAR / wrong method). Stop."
-                )
-                stopSelf()
-                return START_NOT_STICKY
-            }
-        } catch (e: Exception) {
-            Log.e("MyVpnService", "❌ Error: ${e.message}", e)
-            stopSelf()
-            return START_NOT_STICKY
-        }
-
-        return START_STICKY
-    }
-
-    override fun onDestroy() {
-        Log.d("MyVpnService", "onDestroy")
-        stopTun2Socks()
-        try {
-            tunPfd?.close()
-        } catch (_: Exception) {}
-        tunPfd = null
-        super.onDestroy()
-    }
-
-    // ---- Foreground ----
-    private fun startAsForeground() {
-        val channelId = "vpncn2_channel"
-        val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val ch = NotificationChannel(channelId, "VPNcn2", NotificationManager.IMPORTANCE_LOW)
-            nm.createNotificationChannel(ch)
-        }
-        val pi =
-                PendingIntent.getActivity(
-                        this,
-                        0,
-                        Intent(this, MainActivity::class.java),
-                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                )
-        val notif =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    Notification.Builder(this, channelId)
-                            .setContentTitle("VPN đang chạy")
-                            .setContentText("vpncn2 hoạt động qua tun2socks")
-                            .setSmallIcon(android.R.drawable.ic_secure)
-                            .setContentIntent(pi)
-                            .build()
-                } else {
-                    @Suppress("DEPRECATION")
-                    Notification.Builder(this)
-                            .setContentTitle("VPN đang chạy")
-                            .setContentText("vpncn2 hoạt động qua tun2socks")
-                            .setSmallIcon(android.R.drawable.ic_secure)
-                            .setContentIntent(pi)
-                            .build()
-                }
-        startForeground(1, notif)
-    }
-
-    // ---- tun2socks integration ----
-
-    /**
-     * Cố gắng gọi nhiều chữ ký khác nhau:
-     * - start(int, String, int, Protect)
-     * - start(ParcelFileDescriptor, String, int, Protect)
-     * - start(int, String, int)
-     * - stop()/shutdown()/close()
-     *
-     * Tên class mặc định dùng ví dụ: "com.example.tun2socks.Tun2Socks" => THAY bằng FQCN thật của
-     * AAR tun2socks của bạn (hoặc thêm vào danh sách).
-     */
-    private fun startTun2Socks(tun: ParcelFileDescriptor, socks: String): Boolean {
-        val (host, port) = socks.split(":").let { it[0] to it[1].toInt() }
-
-        val classCandidates =
-                arrayOf(
-                        // THAY 1 dòng dưới bằng FQCN thật từ AAR của bạn:
-                        "com.example.tun2socks.Tun2Socks",
-                        // optional fallback tên khác:
-                        "com.example.tun2socks.TunBridge",
-                        "org.outline.tun2socks.Tun2Socks",
-                        "tun2socks.Tun2Socks"
-                )
-
-        for (cn in classCandidates) {
-            try {
-                val cls = Class.forName(cn)
-
-                // (int, String, int, <ProtectInterface>)
-                cls.methods
-                        .firstOrNull { m ->
-                            m.name.equals("start", true) &&
-                                    m.parameterTypes.size == 4 &&
-                                    (m.parameterTypes[0] == Int::class.javaPrimitiveType) &&
-                                    m.parameterTypes[1] == String::class.java &&
-                                    (m.parameterTypes[2] == Int::class.java ||
-                                            m.parameterTypes[2] == Integer.TYPE)
-                        }
-                        ?.let { m ->
-                            val protectIface = m.parameterTypes[3]
-                            val proxy =
-                                    makeProtectProxy(protectIface) { fd ->
-                                        try {
-                                            protect(fd)
-                                        } catch (_: Throwable) {
-                                            false
-                                        }
-                                    }
-                                            ?: return@let
-                            Log.d("MyVpnService", "🚀 $cn.start(fd, host, port, protect)")
-                            m.invoke(null, tun.fd, host, port, proxy)
-                            return true
-                        }
-
-                // (ParcelFileDescriptor, String, int, <ProtectInterface>)
-                cls.methods
-                        .firstOrNull { m ->
-                            m.name.equals("start", true) &&
-                                    m.parameterTypes.size == 4 &&
-                                    ParcelFileDescriptor::class.java.isAssignableFrom(
-                                            m.parameterTypes[0]
-                                    ) &&
-                                    m.parameterTypes[1] == String::class.java &&
-                                    (m.parameterTypes[2] == Int::class.java ||
-                                            m.parameterTypes[2] == Integer.TYPE)
-                        }
-                        ?.let { m ->
-                            val protectIface = m.parameterTypes[3]
-                            val proxy =
-                                    makeProtectProxy(protectIface) { fd ->
-                                        try {
-                                            protect(fd)
-                                        } catch (_: Throwable) {
-                                            false
-                                        }
-                                    }
-                                            ?: return@let
-                            Log.d("MyVpnService", "🚀 $cn.start(pfd, host, port, protect)")
-                            m.invoke(null, tun, host, port, proxy)
-                            return true
-                        }
-
-                // (int, String, int) — không có protect (ít lib; dễ loop nếu lib không tự protect
-                // nội bộ)
-                cls.methods
-                        .firstOrNull { m ->
-                            m.name.equals("start", true) &&
-                                    m.parameterTypes.size == 3 &&
-                                    m.parameterTypes[0] == Int::class.javaPrimitiveType &&
-                                    m.parameterTypes[1] == String::class.java &&
-                                    (m.parameterTypes[2] == Int::class.java ||
-                                            m.parameterTypes[2] == Integer.TYPE)
-                        }
-                        ?.let { m ->
-                            Log.w(
-                                    "MyVpnService",
-                                    "⚠️ $cn.start(fd,host,port) (không protect) — lib phải tự protect nội bộ"
-                            )
-                            m.invoke(null, tun.fd, host, port)
-                            return true
-                        }
-            } catch (t: Throwable) {
-                Log.d("MyVpnService", "Class $cn not usable: ${t.message}")
+                // Bắt đầu VPN service
+                startForegroundService(Intent(this, MyVpnService::class.java).apply {
+                    action = MyVpnService.ACTION_CONNECT
+                    putExtra("SOCKS_HOST", host)
+                    putExtra("SOCKS_PORT", port)
+                    putExtra("ENABLE_UDP", udp)
+                })
+                pendingStart = false
+                r?.success(true)
+            } else {
+                pendingStart = false
+                r?.success(false)
             }
         }
-        return false
-    }
-
-    private fun stopTun2Socks() {
-        val classCandidates =
-                arrayOf(
-                        "com.example.tun2socks.Tun2Socks",
-                        "com.example.tun2socks.TunBridge",
-                        "org.outline.tun2socks.Tun2Socks",
-                        "tun2socks.Tun2Socks"
-                )
-        for (cn in classCandidates) {
-            try {
-                val cls = Class.forName(cn)
-                // try stop()
-                cls.methods
-                        .firstOrNull { it.name.equals("stop", true) && it.parameterTypes.isEmpty() }
-                        ?.let {
-                            Log.d("MyVpnService", "🛑 $cn.stop()")
-                            it.invoke(null)
-                            return
-                        }
-                // try shutdown()
-                cls.methods
-                        .firstOrNull {
-                            it.name.equals("shutdown", true) && it.parameterTypes.isEmpty()
-                        }
-                        ?.let {
-                            Log.d("MyVpnService", "🛑 $cn.shutdown()")
-                            it.invoke(null)
-                            return
-                        }
-                // try close()
-                cls.methods
-                        .firstOrNull {
-                            it.name.equals("close", true) && it.parameterTypes.isEmpty()
-                        }
-                        ?.let {
-                            Log.d("MyVpnService", "🛑 $cn.close()")
-                            it.invoke(null)
-                            return
-                        }
-            } catch (_: Throwable) {
-                /* ignore */
-            }
-        }
-    }
-
-    /** Tạo dynamic proxy cho interface Protect có method boolean protect(int fd). */
-    private fun makeProtectProxy(iface: Class<*>?, impl: (Int) -> Boolean): Any? {
-        if (iface == null || !iface.isInterface) return null
-        val m =
-                iface.methods.firstOrNull {
-                    it.name.equals("protect", true) &&
-                            it.parameterTypes.size == 1 &&
-                            it.parameterTypes[0] == Int::class.javaPrimitiveType
-                }
-                        ?: return null
-
-        return java.lang.reflect.Proxy.newProxyInstance(iface.classLoader, arrayOf(iface)) {
-                _,
-                method,
-                args ->
-            if (method.name.equals("protect", true) && args?.size == 1) {
-                return@newProxyInstance impl(args[0] as Int)
-            }
-            return@newProxyInstance false
-        }
-    }
-}
-
-// ---------------- VPN Status Event Channel ----------------
-class VpnStatusStreamHandler : EventChannel.StreamHandler {
-    private var eventSink: EventChannel.EventSink? = null
-    override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
-        eventSink = events
-        Log.d("VpnStatusStreamHandler", "📡 listener connected")
-        events?.success("disconnected")
-    }
-    override fun onCancel(arguments: Any?) {
-        eventSink = null
-    }
-    fun sendStatus(status: String) {
-        eventSink?.success(status)
     }
 }

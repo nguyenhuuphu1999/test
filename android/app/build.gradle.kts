@@ -21,8 +21,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     
     // Suppress deprecation warnings
@@ -30,7 +30,7 @@ android {
         options.compilerArgs.addAll(listOf("-Xlint:-deprecation", "-Xlint:-options"))
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+        jvmTarget = JavaVersion.VERSION_11.toString()
         freeCompilerArgs += listOf("-Xsuppress-version-warnings")
     }
 
@@ -118,9 +118,11 @@ afterEvaluate {
 }
 
 dependencies {
-    implementation(files("libs/mobileproxy.aar"))
+    implementation(files("mobileproxy.aar"))
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    
+    implementation("androidx.core:core-ktx:1.13.1")
     implementation("org.apache.commons:commons-collections4:4.4")
     implementation("androidx.annotation:annotation:1.9.1")
+    implementation("androidx.webkit:webkit:1.11.0")
+    implementation("androidx.appcompat:appcompat:1.7.0")
 }

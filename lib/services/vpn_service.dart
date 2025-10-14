@@ -1,387 +1,192 @@
-import 'package:flutter/material.dart';
+// services/vpn_service.dart
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../features/keys/domain/entities/key.dart' as KeyEntity;
-import 'native_vpn_service.dart';
-import 'outline_sdk_service.dart';
-import 'vpn_test_service.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/io_client.dart';
 
+import '../features/keys/domain/entities/key.dart' as KeyEntity;
+import 'outline_brigde.dart';
+
+/// VpnService phiên bản "đi như hình":
+/// App mở proxy nội bộ bằng MobileProxy, KHÔNG dùng VpnService/tun2socks.
+/// - connectWithKey: mở proxy local, tạo IOClient qua proxy, (Android) set proxy cho WebView
+/// - disconnect: clear WebView proxy + stop proxy local
 class VpnService {
   static final VpnService _instance = VpnService._internal();
   factory VpnService() => _instance;
   VpnService._internal();
 
-  late final NativeVpnService _nativeVpnService;
+  // ======= Trạng thái =======
+  final ValueNotifier<String> _statusNotifier = ValueNotifier<String>(
+    'disconnected',
+  );
   String _currentStatus = 'disconnected';
-  late final ValueNotifier<String> _statusNotifier;
   KeyEntity.Key? _connectedKey;
-  String? _currentTunnelId;
-  String? _currentServerName;
 
-  void _initializeRealVpn() {
-    _statusNotifier = ValueNotifier<String>('disconnected');
+  // Proxy state
+  String? _proxyAddress; // "127.0.0.1:<port>"
+  IOClient? _ioClientProxy; // HTTP client đi qua proxy
 
-    // ONLY use REAL Native VPN Service - NO SIMULATION, NO FAKE
-    _nativeVpnService = NativeVpnService();
-    debugPrint('🔧 Using REAL Native VPN Service - NO SIMULATION');
-
-    // Listen to real VPN status changes
-    _nativeVpnService.statusNotifier.addListener(() {
-      _currentStatus = _nativeVpnService.statusNotifier.value;
-      _statusNotifier.value = _currentStatus;
-
-      if (_currentStatus == 'disconnected') {
-        _connectedKey = null;
-        _currentTunnelId = null;
-        _currentServerName = null;
-      } else if (_currentStatus == 'connected') {
-        _connectedKey = _nativeVpnService.connectedKey;
-      }
-    });
-  }
-
-  // Getters
+  // ======= Getters giữ API cũ =======
   String get currentStatus => _currentStatus;
   ValueNotifier<String> get statusNotifier => _statusNotifier;
   KeyEntity.Key? get connectedKey => _connectedKey;
+  bool get isConnected => _currentStatus == 'connected';
+  String get connectionStatus => _currentStatus;
+  String? get connectedKeyName => _connectedKey?.name;
+  String? get connectedServer => _connectedKey?.serverName;
 
-  /// Initialize VPN service
-  Future<void> initialize() async {
-    _initializeRealVpn();
-
-    // ONLY initialize REAL Native VPN Service - NO FALLBACKS
-    await _nativeVpnService.initialize();
-    debugPrint('✅ REAL Native VPN Service initialized - NO SIMULATION');
+  /// Giữ tương thích: coi như key hiện tại là key đang nối
+  bool isKeyConnected(KeyEntity.Key key) {
+    if (!isConnected || _connectedKey == null) return false;
+    // so sánh theo id nếu có, fallback theo name+server+port
+    if (_connectedKey!.id != null && key.id != null) {
+      return _connectedKey!.id == key.id;
+    }
+    return _connectedKey!.name == key.name &&
+        _connectedKey!.serverName == key.serverName &&
+        _connectedKey!.port == key.port;
   }
 
-  /// Connect to VPN using a specific key
+  /// Initialize: không cần native init nào cho flow này,
+  /// nhưng giữ hàm cho tương thích (no-op).
+  Future<void> initialize() async {
+    // no-op
+  }
+
+  /// Kết nối: mở proxy nội bộ bằng MobileProxy (OutlineBridge),
+  /// tạo HTTP client qua proxy, (Android) áp dụng proxy cho WebView.
   Future<bool> connectWithKey(KeyEntity.Key key) async {
     try {
-      debugPrint('🚀 Starting VPN connection...');
-      debugPrint('🔧 Using Outline SDK for connection');
+      debugPrint('🚀 Starting proxy (MobileProxy) for key: ${key.name}');
 
-      // Check VPN permission first
-      debugPrint('🔐 Checking VPN permission...');
-      final vpnPermissionOk = await checkVpnPermission();
-      if (!vpnPermissionOk) {
-        debugPrint(
-          'ℹ️ VPN permission dialog opened. Please grant permission and try connecting again.',
-        );
-        throw Exception(
-          'VPN permission dialog opened. Please grant permission and try connecting again.',
-        );
-      }
-      debugPrint('✅ VPN permission granted');
+      // 1) Start local proxy (config tĩnh "split:3" — có thể thay bằng SmartDialer YAML)
+      final ssconfUrl =
+          'ssconf://oss.vpncn2.net/vpncn2key/20251013-m150-manhnguyen-ojdh.json#m150-jessi-251013-1';
 
-      // Test connectivity
-      debugPrint('🔍 Testing connectivity before connecting...');
-      final connectivityOk = await testConnectivity(key);
+      final res = await OutlineBridge.startFromSsconfUrl(
+        ssconfUrl,
+        port: 0, // 0 = để hệ thống tự chọn
+        bindHost: '127.0.0.1',
+        remarks: key.name,
+      );
 
-      if (!connectivityOk) {
-        debugPrint('❌ Connectivity test failed, cannot connect VPN');
-        throw Exception(
-          'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.',
-        );
+      if (!res.ok || res.address == null) {
+        throw Exception('Start local proxy failed: ${res.error}');
       }
 
-      debugPrint('✅ Connectivity test passed, proceeding with VPN connection');
+      _proxyAddress = res.address;
+      debugPrint('✅ Local proxy at $_proxyAddress');
 
-      // Use Outline SDK for connection
-      final result = await connectWithKeyViaSdk(key);
+      // 2) Tạo IOClient đi qua proxy cho các request HTTP trong app
+      _ioClientProxy?.close();
+      _ioClientProxy = await OutlineBridge.createHttpClientViaProxy(
+        _proxyAddress!,
+      );
 
-      if (!result['success']) {
-        debugPrint('❌ VPN connection failed, disconnecting...');
-        await disconnect();
-        throw Exception(
-          'Không thể kết nối VPN qua Outline SDK. Đã ngắt kết nối.',
-        );
-      }
+      // 3) (Android) Áp dụng proxy cho tất cả WebView trong app
+      await OutlineBridge.applyWebViewProxy(_proxyAddress!);
 
-      // Store tunnel info for later disconnection
-      debugPrint('🔍 Result: $result');
-      _currentTunnelId = result['tunnel_id'];
-      _currentServerName = result['server_name'];
-      debugPrint('🔍 Tunnel ID: $_currentTunnelId');
-      debugPrint('🔍 Server Name: $_currentServerName');
+      // 4) Mark connected
+      _connectedKey = key;
+      _setStatus('connected');
 
-      // Check if this is a real VPN tunnel
-      final isRealVpn = result['real_vpn'] == true;
-
-      if (isRealVpn) {
-        debugPrint('✅ REAL VPN tunnel established successfully');
-      } else {
-        debugPrint('❌ VPN tunnel establishment failed');
-        throw Exception('VPN tunnel establishment failed');
-      }
-
-      debugPrint('✅ VPN connection successful via Outline SDK');
-
-      // Only verify traffic if this is a real VPN tunnel
-      if (isRealVpn) {
-        debugPrint('🔍 Verifying VPN traffic for REAL tunnel...');
-
-        // Extract actual IP from config
-        final outlineSdkService = OutlineSdkService();
-        await outlineSdkService.initialize();
-        final vpnServerIp = await outlineSdkService.getVpnServerIp(key);
-
-        if (vpnServerIp == null) {
-          debugPrint(
-            '⚠️ Could not extract VPN server IP, skipping verification',
-          );
-          return true; // Skip verification if we can't get the IP
-        }
-
-        final verificationResult = await VpnTestService.verifyVpnTraffic(
-          vpnServerIp,
-        );
-
-        if (verificationResult.success) {
-          debugPrint(
-            '✅ VPN traffic verified! All traffic is going through VPN server.',
-          );
-          debugPrint('📍 Traffic IP: ${verificationResult.actualIp}');
-          debugPrint('🎯 VPN Server IP: ${verificationResult.expectedIp}');
-        } else {
-          debugPrint('❌ VPN traffic verification failed!');
-          debugPrint('📍 Actual traffic IP: ${verificationResult.actualIp}');
-          debugPrint('🎯 Expected VPN IP: ${verificationResult.expectedIp}');
-          debugPrint('⚠️ Warning: Traffic may not be going through VPN!');
-
-          // Disconnect and throw error if traffic is not going through VPN
-          await disconnect();
-          throw Exception(
-            'VPN connection failed verification. Traffic is not going through VPN server.',
-          );
-        }
-      } // Close if (isRealVpn) block
-      // Traffic verification is always performed for real VPN tunnels
+      // (tuỳ chọn) lưu thông tin key đã nối
+      await _saveConnectedKeyMeta(key);
 
       return true;
     } catch (e) {
-      debugPrint('❌ VPN connection failed: $e');
-      // Ensure VPN is disconnected on any error
-      try {
-        await disconnect();
-      } catch (disconnectError) {
-        debugPrint('⚠️ Error during disconnect: $disconnectError');
-      }
-      throw Exception('Không thể kết nối VPN: ${e.toString()}');
+      debugPrint('❌ connectWithKey error: $e');
+      await _forceCleanup();
+      rethrow; // để UI hiện thông báo từ nơi gọi
     }
   }
 
-  /// Connect to VPN using Outline SDK
-  Future<Map<String, dynamic>> connectWithKeyViaSdk(KeyEntity.Key key) async {
+  /// Ngắt kết nối: clear WebView proxy + stop local proxy.
+  Future<void> disconnect() async {
     try {
-      debugPrint('🔗 Connecting via Outline SDK for key: ${key.name}');
-
-      final outlineSdkService = OutlineSdkService();
-      await outlineSdkService.initialize();
-
-      final result = await outlineSdkService.connectWithKeyViaSdk(key);
-
-      if (result['success']) {
-        _currentStatus = 'connected';
-        _statusNotifier.value = 'connected';
-        _connectedKey = key;
-        _currentTunnelId = result['tunnel_id'];
-        _currentServerName = result['server_name'];
-        debugPrint('✅ Outline SDK connection successful');
-      } else {
-        debugPrint('❌ Outline SDK connection failed');
-      }
-
-      return result;
+      debugPrint('🛑 Disconnecting (proxy) ...');
+      await OutlineBridge.clearWebViewProxy();
+      await OutlineBridge.stopLocalProxy();
     } catch (e) {
-      debugPrint('❌ Outline SDK connection error: $e');
-      rethrow;
+      debugPrint('⚠️ stopLocalProxy/clearWebViewProxy error: $e');
+    } finally {
+      await _forceCleanup();
+      await _clearConnectedKeyPrefs();
+      debugPrint('✅ Disconnected (proxy cleaned)');
     }
   }
 
-  /// Check VPN permission
-  Future<bool> checkVpnPermission() async {
+  /// Test traffic qua proxy: gọi ipify qua IOClient đang dùng proxy.
+  Future<bool> testVpnTrafficVerification() async {
     try {
-      final outlineSdkService = OutlineSdkService();
-      return await outlineSdkService.requestVpnPermission();
-    } catch (e) {
-      debugPrint('❌ VPN permission check failed: $e');
-      return false;
-    }
-  }
-
-  /// Test connectivity using Outline SDK (for testing only, not for real connection)
-  Future<bool> testConnectivity(KeyEntity.Key key) async {
-    try {
-      debugPrint('🔍 Testing connectivity for key: ${key.name}');
-      debugPrint('🔑 Key details:');
-      debugPrint('   • Name: ${key.name}');
-      debugPrint('   • Server: ${key.serverName}');
-      debugPrint('   • Port: ${key.port}');
-      debugPrint('   • Method: ${key.method}');
-      debugPrint('   • Password: ${key.password.substring(0, 3)}***');
-      debugPrint('   • Access URL: ${key.accessUrl}');
-      debugPrint('   • OSS ID: ${key.ossId ?? "N/A"}');
-      debugPrint('   • File Name: ${key.fileName ?? "N/A"}');
-      debugPrint('   • Prefix: ${key.prefix ?? "N/A"}');
-
-      // Create a temporary OutlineSdkService just for testing
-      final outlineSdkService = OutlineSdkService();
-      await outlineSdkService.initialize();
-
-      debugPrint('🔍 Testing connectivity with Outline SDK...');
-      final connectivityResult = await outlineSdkService.testConnectivity(key);
-
-      debugPrint('📊 Connectivity test results:');
-      debugPrint('   • Overall success: ${connectivityResult.success}');
-      debugPrint(
-        '   • TCP result: ${connectivityResult.tcpResult.success} (${connectivityResult.tcpResult.duration}ms)',
+      if (!isConnected || _proxyAddress == null) {
+        debugPrint('❌ Not connected / no proxy address');
+        return false;
+      }
+      final client =
+          _ioClientProxy ??
+          await OutlineBridge.createHttpClientViaProxy(_proxyAddress!);
+      final resp = await client.get(
+        Uri.parse('https://api.ipify.org?format=json'),
       );
-      debugPrint(
-        '   • UDP result: ${connectivityResult.udpResult.success} (${connectivityResult.udpResult.duration}ms)',
-      );
-      debugPrint('   • Transport: ${connectivityResult.transport}');
-
-      if (connectivityResult.success) {
-        debugPrint('✅ Connectivity test passed! Server is reachable.');
-        debugPrint('📊 Test metrics:');
-        debugPrint(
-          '   • TCP latency: ${connectivityResult.tcpResult.duration}ms',
-        );
-        debugPrint(
-          '   • UDP latency: ${connectivityResult.udpResult.duration}ms',
-        );
+      if (resp.statusCode == 200) {
+        final ip = json.decode(resp.body)['ip'];
+        debugPrint('✅ Proxy traffic OK, public IP: $ip');
         return true;
       } else {
-        debugPrint('❌ Connectivity test failed');
-        if (connectivityResult.tcpResult.error != null) {
-          debugPrint('   • TCP error: ${connectivityResult.tcpResult.error}');
-        }
-        if (connectivityResult.udpResult.error != null) {
-          debugPrint('   • UDP error: ${connectivityResult.udpResult.error}');
-        }
+        debugPrint('❌ Proxy test HTTP ${resp.statusCode}');
         return false;
       }
     } catch (e) {
-      debugPrint('❌ Connectivity test failed with exception: $e');
-      debugPrint('📚 Stack trace: ${StackTrace.current}');
+      debugPrint('❌ Proxy traffic test error: $e');
       return false;
     }
   }
 
-  /// Disconnect VPN
-  Future<void> disconnect() async {
+  /// Load connected key info (giữ API cũ): trả về key hiện tại nếu đang nối.
+  Future<KeyEntity.Key?> loadConnectedKeyInfo() async {
+    return _connectedKey;
+  }
+
+  // ================= Helpers =================
+  void _setStatus(String s) {
+    _currentStatus = s;
+    _statusNotifier.value = s;
+  }
+
+  Future<void> _forceCleanup() async {
     try {
-      debugPrint('🛑 Disconnecting VPN...');
+      _ioClientProxy?.close();
+    } catch (_) {}
+    _ioClientProxy = null;
+    _proxyAddress = null;
+    _connectedKey = null;
+    _setStatus('disconnected');
+  }
 
-      // Use Outline SDK for disconnection
-      final outlineSdkService = OutlineSdkService();
-      await outlineSdkService.disconnectViaSdk(_currentTunnelId);
-      debugPrint('✅ VPN disconnected via Outline SDK');
-
-      _currentStatus = 'disconnected';
-      _statusNotifier.value = 'disconnected';
-      _connectedKey = null;
-      _currentTunnelId = null;
-      _currentServerName = null;
-      await _clearConnectedKey();
-      debugPrint('✅ VPN disconnected successfully');
+  Future<void> _saveConnectedKeyMeta(KeyEntity.Key key) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('connected_key_name', key.name);
+      await prefs.setString('connected_key_server', key.serverName);
+      await prefs.setInt('connected_key_port', key.port);
+      await prefs.setString('connected_key_method', key.method);
     } catch (e) {
-      debugPrint('⚠️ VPN disconnect failed: $e');
-      // Still update status even if disconnect fails
-      _currentStatus = 'disconnected';
-      _statusNotifier.value = 'disconnected';
-      _connectedKey = null;
-      _currentTunnelId = null;
-      _currentServerName = null;
+      debugPrint('⚠️ Save connected key meta failed: $e');
     }
   }
 
-  /// Clear connected key from SharedPreferences
-  Future<void> _clearConnectedKey() async {
+  Future<void> _clearConnectedKeyPrefs() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.remove('connected_key_id');
       await prefs.remove('connected_key_name');
       await prefs.remove('connected_key_server');
       await prefs.remove('connected_key_port');
       await prefs.remove('connected_key_method');
-      debugPrint('🗑️ Connected key cleared');
     } catch (e) {
-      debugPrint('❌ Failed to clear connected key: $e');
+      debugPrint('⚠️ Clear connected key prefs failed: $e');
     }
-  }
-
-  /// Test VPN traffic verification manually
-  Future<bool> testVpnTrafficVerification() async {
-    try {
-      if (_connectedKey == null) {
-        debugPrint('❌ No connected key found');
-        return false;
-      }
-
-      debugPrint('🔍 Testing VPN traffic verification...');
-      final outlineSdkService = OutlineSdkService();
-      await outlineSdkService.initialize();
-      final vpnServerIp = await outlineSdkService.getVpnServerIp(
-        _connectedKey!,
-      );
-
-      if (vpnServerIp == null) {
-        debugPrint('❌ Could not get VPN server IP');
-        return false;
-      }
-
-      final verificationResult = await VpnTestService.verifyVpnTraffic(
-        vpnServerIp,
-      );
-
-      debugPrint('📊 VPN Traffic Verification Results:');
-      debugPrint('   • Success: ${verificationResult.success}');
-      debugPrint('   • Expected IP: ${verificationResult.expectedIp}');
-      debugPrint('   • Actual IP: ${verificationResult.actualIp}');
-      debugPrint('   • Message: ${verificationResult.message}');
-
-      return verificationResult.success;
-    } catch (e) {
-      debugPrint('❌ VPN traffic verification test failed: $e');
-      return false;
-    }
-  }
-
-  /// Load connected key info from Native VPN Service
-  Future<KeyEntity.Key?> loadConnectedKeyInfo() async {
-    try {
-      // Use Native VPN Service to load connected key info
-      final connectedKey = await _nativeVpnService.loadConnectedKeyInfo();
-
-      if (connectedKey != null) {
-        debugPrint(
-          '✅ Loaded connected key from Native VPN Service: ${connectedKey.name}',
-        );
-        _connectedKey = connectedKey;
-        return connectedKey;
-      }
-
-      return null;
-    } catch (e) {
-      debugPrint('❌ Failed to load connected key info: $e');
-      return null;
-    }
-  }
-
-  /// Check if VPN is currently connected
-  bool get isConnected => _currentStatus == 'connected';
-
-  /// Get connection status as string
-  String get connectionStatus => _currentStatus;
-
-  /// Get connected key name
-  String? get connectedKeyName => _connectedKey?.name;
-
-  /// Get connected server info
-  String? get connectedServer => _connectedKey?.serverName;
-
-  /// Check if a specific key is currently connected
-  bool isKeyConnected(KeyEntity.Key key) {
-    return _nativeVpnService.isKeyConnected(key);
   }
 }
