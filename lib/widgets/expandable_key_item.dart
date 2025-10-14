@@ -71,42 +71,33 @@ class _ExpandableKeyItemState extends State<ExpandableKeyItem> {
       }
 
       final res = await OutlineBridge.startSsProxy();
-      // final res = await OutlineBridge.startFromSsconfUrl(
-      //   'ssconf://oss.vpncn2.net/vpncn2key/20251013-m150-manhnguyen-ojdh.json#m150-jessi-251013-1',
-      //   port: 0,
-      //   bindHost: '127.0.0.1',
-      //   remarks: widget.keyData?.name ?? widget.name,
-      // );
+      debugPrint("Start SS proxy res:");
+      debugPrint(jsonEncode(res));
 
-      // debugPrint("Start from ssconf URL res:");
-      // debugPrint(
-      //   jsonEncode({
-      //     'ok': res.ok,
-      //     'address': res.address,
-      //     'host': res.host,
-      //     'port': res.port,
-      //     'error': res.error,
-      //   }),
-      // );
+      if (res == null || res['success'] != true) {
+        throw Exception('Start local proxy failed: ${res?['error']}');
+      }
 
-      // if (ok) {
-      //   debugPrint("Ensure VPN permission ok");
-      //   // gọi thẳng vào channel VPN để start TUN
-      //   final responseStartVPN = await _vpnCh.invokeMethod('startVpn', {
-      //     'socks_upstream': res.address, // ví dụ "127.0.0.1:44969"
-      //     'per_app': true, // true = chỉ app này; false = full
-      //   });
+      _proxyAddress = res['address']?.toString();
+      debugPrint('✅ Local proxy via SS at $_proxyAddress');
 
-      //   debugPrint("Response start VPN: $responseStartVPN");
-      // }
+      // Start VPN service with the proxy address
+      debugPrint("Starting VPN service...");
+      final responseStartVPN = await _vpnCh.invokeMethod('startVpn', {
+        'config': '', // Empty config since we're using local proxy
+        'port': '1080', // Default port
+        'socks_upstream': _proxyAddress, // Proxy address from local proxy
+        'per_app': false, // Route all traffic through VPN
+      });
 
-      // if (!res.ok || res.address == null) {
-      //   throw Exception('Start local proxy failed: ${res.error}');
-      // }
+      debugPrint("Response start VPN: $responseStartVPN");
 
-      // // _proxyAddress = res.address;
-      // debugPrint('✅ Local proxy via SS at $_proxyAddress');
-      _toast('Đã kết nối qua proxy: $_proxyAddress');
+      if (responseStartVPN == true) {
+        _connected = true;
+        _toast('✅ VPN đã kết nối thành công!');
+      } else {
+        throw Exception('Failed to start VPN service');
+      }
     } catch (e) {
       debugPrint('❌ Error connecting to proxy: $e');
       _toast('Lỗi kết nối: $e', isError: true);

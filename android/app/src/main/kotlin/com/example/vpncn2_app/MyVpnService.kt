@@ -201,18 +201,18 @@ class MyVpnService : VpnService() {
                     ((packet[22].toInt() and 0xFF) shl 8) or (packet[23].toInt() and 0xFF)
                 }
                 
-                Log.d(TAG, "Forwarding packet to $destIp:$destPort via HTTP proxy")
+                Log.d(TAG, "Forwarding packet to $destIp:$destPort via SOCKS5 proxy")
                 
-                // Use HTTP proxy to connect to destination
+                // Use SOCKS5 proxy to connect to destination
                 val connectionKey = "$destIp:$destPort"
                 var socket = connectionPool[connectionKey]
                 
                 // Check if existing connection is still valid
                 if (socket == null || socket.isClosed) {
-                    socket = createHttpProxyConnection(proxyHost, proxyPort, destIp, destPort)
+                    socket = createSocks5Connection(proxyHost, proxyPort, destIp, destPort)
                     if (socket != null) {
                         connectionPool[connectionKey] = socket
-                        Log.d(TAG, "Created new connection for $connectionKey")
+                        Log.d(TAG, "Created new SOCKS5 connection for $connectionKey")
                     }
                 }
                 
@@ -237,60 +237,59 @@ class MyVpnService : VpnService() {
         }
     }
     
-    private fun createHttpProxyConnection(proxyHost: String, proxyPort: Int, destIp: String, destPort: Int): Socket? {
+    private fun createSocks5Connection(proxyHost: String, proxyPort: Int, destIp: String, destPort: Int): Socket? {
         return try {
             val socket = Socket()
-            socket.connect(InetSocketAddress(proxyHost, proxyPort), 5000) // Reduced timeout
-            socket.soTimeout = 3000 // Set read timeout
+            socket.connect(InetSocketAddress(proxyHost, proxyPort), 5000)
+            socket.soTimeout = 5000
             val output = socket.getOutputStream()
             val input = socket.getInputStream()
             
-            // HTTP CONNECT request
-            val connectRequest = "CONNECT $destIp:$destPort HTTP/1.1\r\n" +
-                    "Host: $destIp:$destPort\r\n" +
-                    "Proxy-Connection: keep-alive\r\n" +
-                    "User-Agent: VPNClient/1.0\r\n" +
-                    "Connection: keep-alive\r\n" +
-                    "\r\n"
-            
-            output.write(connectRequest.toByteArray())
+            // SOCKS5 handshake
+            output.write(byteArrayOf(0x05, 0x01, 0x00)) // Version 5, 1 auth method, No auth
             output.flush()
             
-            // Read HTTP response with timeout
-            val response = StringBuilder()
-            val buffer = ByteArray(1024)
-            var totalRead = 0
-            var bytesRead: Int
-            
-            try {
-                while (totalRead < 4096) { // Limit response size
-                    bytesRead = input.read(buffer)
-                    if (bytesRead == -1) break
-                    
-                    response.append(String(buffer, 0, bytesRead))
-                    totalRead += bytesRead
-                    
-                    if (response.toString().contains("\r\n\r\n")) {
-                        break
-                    }
-                }
-            } catch (e: java.net.SocketTimeoutException) {
-                Log.w(TAG, "HTTP response timeout for $destIp:$destPort, but continuing...")
-            }
-            
-            val responseStr = response.toString()
-            Log.d(TAG, "HTTP CONNECT response for $destIp:$destPort: ${responseStr.take(200)}")
-            
-            if (!responseStr.startsWith("HTTP/1.1 200") && !responseStr.startsWith("HTTP/1.0 200")) {
-                Log.e(TAG, "HTTP CONNECT failed: $responseStr")
+            val handshakeResponse = ByteArray(2)
+            input.read(handshakeResponse)
+            if (handshakeResponse[0] != 0x05.toByte() || handshakeResponse[1] != 0x00.toByte()) {
+                Log.e(TAG, "SOCKS5 handshake failed for $destIp:$destPort")
                 socket.close()
                 return null
             }
             
-            Log.d(TAG, "HTTP proxy connection established to $destIp:$destPort")
+            // SOCKS5 connect request
+            val connectRequest = ByteArray(10)
+            connectRequest[0] = 0x05 // Version
+            connectRequest[1] = 0x01 // Connect
+            connectRequest[2] = 0x00 // Reserved
+            connectRequest[3] = 0x01 // IPv4
+            
+            // Destination IP
+            val ipParts = destIp.split(".")
+            for (i in 0..3) {
+                connectRequest[4 + i] = ipParts[i].toInt().toByte()
+            }
+            
+            // Destination port
+            connectRequest[8] = (destPort shr 8).toByte()
+            connectRequest[9] = destPort.toByte()
+            
+            output.write(connectRequest)
+            output.flush()
+            
+            // Read connect response
+            val connectResponse = ByteArray(10)
+            input.read(connectResponse)
+            if (connectResponse[1] != 0x00.toByte()) {
+                Log.e(TAG, "SOCKS5 connect failed for $destIp:$destPort, response: ${connectResponse[1]}")
+                socket.close()
+                return null
+            }
+            
+            Log.d(TAG, "SOCKS5 connection established to $destIp:$destPort")
             socket
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to create HTTP proxy connection to $destIp:$destPort", e)
+            Log.e(TAG, "Failed to create SOCKS5 connection to $destIp:$destPort", e)
             null
         }
     }
