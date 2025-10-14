@@ -4,6 +4,10 @@ import 'package:vpncn2_app/constants/app_colors.dart';
 import 'package:vpncn2_app/constants/app_strings.dart';
 import 'package:vpncn2_app/utils/responsive.dart';
 import 'package:vpncn2_app/widgets/common_footer.dart';
+import 'package:vpncn2_app/widgets/top_search_bar.dart';
+import 'package:vpncn2_app/widgets/home_tabs.dart';
+import 'package:vpncn2_app/widgets/smooth_main_layout.dart';
+import 'package:vpncn2_app/services/devices_service.dart';
 
 class AddDeviceScreen extends StatefulWidget {
   const AddDeviceScreen({super.key});
@@ -155,15 +159,36 @@ class _AddDeviceScreenState extends State<AddDeviceScreen> {
     );
   }
 
-  void _addDevice() {
-    // Simulate adding device
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Device added successfully!'),
-        backgroundColor: AppColors.SUCCESS_COLOR,
-      ),
+  Future<void> _addDevice() async {
+    final mac = _macController.text.trim();
+    final name = _nameController.text.trim();
+    final serial = 'SN${DateTime.now().millisecondsSinceEpoch}';
+
+    final result = await DevicesService.addDevice(
+      deviceSerialNumber: serial,
+      deviceMacAddress: mac,
+      deviceAlias: name,
     );
-    Navigator.of(context).pop();
+
+    result.when(
+      ok: (_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Device added successfully!'),
+            backgroundColor: AppColors.SUCCESS_COLOR,
+          ),
+        );
+        Navigator.of(context).pop();
+      },
+      err: (f) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to add device: ${f.message}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -199,7 +224,39 @@ class _AddDeviceScreenState extends State<AddDeviceScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Keep the same header structure as Home
+                    TopSearchBar(onChanged: (v) {}),
+                    const SizedBox(height: 12),
+                    HomeTabs(
+                      selectedIndex: 1,
+                      keyCount: 0,
+                      onChanged: (index) {
+                        if (index == 0) {
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(
+                              builder: (context) => const SmoothMainLayout(
+                                initialIndex: 0,
+                                homeInitialTabIndex: 0,
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+                        if (index == 2) {
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(
+                              builder: (context) => const SmoothMainLayout(
+                                initialIndex: 0,
+                                homeInitialTabIndex: 2,
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+                      },
+                    ),
                     SizedBox(height: Responsive.height(context, 3)),
+                    SizedBox(height: Responsive.height(context, 1)),
 
                     // Device MAC Field
                     const Text(

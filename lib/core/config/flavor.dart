@@ -4,11 +4,11 @@ class Flavor {
   static String get baseUrl {
     switch (Env.current) {
       case Environment.development:
-        return 'https://api.vpncn2.net/api';
+        return 'https://26d70c194b64.ngrok-free.app/api';
       case Environment.staging:
-        return 'https://staging-api.vpncn2.com/api';
+        return 'https://26d70c194b64.ngrok-free.app/api';
       case Environment.production:
-        return 'https://api.vpncn2.net/api';
+        return 'https://26d70c194b64.ngrok-free.app/api';
     }
   }
 

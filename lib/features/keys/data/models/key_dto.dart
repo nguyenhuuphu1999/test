@@ -7,28 +7,29 @@ part 'key_dto.g.dart';
 @freezed
 class KeyDto with _$KeyDto {
   const factory KeyDto({
-    @JsonKey(name: '_id') required String id,
-    required String keyId,
+    required String id,
+    String? keyId,
     required String name,
-    required String password,
-    required int port,
-    required String method,
+    int? port,
+    String? method,
     required String accessUrl,
-    required bool enable,
-    required bool enableByAdmin,
-    required int dataLimit,
-    required int dataUsage,
-    required int dataExpand,
-    required ServerInfo serverId,
-    required UserInfo userId,
-    OssInfo? ossId,
-    AwsInfo? awsId,
-    required String account,
-    required String startDate,
-    required String endDate,
-    required int status,
-    required String createdAt,
-    required String updatedAt,
+    String? password,
+    bool? enable,
+    bool? enableByAdmin,
+    int? status,
+    int? dataLimit,
+    int? dataUsage,
+    int? dataUsageToday,
+    int? dataUsageYesterday,
+    double? usagePercentage,
+    ServerDto? server,
+    DateTime? createdAt,
+    DateTime? endDate,
+    int? daysRemaining,
+    bool? isUserNormal,
+    MigrationDto? migration,
+    List<RecentUsageDto>? recentUsage,
+    UsageStatsDto? usageStats,
   }) = _KeyDto;
 
   factory KeyDto.fromJson(Map<String, dynamic> json) => _$KeyDtoFromJson(json);
@@ -38,82 +39,76 @@ extension KeyDtoX on KeyDto {
   Key toEntity() {
     return Key(
       id: id,
-      keyId: keyId,
+      keyId: keyId ?? '',
       name: name,
-      password: password,
-      port: port,
-      method: method,
+      password: password ?? '',
+      port: port ?? 443,
+      method: method ?? 'chacha20-ietf-poly1305',
       accessUrl: accessUrl,
-      enable: enable,
-      enableByAdmin: enableByAdmin,
-      dataLimit: dataLimit,
-      dataUsage: dataUsage,
-      dataExpand: dataExpand,
-      serverLocation: serverId.location,
-      serverName: serverId.name,
-      account: account,
-      startDate: DateTime.tryParse(startDate) ?? DateTime.now(),
-      endDate: DateTime.tryParse(endDate) ?? DateTime.now(),
-      status: status,
-      createdAt: DateTime.tryParse(createdAt) ?? DateTime.now(),
-      updatedAt: DateTime.tryParse(updatedAt) ?? DateTime.now(),
-      ossId: ossId?.ossId,
-      fileName: ossId?.fileName ?? awsId?.fileName,
-      prefix: ossId?.prefix ?? awsId?.prefix,
+      enable: enable ?? true,
+      enableByAdmin: enableByAdmin ?? true,
+      dataLimit: dataLimit ?? 0,
+      dataUsage: dataUsage ?? 0,
+      dataExpand: dataLimit ?? 0, // Use dataLimit as dataExpand for now
+      serverLocation: server?.location ?? 'Unknown',
+      serverName: server?.name ?? 'Unknown Server',
+      account: '', // Not available in new API
+      startDate: createdAt ?? DateTime.now(),
+      endDate: endDate ?? DateTime.now().add(const Duration(days: 30)),
+      status: status ?? 1,
+      createdAt: createdAt ?? DateTime.now(),
+      updatedAt: createdAt ?? DateTime.now(), // Use createdAt as updatedAt
+      ossId: null, // Not available in new API
+      fileName: null, // Not available in new API
+      prefix: null, // Not available in new API
     );
   }
 }
 
 @freezed
-class ServerInfo with _$ServerInfo {
-  const factory ServerInfo({
-    @JsonKey(name: '_id') required String id,
-    required String location,
+class ServerDto with _$ServerDto {
+  const factory ServerDto({
+    required String id,
     required String name,
-  }) = _ServerInfo;
+    String? location,
+    String? ip,
+    String? country,
+  }) = _ServerDto;
 
-  factory ServerInfo.fromJson(Map<String, dynamic> json) =>
-      _$ServerInfoFromJson(json);
+  factory ServerDto.fromJson(Map<String, dynamic> json) =>
+      _$ServerDtoFromJson(json);
 }
 
 @freezed
-class UserInfo with _$UserInfo {
-  const factory UserInfo({
-    @JsonKey(name: '_id') required String id,
-    required String email,
-    required String username,
-    required int role,
-    int? money,
-  }) = _UserInfo;
+class MigrationDto with _$MigrationDto {
+  const factory MigrationDto({
+    DateTime? migrateDate,
+    int? counterMigrate,
+    int? counterMigrateV2,
+  }) = _MigrationDto;
 
-  factory UserInfo.fromJson(Map<String, dynamic> json) =>
-      _$UserInfoFromJson(json);
+  factory MigrationDto.fromJson(Map<String, dynamic> json) =>
+      _$MigrationDtoFromJson(json);
 }
 
 @freezed
-class OssInfo with _$OssInfo {
-  const factory OssInfo({
-    @JsonKey(name: '_id') required String id,
-    required String ossId,
-    required String fileName,
-    required String prefix,
-    required int status,
-  }) = _OssInfo;
+class RecentUsageDto with _$RecentUsageDto {
+  const factory RecentUsageDto({required String date, required double usage}) =
+      _RecentUsageDto;
 
-  factory OssInfo.fromJson(Map<String, dynamic> json) =>
-      _$OssInfoFromJson(json);
+  factory RecentUsageDto.fromJson(Map<String, dynamic> json) =>
+      _$RecentUsageDtoFromJson(json);
 }
 
 @freezed
-class AwsInfo with _$AwsInfo {
-  const factory AwsInfo({
-    @JsonKey(name: '_id') required String id,
-    required String awsId,
-    required String fileName,
-    required String prefix,
-    required int status,
-  }) = _AwsInfo;
+class UsageStatsDto with _$UsageStatsDto {
+  const factory UsageStatsDto({
+    required double total,
+    required double average,
+    required double peak,
+    String? peakDate,
+  }) = _UsageStatsDto;
 
-  factory AwsInfo.fromJson(Map<String, dynamic> json) =>
-      _$AwsInfoFromJson(json);
+  factory UsageStatsDto.fromJson(Map<String, dynamic> json) =>
+      _$UsageStatsDtoFromJson(json);
 }

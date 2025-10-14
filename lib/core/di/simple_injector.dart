@@ -14,6 +14,18 @@ import '../../features/keys/data/datasources/keys_api.dart';
 import '../../features/keys/data/repositories/keys_repository_impl.dart';
 import '../../features/keys/domain/repositories/keys_repository.dart';
 import '../../features/keys/domain/usecases/get_keys_usecase.dart';
+import '../../features/devices/data/datasources/devices_api.dart';
+import '../../features/devices/data/repositories/devices_repository_impl.dart';
+import '../../features/devices/domain/repositories/devices_repository.dart';
+import '../../features/locations/data/datasources/locations_api.dart';
+import '../../features/locations/data/repositories/locations_repository_impl.dart';
+import '../../features/locations/domain/repositories/locations_repository.dart';
+import '../../features/plans/data/datasources/plans_api.dart';
+import '../../features/plans/data/repositories/plans_repository_impl.dart';
+import '../../features/plans/domain/repositories/plans_repository.dart';
+import '../../features/payment_methods/data/datasources/payment_methods_api.dart';
+import '../../features/payment_methods/data/repositories/payment_methods_repository_impl.dart';
+import '../../features/payment_methods/domain/repositories/payment_methods_repository.dart';
 
 final sl = GetIt.instance;
 
@@ -84,5 +96,49 @@ Future<void> initSimpleDI() async {
 
   if (!sl.isRegistered<GetKeysUseCase>()) {
     sl.registerLazySingleton(() => GetKeysUseCase(sl<KeysRepository>()));
+  }
+
+  // Devices feature - only if not already registered
+  if (!sl.isRegistered<DevicesApi>()) {
+    sl.registerLazySingleton(() => DevicesApi(sl<Dio>()));
+  }
+
+  if (!sl.isRegistered<DevicesRepository>()) {
+    sl.registerLazySingleton<DevicesRepository>(
+      () => DevicesRepositoryImpl(sl<DevicesApi>()),
+    );
+  }
+
+  // Locations feature - only if not already registered
+  if (!sl.isRegistered<LocationsApi>()) {
+    sl.registerLazySingleton(() => LocationsApi(sl<Dio>()));
+  }
+
+  if (!sl.isRegistered<LocationsRepository>()) {
+    sl.registerLazySingleton<LocationsRepository>(
+      () => LocationsRepositoryImpl(sl<LocationsApi>()),
+    );
+  }
+
+  // Plans feature - only if not already registered
+  if (!sl.isRegistered<PlansApi>()) {
+    sl.registerLazySingleton(() => PlansApi(sl<Dio>()));
+  }
+
+  if (!sl.isRegistered<PlansRepository>()) {
+    sl.registerLazySingleton<PlansRepository>(
+      () => PlansRepositoryImpl(sl<PlansApi>()),
+    );
+  }
+
+  // Payment Methods feature - only if not already registered
+  if (!sl.isRegistered<PaymentMethodsApi>()) {
+    sl.registerLazySingleton(() => PaymentMethodsApi(sl<Dio>()));
+  }
+
+  if (!sl.isRegistered<PaymentMethodsRepository>()) {
+    sl.registerLazySingleton<PaymentMethodsRepository>(
+      () => PaymentMethodsRepositoryImpl(sl<PaymentMethodsApi>()),
+    );
   }
 }

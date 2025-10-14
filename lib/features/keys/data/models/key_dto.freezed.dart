@@ -21,29 +21,29 @@ KeyDto _$KeyDtoFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$KeyDto {
-  @JsonKey(name: '_id')
   String get id => throw _privateConstructorUsedError;
-  String get keyId => throw _privateConstructorUsedError;
+  String? get keyId => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
-  String get password => throw _privateConstructorUsedError;
-  int get port => throw _privateConstructorUsedError;
-  String get method => throw _privateConstructorUsedError;
+  int? get port => throw _privateConstructorUsedError;
+  String? get method => throw _privateConstructorUsedError;
   String get accessUrl => throw _privateConstructorUsedError;
-  bool get enable => throw _privateConstructorUsedError;
-  bool get enableByAdmin => throw _privateConstructorUsedError;
-  int get dataLimit => throw _privateConstructorUsedError;
-  int get dataUsage => throw _privateConstructorUsedError;
-  int get dataExpand => throw _privateConstructorUsedError;
-  ServerInfo get serverId => throw _privateConstructorUsedError;
-  UserInfo get userId => throw _privateConstructorUsedError;
-  OssInfo? get ossId => throw _privateConstructorUsedError;
-  AwsInfo? get awsId => throw _privateConstructorUsedError;
-  String get account => throw _privateConstructorUsedError;
-  String get startDate => throw _privateConstructorUsedError;
-  String get endDate => throw _privateConstructorUsedError;
-  int get status => throw _privateConstructorUsedError;
-  String get createdAt => throw _privateConstructorUsedError;
-  String get updatedAt => throw _privateConstructorUsedError;
+  String? get password => throw _privateConstructorUsedError;
+  bool? get enable => throw _privateConstructorUsedError;
+  bool? get enableByAdmin => throw _privateConstructorUsedError;
+  int? get status => throw _privateConstructorUsedError;
+  int? get dataLimit => throw _privateConstructorUsedError;
+  int? get dataUsage => throw _privateConstructorUsedError;
+  int? get dataUsageToday => throw _privateConstructorUsedError;
+  int? get dataUsageYesterday => throw _privateConstructorUsedError;
+  double? get usagePercentage => throw _privateConstructorUsedError;
+  ServerDto? get server => throw _privateConstructorUsedError;
+  DateTime? get createdAt => throw _privateConstructorUsedError;
+  DateTime? get endDate => throw _privateConstructorUsedError;
+  int? get daysRemaining => throw _privateConstructorUsedError;
+  bool? get isUserNormal => throw _privateConstructorUsedError;
+  MigrationDto? get migration => throw _privateConstructorUsedError;
+  List<RecentUsageDto>? get recentUsage => throw _privateConstructorUsedError;
+  UsageStatsDto? get usageStats => throw _privateConstructorUsedError;
 
   /// Serializes this KeyDto to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -60,34 +60,34 @@ abstract class $KeyDtoCopyWith<$Res> {
       _$KeyDtoCopyWithImpl<$Res, KeyDto>;
   @useResult
   $Res call({
-    @JsonKey(name: '_id') String id,
-    String keyId,
+    String id,
+    String? keyId,
     String name,
-    String password,
-    int port,
-    String method,
+    int? port,
+    String? method,
     String accessUrl,
-    bool enable,
-    bool enableByAdmin,
-    int dataLimit,
-    int dataUsage,
-    int dataExpand,
-    ServerInfo serverId,
-    UserInfo userId,
-    OssInfo? ossId,
-    AwsInfo? awsId,
-    String account,
-    String startDate,
-    String endDate,
-    int status,
-    String createdAt,
-    String updatedAt,
+    String? password,
+    bool? enable,
+    bool? enableByAdmin,
+    int? status,
+    int? dataLimit,
+    int? dataUsage,
+    int? dataUsageToday,
+    int? dataUsageYesterday,
+    double? usagePercentage,
+    ServerDto? server,
+    DateTime? createdAt,
+    DateTime? endDate,
+    int? daysRemaining,
+    bool? isUserNormal,
+    MigrationDto? migration,
+    List<RecentUsageDto>? recentUsage,
+    UsageStatsDto? usageStats,
   });
 
-  $ServerInfoCopyWith<$Res> get serverId;
-  $UserInfoCopyWith<$Res> get userId;
-  $OssInfoCopyWith<$Res>? get ossId;
-  $AwsInfoCopyWith<$Res>? get awsId;
+  $ServerDtoCopyWith<$Res>? get server;
+  $MigrationDtoCopyWith<$Res>? get migration;
+  $UsageStatsDtoCopyWith<$Res>? get usageStats;
 }
 
 /// @nodoc
@@ -106,27 +106,28 @@ class _$KeyDtoCopyWithImpl<$Res, $Val extends KeyDto>
   @override
   $Res call({
     Object? id = null,
-    Object? keyId = null,
+    Object? keyId = freezed,
     Object? name = null,
-    Object? password = null,
-    Object? port = null,
-    Object? method = null,
+    Object? port = freezed,
+    Object? method = freezed,
     Object? accessUrl = null,
-    Object? enable = null,
-    Object? enableByAdmin = null,
-    Object? dataLimit = null,
-    Object? dataUsage = null,
-    Object? dataExpand = null,
-    Object? serverId = null,
-    Object? userId = null,
-    Object? ossId = freezed,
-    Object? awsId = freezed,
-    Object? account = null,
-    Object? startDate = null,
-    Object? endDate = null,
-    Object? status = null,
-    Object? createdAt = null,
-    Object? updatedAt = null,
+    Object? password = freezed,
+    Object? enable = freezed,
+    Object? enableByAdmin = freezed,
+    Object? status = freezed,
+    Object? dataLimit = freezed,
+    Object? dataUsage = freezed,
+    Object? dataUsageToday = freezed,
+    Object? dataUsageYesterday = freezed,
+    Object? usagePercentage = freezed,
+    Object? server = freezed,
+    Object? createdAt = freezed,
+    Object? endDate = freezed,
+    Object? daysRemaining = freezed,
+    Object? isUserNormal = freezed,
+    Object? migration = freezed,
+    Object? recentUsage = freezed,
+    Object? usageStats = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -134,90 +135,94 @@ class _$KeyDtoCopyWithImpl<$Res, $Val extends KeyDto>
                 ? _value.id
                 : id // ignore: cast_nullable_to_non_nullable
                       as String,
-            keyId: null == keyId
+            keyId: freezed == keyId
                 ? _value.keyId
                 : keyId // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as String?,
             name: null == name
                 ? _value.name
                 : name // ignore: cast_nullable_to_non_nullable
                       as String,
-            password: null == password
-                ? _value.password
-                : password // ignore: cast_nullable_to_non_nullable
-                      as String,
-            port: null == port
+            port: freezed == port
                 ? _value.port
                 : port // ignore: cast_nullable_to_non_nullable
-                      as int,
-            method: null == method
+                      as int?,
+            method: freezed == method
                 ? _value.method
                 : method // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as String?,
             accessUrl: null == accessUrl
                 ? _value.accessUrl
                 : accessUrl // ignore: cast_nullable_to_non_nullable
                       as String,
-            enable: null == enable
+            password: freezed == password
+                ? _value.password
+                : password // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            enable: freezed == enable
                 ? _value.enable
                 : enable // ignore: cast_nullable_to_non_nullable
-                      as bool,
-            enableByAdmin: null == enableByAdmin
+                      as bool?,
+            enableByAdmin: freezed == enableByAdmin
                 ? _value.enableByAdmin
                 : enableByAdmin // ignore: cast_nullable_to_non_nullable
-                      as bool,
-            dataLimit: null == dataLimit
-                ? _value.dataLimit
-                : dataLimit // ignore: cast_nullable_to_non_nullable
-                      as int,
-            dataUsage: null == dataUsage
-                ? _value.dataUsage
-                : dataUsage // ignore: cast_nullable_to_non_nullable
-                      as int,
-            dataExpand: null == dataExpand
-                ? _value.dataExpand
-                : dataExpand // ignore: cast_nullable_to_non_nullable
-                      as int,
-            serverId: null == serverId
-                ? _value.serverId
-                : serverId // ignore: cast_nullable_to_non_nullable
-                      as ServerInfo,
-            userId: null == userId
-                ? _value.userId
-                : userId // ignore: cast_nullable_to_non_nullable
-                      as UserInfo,
-            ossId: freezed == ossId
-                ? _value.ossId
-                : ossId // ignore: cast_nullable_to_non_nullable
-                      as OssInfo?,
-            awsId: freezed == awsId
-                ? _value.awsId
-                : awsId // ignore: cast_nullable_to_non_nullable
-                      as AwsInfo?,
-            account: null == account
-                ? _value.account
-                : account // ignore: cast_nullable_to_non_nullable
-                      as String,
-            startDate: null == startDate
-                ? _value.startDate
-                : startDate // ignore: cast_nullable_to_non_nullable
-                      as String,
-            endDate: null == endDate
-                ? _value.endDate
-                : endDate // ignore: cast_nullable_to_non_nullable
-                      as String,
-            status: null == status
+                      as bool?,
+            status: freezed == status
                 ? _value.status
                 : status // ignore: cast_nullable_to_non_nullable
-                      as int,
-            createdAt: null == createdAt
+                      as int?,
+            dataLimit: freezed == dataLimit
+                ? _value.dataLimit
+                : dataLimit // ignore: cast_nullable_to_non_nullable
+                      as int?,
+            dataUsage: freezed == dataUsage
+                ? _value.dataUsage
+                : dataUsage // ignore: cast_nullable_to_non_nullable
+                      as int?,
+            dataUsageToday: freezed == dataUsageToday
+                ? _value.dataUsageToday
+                : dataUsageToday // ignore: cast_nullable_to_non_nullable
+                      as int?,
+            dataUsageYesterday: freezed == dataUsageYesterday
+                ? _value.dataUsageYesterday
+                : dataUsageYesterday // ignore: cast_nullable_to_non_nullable
+                      as int?,
+            usagePercentage: freezed == usagePercentage
+                ? _value.usagePercentage
+                : usagePercentage // ignore: cast_nullable_to_non_nullable
+                      as double?,
+            server: freezed == server
+                ? _value.server
+                : server // ignore: cast_nullable_to_non_nullable
+                      as ServerDto?,
+            createdAt: freezed == createdAt
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
-                      as String,
-            updatedAt: null == updatedAt
-                ? _value.updatedAt
-                : updatedAt // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as DateTime?,
+            endDate: freezed == endDate
+                ? _value.endDate
+                : endDate // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+            daysRemaining: freezed == daysRemaining
+                ? _value.daysRemaining
+                : daysRemaining // ignore: cast_nullable_to_non_nullable
+                      as int?,
+            isUserNormal: freezed == isUserNormal
+                ? _value.isUserNormal
+                : isUserNormal // ignore: cast_nullable_to_non_nullable
+                      as bool?,
+            migration: freezed == migration
+                ? _value.migration
+                : migration // ignore: cast_nullable_to_non_nullable
+                      as MigrationDto?,
+            recentUsage: freezed == recentUsage
+                ? _value.recentUsage
+                : recentUsage // ignore: cast_nullable_to_non_nullable
+                      as List<RecentUsageDto>?,
+            usageStats: freezed == usageStats
+                ? _value.usageStats
+                : usageStats // ignore: cast_nullable_to_non_nullable
+                      as UsageStatsDto?,
           )
           as $Val,
     );
@@ -227,33 +232,13 @@ class _$KeyDtoCopyWithImpl<$Res, $Val extends KeyDto>
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $ServerInfoCopyWith<$Res> get serverId {
-    return $ServerInfoCopyWith<$Res>(_value.serverId, (value) {
-      return _then(_value.copyWith(serverId: value) as $Val);
-    });
-  }
-
-  /// Create a copy of KeyDto
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $UserInfoCopyWith<$Res> get userId {
-    return $UserInfoCopyWith<$Res>(_value.userId, (value) {
-      return _then(_value.copyWith(userId: value) as $Val);
-    });
-  }
-
-  /// Create a copy of KeyDto
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $OssInfoCopyWith<$Res>? get ossId {
-    if (_value.ossId == null) {
+  $ServerDtoCopyWith<$Res>? get server {
+    if (_value.server == null) {
       return null;
     }
 
-    return $OssInfoCopyWith<$Res>(_value.ossId!, (value) {
-      return _then(_value.copyWith(ossId: value) as $Val);
+    return $ServerDtoCopyWith<$Res>(_value.server!, (value) {
+      return _then(_value.copyWith(server: value) as $Val);
     });
   }
 
@@ -261,13 +246,27 @@ class _$KeyDtoCopyWithImpl<$Res, $Val extends KeyDto>
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $AwsInfoCopyWith<$Res>? get awsId {
-    if (_value.awsId == null) {
+  $MigrationDtoCopyWith<$Res>? get migration {
+    if (_value.migration == null) {
       return null;
     }
 
-    return $AwsInfoCopyWith<$Res>(_value.awsId!, (value) {
-      return _then(_value.copyWith(awsId: value) as $Val);
+    return $MigrationDtoCopyWith<$Res>(_value.migration!, (value) {
+      return _then(_value.copyWith(migration: value) as $Val);
+    });
+  }
+
+  /// Create a copy of KeyDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UsageStatsDtoCopyWith<$Res>? get usageStats {
+    if (_value.usageStats == null) {
+      return null;
+    }
+
+    return $UsageStatsDtoCopyWith<$Res>(_value.usageStats!, (value) {
+      return _then(_value.copyWith(usageStats: value) as $Val);
     });
   }
 }
@@ -281,38 +280,37 @@ abstract class _$$KeyDtoImplCopyWith<$Res> implements $KeyDtoCopyWith<$Res> {
   @override
   @useResult
   $Res call({
-    @JsonKey(name: '_id') String id,
-    String keyId,
+    String id,
+    String? keyId,
     String name,
-    String password,
-    int port,
-    String method,
+    int? port,
+    String? method,
     String accessUrl,
-    bool enable,
-    bool enableByAdmin,
-    int dataLimit,
-    int dataUsage,
-    int dataExpand,
-    ServerInfo serverId,
-    UserInfo userId,
-    OssInfo? ossId,
-    AwsInfo? awsId,
-    String account,
-    String startDate,
-    String endDate,
-    int status,
-    String createdAt,
-    String updatedAt,
+    String? password,
+    bool? enable,
+    bool? enableByAdmin,
+    int? status,
+    int? dataLimit,
+    int? dataUsage,
+    int? dataUsageToday,
+    int? dataUsageYesterday,
+    double? usagePercentage,
+    ServerDto? server,
+    DateTime? createdAt,
+    DateTime? endDate,
+    int? daysRemaining,
+    bool? isUserNormal,
+    MigrationDto? migration,
+    List<RecentUsageDto>? recentUsage,
+    UsageStatsDto? usageStats,
   });
 
   @override
-  $ServerInfoCopyWith<$Res> get serverId;
+  $ServerDtoCopyWith<$Res>? get server;
   @override
-  $UserInfoCopyWith<$Res> get userId;
+  $MigrationDtoCopyWith<$Res>? get migration;
   @override
-  $OssInfoCopyWith<$Res>? get ossId;
-  @override
-  $AwsInfoCopyWith<$Res>? get awsId;
+  $UsageStatsDtoCopyWith<$Res>? get usageStats;
 }
 
 /// @nodoc
@@ -330,27 +328,28 @@ class __$$KeyDtoImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
-    Object? keyId = null,
+    Object? keyId = freezed,
     Object? name = null,
-    Object? password = null,
-    Object? port = null,
-    Object? method = null,
+    Object? port = freezed,
+    Object? method = freezed,
     Object? accessUrl = null,
-    Object? enable = null,
-    Object? enableByAdmin = null,
-    Object? dataLimit = null,
-    Object? dataUsage = null,
-    Object? dataExpand = null,
-    Object? serverId = null,
-    Object? userId = null,
-    Object? ossId = freezed,
-    Object? awsId = freezed,
-    Object? account = null,
-    Object? startDate = null,
-    Object? endDate = null,
-    Object? status = null,
-    Object? createdAt = null,
-    Object? updatedAt = null,
+    Object? password = freezed,
+    Object? enable = freezed,
+    Object? enableByAdmin = freezed,
+    Object? status = freezed,
+    Object? dataLimit = freezed,
+    Object? dataUsage = freezed,
+    Object? dataUsageToday = freezed,
+    Object? dataUsageYesterday = freezed,
+    Object? usagePercentage = freezed,
+    Object? server = freezed,
+    Object? createdAt = freezed,
+    Object? endDate = freezed,
+    Object? daysRemaining = freezed,
+    Object? isUserNormal = freezed,
+    Object? migration = freezed,
+    Object? recentUsage = freezed,
+    Object? usageStats = freezed,
   }) {
     return _then(
       _$KeyDtoImpl(
@@ -358,90 +357,94 @@ class __$$KeyDtoImplCopyWithImpl<$Res>
             ? _value.id
             : id // ignore: cast_nullable_to_non_nullable
                   as String,
-        keyId: null == keyId
+        keyId: freezed == keyId
             ? _value.keyId
             : keyId // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as String?,
         name: null == name
             ? _value.name
             : name // ignore: cast_nullable_to_non_nullable
                   as String,
-        password: null == password
-            ? _value.password
-            : password // ignore: cast_nullable_to_non_nullable
-                  as String,
-        port: null == port
+        port: freezed == port
             ? _value.port
             : port // ignore: cast_nullable_to_non_nullable
-                  as int,
-        method: null == method
+                  as int?,
+        method: freezed == method
             ? _value.method
             : method // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as String?,
         accessUrl: null == accessUrl
             ? _value.accessUrl
             : accessUrl // ignore: cast_nullable_to_non_nullable
                   as String,
-        enable: null == enable
+        password: freezed == password
+            ? _value.password
+            : password // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        enable: freezed == enable
             ? _value.enable
             : enable // ignore: cast_nullable_to_non_nullable
-                  as bool,
-        enableByAdmin: null == enableByAdmin
+                  as bool?,
+        enableByAdmin: freezed == enableByAdmin
             ? _value.enableByAdmin
             : enableByAdmin // ignore: cast_nullable_to_non_nullable
-                  as bool,
-        dataLimit: null == dataLimit
-            ? _value.dataLimit
-            : dataLimit // ignore: cast_nullable_to_non_nullable
-                  as int,
-        dataUsage: null == dataUsage
-            ? _value.dataUsage
-            : dataUsage // ignore: cast_nullable_to_non_nullable
-                  as int,
-        dataExpand: null == dataExpand
-            ? _value.dataExpand
-            : dataExpand // ignore: cast_nullable_to_non_nullable
-                  as int,
-        serverId: null == serverId
-            ? _value.serverId
-            : serverId // ignore: cast_nullable_to_non_nullable
-                  as ServerInfo,
-        userId: null == userId
-            ? _value.userId
-            : userId // ignore: cast_nullable_to_non_nullable
-                  as UserInfo,
-        ossId: freezed == ossId
-            ? _value.ossId
-            : ossId // ignore: cast_nullable_to_non_nullable
-                  as OssInfo?,
-        awsId: freezed == awsId
-            ? _value.awsId
-            : awsId // ignore: cast_nullable_to_non_nullable
-                  as AwsInfo?,
-        account: null == account
-            ? _value.account
-            : account // ignore: cast_nullable_to_non_nullable
-                  as String,
-        startDate: null == startDate
-            ? _value.startDate
-            : startDate // ignore: cast_nullable_to_non_nullable
-                  as String,
-        endDate: null == endDate
-            ? _value.endDate
-            : endDate // ignore: cast_nullable_to_non_nullable
-                  as String,
-        status: null == status
+                  as bool?,
+        status: freezed == status
             ? _value.status
             : status // ignore: cast_nullable_to_non_nullable
-                  as int,
-        createdAt: null == createdAt
+                  as int?,
+        dataLimit: freezed == dataLimit
+            ? _value.dataLimit
+            : dataLimit // ignore: cast_nullable_to_non_nullable
+                  as int?,
+        dataUsage: freezed == dataUsage
+            ? _value.dataUsage
+            : dataUsage // ignore: cast_nullable_to_non_nullable
+                  as int?,
+        dataUsageToday: freezed == dataUsageToday
+            ? _value.dataUsageToday
+            : dataUsageToday // ignore: cast_nullable_to_non_nullable
+                  as int?,
+        dataUsageYesterday: freezed == dataUsageYesterday
+            ? _value.dataUsageYesterday
+            : dataUsageYesterday // ignore: cast_nullable_to_non_nullable
+                  as int?,
+        usagePercentage: freezed == usagePercentage
+            ? _value.usagePercentage
+            : usagePercentage // ignore: cast_nullable_to_non_nullable
+                  as double?,
+        server: freezed == server
+            ? _value.server
+            : server // ignore: cast_nullable_to_non_nullable
+                  as ServerDto?,
+        createdAt: freezed == createdAt
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
-                  as String,
-        updatedAt: null == updatedAt
-            ? _value.updatedAt
-            : updatedAt // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as DateTime?,
+        endDate: freezed == endDate
+            ? _value.endDate
+            : endDate // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+        daysRemaining: freezed == daysRemaining
+            ? _value.daysRemaining
+            : daysRemaining // ignore: cast_nullable_to_non_nullable
+                  as int?,
+        isUserNormal: freezed == isUserNormal
+            ? _value.isUserNormal
+            : isUserNormal // ignore: cast_nullable_to_non_nullable
+                  as bool?,
+        migration: freezed == migration
+            ? _value.migration
+            : migration // ignore: cast_nullable_to_non_nullable
+                  as MigrationDto?,
+        recentUsage: freezed == recentUsage
+            ? _value._recentUsage
+            : recentUsage // ignore: cast_nullable_to_non_nullable
+                  as List<RecentUsageDto>?,
+        usageStats: freezed == usageStats
+            ? _value.usageStats
+            : usageStats // ignore: cast_nullable_to_non_nullable
+                  as UsageStatsDto?,
       ),
     );
   }
@@ -451,82 +454,92 @@ class __$$KeyDtoImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$KeyDtoImpl implements _KeyDto {
   const _$KeyDtoImpl({
-    @JsonKey(name: '_id') required this.id,
-    required this.keyId,
+    required this.id,
+    this.keyId,
     required this.name,
-    required this.password,
-    required this.port,
-    required this.method,
+    this.port,
+    this.method,
     required this.accessUrl,
-    required this.enable,
-    required this.enableByAdmin,
-    required this.dataLimit,
-    required this.dataUsage,
-    required this.dataExpand,
-    required this.serverId,
-    required this.userId,
-    this.ossId,
-    this.awsId,
-    required this.account,
-    required this.startDate,
-    required this.endDate,
-    required this.status,
-    required this.createdAt,
-    required this.updatedAt,
-  });
+    this.password,
+    this.enable,
+    this.enableByAdmin,
+    this.status,
+    this.dataLimit,
+    this.dataUsage,
+    this.dataUsageToday,
+    this.dataUsageYesterday,
+    this.usagePercentage,
+    this.server,
+    this.createdAt,
+    this.endDate,
+    this.daysRemaining,
+    this.isUserNormal,
+    this.migration,
+    final List<RecentUsageDto>? recentUsage,
+    this.usageStats,
+  }) : _recentUsage = recentUsage;
 
   factory _$KeyDtoImpl.fromJson(Map<String, dynamic> json) =>
       _$$KeyDtoImplFromJson(json);
 
   @override
-  @JsonKey(name: '_id')
   final String id;
   @override
-  final String keyId;
+  final String? keyId;
   @override
   final String name;
   @override
-  final String password;
+  final int? port;
   @override
-  final int port;
-  @override
-  final String method;
+  final String? method;
   @override
   final String accessUrl;
   @override
-  final bool enable;
+  final String? password;
   @override
-  final bool enableByAdmin;
+  final bool? enable;
   @override
-  final int dataLimit;
+  final bool? enableByAdmin;
   @override
-  final int dataUsage;
+  final int? status;
   @override
-  final int dataExpand;
+  final int? dataLimit;
   @override
-  final ServerInfo serverId;
+  final int? dataUsage;
   @override
-  final UserInfo userId;
+  final int? dataUsageToday;
   @override
-  final OssInfo? ossId;
+  final int? dataUsageYesterday;
   @override
-  final AwsInfo? awsId;
+  final double? usagePercentage;
   @override
-  final String account;
+  final ServerDto? server;
   @override
-  final String startDate;
+  final DateTime? createdAt;
   @override
-  final String endDate;
+  final DateTime? endDate;
   @override
-  final int status;
+  final int? daysRemaining;
   @override
-  final String createdAt;
+  final bool? isUserNormal;
   @override
-  final String updatedAt;
+  final MigrationDto? migration;
+  final List<RecentUsageDto>? _recentUsage;
+  @override
+  List<RecentUsageDto>? get recentUsage {
+    final value = _recentUsage;
+    if (value == null) return null;
+    if (_recentUsage is EqualUnmodifiableListView) return _recentUsage;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
+  @override
+  final UsageStatsDto? usageStats;
 
   @override
   String toString() {
-    return 'KeyDto(id: $id, keyId: $keyId, name: $name, password: $password, port: $port, method: $method, accessUrl: $accessUrl, enable: $enable, enableByAdmin: $enableByAdmin, dataLimit: $dataLimit, dataUsage: $dataUsage, dataExpand: $dataExpand, serverId: $serverId, userId: $userId, ossId: $ossId, awsId: $awsId, account: $account, startDate: $startDate, endDate: $endDate, status: $status, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'KeyDto(id: $id, keyId: $keyId, name: $name, port: $port, method: $method, accessUrl: $accessUrl, password: $password, enable: $enable, enableByAdmin: $enableByAdmin, status: $status, dataLimit: $dataLimit, dataUsage: $dataUsage, dataUsageToday: $dataUsageToday, dataUsageYesterday: $dataUsageYesterday, usagePercentage: $usagePercentage, server: $server, createdAt: $createdAt, endDate: $endDate, daysRemaining: $daysRemaining, isUserNormal: $isUserNormal, migration: $migration, recentUsage: $recentUsage, usageStats: $usageStats)';
   }
 
   @override
@@ -537,35 +550,42 @@ class _$KeyDtoImpl implements _KeyDto {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.keyId, keyId) || other.keyId == keyId) &&
             (identical(other.name, name) || other.name == name) &&
-            (identical(other.password, password) ||
-                other.password == password) &&
             (identical(other.port, port) || other.port == port) &&
             (identical(other.method, method) || other.method == method) &&
             (identical(other.accessUrl, accessUrl) ||
                 other.accessUrl == accessUrl) &&
+            (identical(other.password, password) ||
+                other.password == password) &&
             (identical(other.enable, enable) || other.enable == enable) &&
             (identical(other.enableByAdmin, enableByAdmin) ||
                 other.enableByAdmin == enableByAdmin) &&
+            (identical(other.status, status) || other.status == status) &&
             (identical(other.dataLimit, dataLimit) ||
                 other.dataLimit == dataLimit) &&
             (identical(other.dataUsage, dataUsage) ||
                 other.dataUsage == dataUsage) &&
-            (identical(other.dataExpand, dataExpand) ||
-                other.dataExpand == dataExpand) &&
-            (identical(other.serverId, serverId) ||
-                other.serverId == serverId) &&
-            (identical(other.userId, userId) || other.userId == userId) &&
-            (identical(other.ossId, ossId) || other.ossId == ossId) &&
-            (identical(other.awsId, awsId) || other.awsId == awsId) &&
-            (identical(other.account, account) || other.account == account) &&
-            (identical(other.startDate, startDate) ||
-                other.startDate == startDate) &&
-            (identical(other.endDate, endDate) || other.endDate == endDate) &&
-            (identical(other.status, status) || other.status == status) &&
+            (identical(other.dataUsageToday, dataUsageToday) ||
+                other.dataUsageToday == dataUsageToday) &&
+            (identical(other.dataUsageYesterday, dataUsageYesterday) ||
+                other.dataUsageYesterday == dataUsageYesterday) &&
+            (identical(other.usagePercentage, usagePercentage) ||
+                other.usagePercentage == usagePercentage) &&
+            (identical(other.server, server) || other.server == server) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
-            (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt));
+            (identical(other.endDate, endDate) || other.endDate == endDate) &&
+            (identical(other.daysRemaining, daysRemaining) ||
+                other.daysRemaining == daysRemaining) &&
+            (identical(other.isUserNormal, isUserNormal) ||
+                other.isUserNormal == isUserNormal) &&
+            (identical(other.migration, migration) ||
+                other.migration == migration) &&
+            const DeepCollectionEquality().equals(
+              other._recentUsage,
+              _recentUsage,
+            ) &&
+            (identical(other.usageStats, usageStats) ||
+                other.usageStats == usageStats));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -575,25 +595,26 @@ class _$KeyDtoImpl implements _KeyDto {
     id,
     keyId,
     name,
-    password,
     port,
     method,
     accessUrl,
+    password,
     enable,
     enableByAdmin,
+    status,
     dataLimit,
     dataUsage,
-    dataExpand,
-    serverId,
-    userId,
-    ossId,
-    awsId,
-    account,
-    startDate,
-    endDate,
-    status,
+    dataUsageToday,
+    dataUsageYesterday,
+    usagePercentage,
+    server,
     createdAt,
-    updatedAt,
+    endDate,
+    daysRemaining,
+    isUserNormal,
+    migration,
+    const DeepCollectionEquality().hash(_recentUsage),
+    usageStats,
   ]);
 
   /// Create a copy of KeyDto
@@ -612,77 +633,79 @@ class _$KeyDtoImpl implements _KeyDto {
 
 abstract class _KeyDto implements KeyDto {
   const factory _KeyDto({
-    @JsonKey(name: '_id') required final String id,
-    required final String keyId,
+    required final String id,
+    final String? keyId,
     required final String name,
-    required final String password,
-    required final int port,
-    required final String method,
+    final int? port,
+    final String? method,
     required final String accessUrl,
-    required final bool enable,
-    required final bool enableByAdmin,
-    required final int dataLimit,
-    required final int dataUsage,
-    required final int dataExpand,
-    required final ServerInfo serverId,
-    required final UserInfo userId,
-    final OssInfo? ossId,
-    final AwsInfo? awsId,
-    required final String account,
-    required final String startDate,
-    required final String endDate,
-    required final int status,
-    required final String createdAt,
-    required final String updatedAt,
+    final String? password,
+    final bool? enable,
+    final bool? enableByAdmin,
+    final int? status,
+    final int? dataLimit,
+    final int? dataUsage,
+    final int? dataUsageToday,
+    final int? dataUsageYesterday,
+    final double? usagePercentage,
+    final ServerDto? server,
+    final DateTime? createdAt,
+    final DateTime? endDate,
+    final int? daysRemaining,
+    final bool? isUserNormal,
+    final MigrationDto? migration,
+    final List<RecentUsageDto>? recentUsage,
+    final UsageStatsDto? usageStats,
   }) = _$KeyDtoImpl;
 
   factory _KeyDto.fromJson(Map<String, dynamic> json) = _$KeyDtoImpl.fromJson;
 
   @override
-  @JsonKey(name: '_id')
   String get id;
   @override
-  String get keyId;
+  String? get keyId;
   @override
   String get name;
   @override
-  String get password;
+  int? get port;
   @override
-  int get port;
-  @override
-  String get method;
+  String? get method;
   @override
   String get accessUrl;
   @override
-  bool get enable;
+  String? get password;
   @override
-  bool get enableByAdmin;
+  bool? get enable;
   @override
-  int get dataLimit;
+  bool? get enableByAdmin;
   @override
-  int get dataUsage;
+  int? get status;
   @override
-  int get dataExpand;
+  int? get dataLimit;
   @override
-  ServerInfo get serverId;
+  int? get dataUsage;
   @override
-  UserInfo get userId;
+  int? get dataUsageToday;
   @override
-  OssInfo? get ossId;
+  int? get dataUsageYesterday;
   @override
-  AwsInfo? get awsId;
+  double? get usagePercentage;
   @override
-  String get account;
+  ServerDto? get server;
   @override
-  String get startDate;
+  DateTime? get createdAt;
   @override
-  String get endDate;
+  DateTime? get endDate;
   @override
-  int get status;
+  int? get daysRemaining;
   @override
-  String get createdAt;
+  bool? get isUserNormal;
   @override
-  String get updatedAt;
+  MigrationDto? get migration;
+  @override
+  List<RecentUsageDto>? get recentUsage;
+  @override
+  UsageStatsDto? get usageStats;
 
   /// Create a copy of KeyDto
   /// with the given fields replaced by the non-null parameter values.
@@ -692,254 +715,62 @@ abstract class _KeyDto implements KeyDto {
       throw _privateConstructorUsedError;
 }
 
-ServerInfo _$ServerInfoFromJson(Map<String, dynamic> json) {
-  return _ServerInfo.fromJson(json);
+ServerDto _$ServerDtoFromJson(Map<String, dynamic> json) {
+  return _ServerDto.fromJson(json);
 }
 
 /// @nodoc
-mixin _$ServerInfo {
-  @JsonKey(name: '_id')
+mixin _$ServerDto {
   String get id => throw _privateConstructorUsedError;
-  String get location => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
+  String? get location => throw _privateConstructorUsedError;
+  String? get ip => throw _privateConstructorUsedError;
+  String? get country => throw _privateConstructorUsedError;
 
-  /// Serializes this ServerInfo to a JSON map.
+  /// Serializes this ServerDto to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
-  /// Create a copy of ServerInfo
+  /// Create a copy of ServerDto
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $ServerInfoCopyWith<ServerInfo> get copyWith =>
+  $ServerDtoCopyWith<ServerDto> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $ServerInfoCopyWith<$Res> {
-  factory $ServerInfoCopyWith(
-    ServerInfo value,
-    $Res Function(ServerInfo) then,
-  ) = _$ServerInfoCopyWithImpl<$Res, ServerInfo>;
-  @useResult
-  $Res call({@JsonKey(name: '_id') String id, String location, String name});
-}
-
-/// @nodoc
-class _$ServerInfoCopyWithImpl<$Res, $Val extends ServerInfo>
-    implements $ServerInfoCopyWith<$Res> {
-  _$ServerInfoCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of ServerInfo
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? id = null, Object? location = null, Object? name = null}) {
-    return _then(
-      _value.copyWith(
-            id: null == id
-                ? _value.id
-                : id // ignore: cast_nullable_to_non_nullable
-                      as String,
-            location: null == location
-                ? _value.location
-                : location // ignore: cast_nullable_to_non_nullable
-                      as String,
-            name: null == name
-                ? _value.name
-                : name // ignore: cast_nullable_to_non_nullable
-                      as String,
-          )
-          as $Val,
-    );
-  }
-}
-
-/// @nodoc
-abstract class _$$ServerInfoImplCopyWith<$Res>
-    implements $ServerInfoCopyWith<$Res> {
-  factory _$$ServerInfoImplCopyWith(
-    _$ServerInfoImpl value,
-    $Res Function(_$ServerInfoImpl) then,
-  ) = __$$ServerInfoImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({@JsonKey(name: '_id') String id, String location, String name});
-}
-
-/// @nodoc
-class __$$ServerInfoImplCopyWithImpl<$Res>
-    extends _$ServerInfoCopyWithImpl<$Res, _$ServerInfoImpl>
-    implements _$$ServerInfoImplCopyWith<$Res> {
-  __$$ServerInfoImplCopyWithImpl(
-    _$ServerInfoImpl _value,
-    $Res Function(_$ServerInfoImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of ServerInfo
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? id = null, Object? location = null, Object? name = null}) {
-    return _then(
-      _$ServerInfoImpl(
-        id: null == id
-            ? _value.id
-            : id // ignore: cast_nullable_to_non_nullable
-                  as String,
-        location: null == location
-            ? _value.location
-            : location // ignore: cast_nullable_to_non_nullable
-                  as String,
-        name: null == name
-            ? _value.name
-            : name // ignore: cast_nullable_to_non_nullable
-                  as String,
-      ),
-    );
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$ServerInfoImpl implements _ServerInfo {
-  const _$ServerInfoImpl({
-    @JsonKey(name: '_id') required this.id,
-    required this.location,
-    required this.name,
-  });
-
-  factory _$ServerInfoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ServerInfoImplFromJson(json);
-
-  @override
-  @JsonKey(name: '_id')
-  final String id;
-  @override
-  final String location;
-  @override
-  final String name;
-
-  @override
-  String toString() {
-    return 'ServerInfo(id: $id, location: $location, name: $name)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ServerInfoImpl &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.location, location) ||
-                other.location == location) &&
-            (identical(other.name, name) || other.name == name));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, id, location, name);
-
-  /// Create a copy of ServerInfo
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ServerInfoImplCopyWith<_$ServerInfoImpl> get copyWith =>
-      __$$ServerInfoImplCopyWithImpl<_$ServerInfoImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ServerInfoImplToJson(this);
-  }
-}
-
-abstract class _ServerInfo implements ServerInfo {
-  const factory _ServerInfo({
-    @JsonKey(name: '_id') required final String id,
-    required final String location,
-    required final String name,
-  }) = _$ServerInfoImpl;
-
-  factory _ServerInfo.fromJson(Map<String, dynamic> json) =
-      _$ServerInfoImpl.fromJson;
-
-  @override
-  @JsonKey(name: '_id')
-  String get id;
-  @override
-  String get location;
-  @override
-  String get name;
-
-  /// Create a copy of ServerInfo
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ServerInfoImplCopyWith<_$ServerInfoImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-UserInfo _$UserInfoFromJson(Map<String, dynamic> json) {
-  return _UserInfo.fromJson(json);
-}
-
-/// @nodoc
-mixin _$UserInfo {
-  @JsonKey(name: '_id')
-  String get id => throw _privateConstructorUsedError;
-  String get email => throw _privateConstructorUsedError;
-  String get username => throw _privateConstructorUsedError;
-  int get role => throw _privateConstructorUsedError;
-  int? get money => throw _privateConstructorUsedError;
-
-  /// Serializes this UserInfo to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of UserInfo
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $UserInfoCopyWith<UserInfo> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $UserInfoCopyWith<$Res> {
-  factory $UserInfoCopyWith(UserInfo value, $Res Function(UserInfo) then) =
-      _$UserInfoCopyWithImpl<$Res, UserInfo>;
+abstract class $ServerDtoCopyWith<$Res> {
+  factory $ServerDtoCopyWith(ServerDto value, $Res Function(ServerDto) then) =
+      _$ServerDtoCopyWithImpl<$Res, ServerDto>;
   @useResult
   $Res call({
-    @JsonKey(name: '_id') String id,
-    String email,
-    String username,
-    int role,
-    int? money,
+    String id,
+    String name,
+    String? location,
+    String? ip,
+    String? country,
   });
 }
 
 /// @nodoc
-class _$UserInfoCopyWithImpl<$Res, $Val extends UserInfo>
-    implements $UserInfoCopyWith<$Res> {
-  _$UserInfoCopyWithImpl(this._value, this._then);
+class _$ServerDtoCopyWithImpl<$Res, $Val extends ServerDto>
+    implements $ServerDtoCopyWith<$Res> {
+  _$ServerDtoCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of UserInfo
+  /// Create a copy of ServerDto
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? id = null,
-    Object? email = null,
-    Object? username = null,
-    Object? role = null,
-    Object? money = freezed,
+    Object? name = null,
+    Object? location = freezed,
+    Object? ip = freezed,
+    Object? country = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -947,21 +778,251 @@ class _$UserInfoCopyWithImpl<$Res, $Val extends UserInfo>
                 ? _value.id
                 : id // ignore: cast_nullable_to_non_nullable
                       as String,
-            email: null == email
-                ? _value.email
-                : email // ignore: cast_nullable_to_non_nullable
+            name: null == name
+                ? _value.name
+                : name // ignore: cast_nullable_to_non_nullable
                       as String,
-            username: null == username
-                ? _value.username
-                : username // ignore: cast_nullable_to_non_nullable
-                      as String,
-            role: null == role
-                ? _value.role
-                : role // ignore: cast_nullable_to_non_nullable
-                      as int,
-            money: freezed == money
-                ? _value.money
-                : money // ignore: cast_nullable_to_non_nullable
+            location: freezed == location
+                ? _value.location
+                : location // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            ip: freezed == ip
+                ? _value.ip
+                : ip // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            country: freezed == country
+                ? _value.country
+                : country // ignore: cast_nullable_to_non_nullable
+                      as String?,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$ServerDtoImplCopyWith<$Res>
+    implements $ServerDtoCopyWith<$Res> {
+  factory _$$ServerDtoImplCopyWith(
+    _$ServerDtoImpl value,
+    $Res Function(_$ServerDtoImpl) then,
+  ) = __$$ServerDtoImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({
+    String id,
+    String name,
+    String? location,
+    String? ip,
+    String? country,
+  });
+}
+
+/// @nodoc
+class __$$ServerDtoImplCopyWithImpl<$Res>
+    extends _$ServerDtoCopyWithImpl<$Res, _$ServerDtoImpl>
+    implements _$$ServerDtoImplCopyWith<$Res> {
+  __$$ServerDtoImplCopyWithImpl(
+    _$ServerDtoImpl _value,
+    $Res Function(_$ServerDtoImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of ServerDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? location = freezed,
+    Object? ip = freezed,
+    Object? country = freezed,
+  }) {
+    return _then(
+      _$ServerDtoImpl(
+        id: null == id
+            ? _value.id
+            : id // ignore: cast_nullable_to_non_nullable
+                  as String,
+        name: null == name
+            ? _value.name
+            : name // ignore: cast_nullable_to_non_nullable
+                  as String,
+        location: freezed == location
+            ? _value.location
+            : location // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        ip: freezed == ip
+            ? _value.ip
+            : ip // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        country: freezed == country
+            ? _value.country
+            : country // ignore: cast_nullable_to_non_nullable
+                  as String?,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$ServerDtoImpl implements _ServerDto {
+  const _$ServerDtoImpl({
+    required this.id,
+    required this.name,
+    this.location,
+    this.ip,
+    this.country,
+  });
+
+  factory _$ServerDtoImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ServerDtoImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String name;
+  @override
+  final String? location;
+  @override
+  final String? ip;
+  @override
+  final String? country;
+
+  @override
+  String toString() {
+    return 'ServerDto(id: $id, name: $name, location: $location, ip: $ip, country: $country)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ServerDtoImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.location, location) ||
+                other.location == location) &&
+            (identical(other.ip, ip) || other.ip == ip) &&
+            (identical(other.country, country) || other.country == country));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, name, location, ip, country);
+
+  /// Create a copy of ServerDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ServerDtoImplCopyWith<_$ServerDtoImpl> get copyWith =>
+      __$$ServerDtoImplCopyWithImpl<_$ServerDtoImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$ServerDtoImplToJson(this);
+  }
+}
+
+abstract class _ServerDto implements ServerDto {
+  const factory _ServerDto({
+    required final String id,
+    required final String name,
+    final String? location,
+    final String? ip,
+    final String? country,
+  }) = _$ServerDtoImpl;
+
+  factory _ServerDto.fromJson(Map<String, dynamic> json) =
+      _$ServerDtoImpl.fromJson;
+
+  @override
+  String get id;
+  @override
+  String get name;
+  @override
+  String? get location;
+  @override
+  String? get ip;
+  @override
+  String? get country;
+
+  /// Create a copy of ServerDto
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ServerDtoImplCopyWith<_$ServerDtoImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+MigrationDto _$MigrationDtoFromJson(Map<String, dynamic> json) {
+  return _MigrationDto.fromJson(json);
+}
+
+/// @nodoc
+mixin _$MigrationDto {
+  DateTime? get migrateDate => throw _privateConstructorUsedError;
+  int? get counterMigrate => throw _privateConstructorUsedError;
+  int? get counterMigrateV2 => throw _privateConstructorUsedError;
+
+  /// Serializes this MigrationDto to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of MigrationDto
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $MigrationDtoCopyWith<MigrationDto> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $MigrationDtoCopyWith<$Res> {
+  factory $MigrationDtoCopyWith(
+    MigrationDto value,
+    $Res Function(MigrationDto) then,
+  ) = _$MigrationDtoCopyWithImpl<$Res, MigrationDto>;
+  @useResult
+  $Res call({
+    DateTime? migrateDate,
+    int? counterMigrate,
+    int? counterMigrateV2,
+  });
+}
+
+/// @nodoc
+class _$MigrationDtoCopyWithImpl<$Res, $Val extends MigrationDto>
+    implements $MigrationDtoCopyWith<$Res> {
+  _$MigrationDtoCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of MigrationDto
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? migrateDate = freezed,
+    Object? counterMigrate = freezed,
+    Object? counterMigrateV2 = freezed,
+  }) {
+    return _then(
+      _value.copyWith(
+            migrateDate: freezed == migrateDate
+                ? _value.migrateDate
+                : migrateDate // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+            counterMigrate: freezed == counterMigrate
+                ? _value.counterMigrate
+                : counterMigrate // ignore: cast_nullable_to_non_nullable
+                      as int?,
+            counterMigrateV2: freezed == counterMigrateV2
+                ? _value.counterMigrateV2
+                : counterMigrateV2 // ignore: cast_nullable_to_non_nullable
                       as int?,
           )
           as $Val,
@@ -970,64 +1031,52 @@ class _$UserInfoCopyWithImpl<$Res, $Val extends UserInfo>
 }
 
 /// @nodoc
-abstract class _$$UserInfoImplCopyWith<$Res>
-    implements $UserInfoCopyWith<$Res> {
-  factory _$$UserInfoImplCopyWith(
-    _$UserInfoImpl value,
-    $Res Function(_$UserInfoImpl) then,
-  ) = __$$UserInfoImplCopyWithImpl<$Res>;
+abstract class _$$MigrationDtoImplCopyWith<$Res>
+    implements $MigrationDtoCopyWith<$Res> {
+  factory _$$MigrationDtoImplCopyWith(
+    _$MigrationDtoImpl value,
+    $Res Function(_$MigrationDtoImpl) then,
+  ) = __$$MigrationDtoImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({
-    @JsonKey(name: '_id') String id,
-    String email,
-    String username,
-    int role,
-    int? money,
+    DateTime? migrateDate,
+    int? counterMigrate,
+    int? counterMigrateV2,
   });
 }
 
 /// @nodoc
-class __$$UserInfoImplCopyWithImpl<$Res>
-    extends _$UserInfoCopyWithImpl<$Res, _$UserInfoImpl>
-    implements _$$UserInfoImplCopyWith<$Res> {
-  __$$UserInfoImplCopyWithImpl(
-    _$UserInfoImpl _value,
-    $Res Function(_$UserInfoImpl) _then,
+class __$$MigrationDtoImplCopyWithImpl<$Res>
+    extends _$MigrationDtoCopyWithImpl<$Res, _$MigrationDtoImpl>
+    implements _$$MigrationDtoImplCopyWith<$Res> {
+  __$$MigrationDtoImplCopyWithImpl(
+    _$MigrationDtoImpl _value,
+    $Res Function(_$MigrationDtoImpl) _then,
   ) : super(_value, _then);
 
-  /// Create a copy of UserInfo
+  /// Create a copy of MigrationDto
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
-    Object? email = null,
-    Object? username = null,
-    Object? role = null,
-    Object? money = freezed,
+    Object? migrateDate = freezed,
+    Object? counterMigrate = freezed,
+    Object? counterMigrateV2 = freezed,
   }) {
     return _then(
-      _$UserInfoImpl(
-        id: null == id
-            ? _value.id
-            : id // ignore: cast_nullable_to_non_nullable
-                  as String,
-        email: null == email
-            ? _value.email
-            : email // ignore: cast_nullable_to_non_nullable
-                  as String,
-        username: null == username
-            ? _value.username
-            : username // ignore: cast_nullable_to_non_nullable
-                  as String,
-        role: null == role
-            ? _value.role
-            : role // ignore: cast_nullable_to_non_nullable
-                  as int,
-        money: freezed == money
-            ? _value.money
-            : money // ignore: cast_nullable_to_non_nullable
+      _$MigrationDtoImpl(
+        migrateDate: freezed == migrateDate
+            ? _value.migrateDate
+            : migrateDate // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+        counterMigrate: freezed == counterMigrate
+            ? _value.counterMigrate
+            : counterMigrate // ignore: cast_nullable_to_non_nullable
+                  as int?,
+        counterMigrateV2: freezed == counterMigrateV2
+            ? _value.counterMigrateV2
+            : counterMigrateV2 // ignore: cast_nullable_to_non_nullable
                   as int?,
       ),
     );
@@ -1036,178 +1085,139 @@ class __$$UserInfoImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$UserInfoImpl implements _UserInfo {
-  const _$UserInfoImpl({
-    @JsonKey(name: '_id') required this.id,
-    required this.email,
-    required this.username,
-    required this.role,
-    this.money,
+class _$MigrationDtoImpl implements _MigrationDto {
+  const _$MigrationDtoImpl({
+    this.migrateDate,
+    this.counterMigrate,
+    this.counterMigrateV2,
   });
 
-  factory _$UserInfoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$UserInfoImplFromJson(json);
+  factory _$MigrationDtoImpl.fromJson(Map<String, dynamic> json) =>
+      _$$MigrationDtoImplFromJson(json);
 
   @override
-  @JsonKey(name: '_id')
-  final String id;
+  final DateTime? migrateDate;
   @override
-  final String email;
+  final int? counterMigrate;
   @override
-  final String username;
-  @override
-  final int role;
-  @override
-  final int? money;
+  final int? counterMigrateV2;
 
   @override
   String toString() {
-    return 'UserInfo(id: $id, email: $email, username: $username, role: $role, money: $money)';
+    return 'MigrationDto(migrateDate: $migrateDate, counterMigrate: $counterMigrate, counterMigrateV2: $counterMigrateV2)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$UserInfoImpl &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.email, email) || other.email == email) &&
-            (identical(other.username, username) ||
-                other.username == username) &&
-            (identical(other.role, role) || other.role == role) &&
-            (identical(other.money, money) || other.money == money));
+            other is _$MigrationDtoImpl &&
+            (identical(other.migrateDate, migrateDate) ||
+                other.migrateDate == migrateDate) &&
+            (identical(other.counterMigrate, counterMigrate) ||
+                other.counterMigrate == counterMigrate) &&
+            (identical(other.counterMigrateV2, counterMigrateV2) ||
+                other.counterMigrateV2 == counterMigrateV2));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, id, email, username, role, money);
+      Object.hash(runtimeType, migrateDate, counterMigrate, counterMigrateV2);
 
-  /// Create a copy of UserInfo
+  /// Create a copy of MigrationDto
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$UserInfoImplCopyWith<_$UserInfoImpl> get copyWith =>
-      __$$UserInfoImplCopyWithImpl<_$UserInfoImpl>(this, _$identity);
+  _$$MigrationDtoImplCopyWith<_$MigrationDtoImpl> get copyWith =>
+      __$$MigrationDtoImplCopyWithImpl<_$MigrationDtoImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$UserInfoImplToJson(this);
+    return _$$MigrationDtoImplToJson(this);
   }
 }
 
-abstract class _UserInfo implements UserInfo {
-  const factory _UserInfo({
-    @JsonKey(name: '_id') required final String id,
-    required final String email,
-    required final String username,
-    required final int role,
-    final int? money,
-  }) = _$UserInfoImpl;
+abstract class _MigrationDto implements MigrationDto {
+  const factory _MigrationDto({
+    final DateTime? migrateDate,
+    final int? counterMigrate,
+    final int? counterMigrateV2,
+  }) = _$MigrationDtoImpl;
 
-  factory _UserInfo.fromJson(Map<String, dynamic> json) =
-      _$UserInfoImpl.fromJson;
+  factory _MigrationDto.fromJson(Map<String, dynamic> json) =
+      _$MigrationDtoImpl.fromJson;
 
   @override
-  @JsonKey(name: '_id')
-  String get id;
+  DateTime? get migrateDate;
   @override
-  String get email;
+  int? get counterMigrate;
   @override
-  String get username;
-  @override
-  int get role;
-  @override
-  int? get money;
+  int? get counterMigrateV2;
 
-  /// Create a copy of UserInfo
+  /// Create a copy of MigrationDto
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$UserInfoImplCopyWith<_$UserInfoImpl> get copyWith =>
+  _$$MigrationDtoImplCopyWith<_$MigrationDtoImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
-OssInfo _$OssInfoFromJson(Map<String, dynamic> json) {
-  return _OssInfo.fromJson(json);
+RecentUsageDto _$RecentUsageDtoFromJson(Map<String, dynamic> json) {
+  return _RecentUsageDto.fromJson(json);
 }
 
 /// @nodoc
-mixin _$OssInfo {
-  @JsonKey(name: '_id')
-  String get id => throw _privateConstructorUsedError;
-  String get ossId => throw _privateConstructorUsedError;
-  String get fileName => throw _privateConstructorUsedError;
-  String get prefix => throw _privateConstructorUsedError;
-  int get status => throw _privateConstructorUsedError;
+mixin _$RecentUsageDto {
+  String get date => throw _privateConstructorUsedError;
+  double get usage => throw _privateConstructorUsedError;
 
-  /// Serializes this OssInfo to a JSON map.
+  /// Serializes this RecentUsageDto to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
-  /// Create a copy of OssInfo
+  /// Create a copy of RecentUsageDto
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $OssInfoCopyWith<OssInfo> get copyWith => throw _privateConstructorUsedError;
+  $RecentUsageDtoCopyWith<RecentUsageDto> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $OssInfoCopyWith<$Res> {
-  factory $OssInfoCopyWith(OssInfo value, $Res Function(OssInfo) then) =
-      _$OssInfoCopyWithImpl<$Res, OssInfo>;
+abstract class $RecentUsageDtoCopyWith<$Res> {
+  factory $RecentUsageDtoCopyWith(
+    RecentUsageDto value,
+    $Res Function(RecentUsageDto) then,
+  ) = _$RecentUsageDtoCopyWithImpl<$Res, RecentUsageDto>;
   @useResult
-  $Res call({
-    @JsonKey(name: '_id') String id,
-    String ossId,
-    String fileName,
-    String prefix,
-    int status,
-  });
+  $Res call({String date, double usage});
 }
 
 /// @nodoc
-class _$OssInfoCopyWithImpl<$Res, $Val extends OssInfo>
-    implements $OssInfoCopyWith<$Res> {
-  _$OssInfoCopyWithImpl(this._value, this._then);
+class _$RecentUsageDtoCopyWithImpl<$Res, $Val extends RecentUsageDto>
+    implements $RecentUsageDtoCopyWith<$Res> {
+  _$RecentUsageDtoCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of OssInfo
+  /// Create a copy of RecentUsageDto
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? id = null,
-    Object? ossId = null,
-    Object? fileName = null,
-    Object? prefix = null,
-    Object? status = null,
-  }) {
+  $Res call({Object? date = null, Object? usage = null}) {
     return _then(
       _value.copyWith(
-            id: null == id
-                ? _value.id
-                : id // ignore: cast_nullable_to_non_nullable
+            date: null == date
+                ? _value.date
+                : date // ignore: cast_nullable_to_non_nullable
                       as String,
-            ossId: null == ossId
-                ? _value.ossId
-                : ossId // ignore: cast_nullable_to_non_nullable
-                      as String,
-            fileName: null == fileName
-                ? _value.fileName
-                : fileName // ignore: cast_nullable_to_non_nullable
-                      as String,
-            prefix: null == prefix
-                ? _value.prefix
-                : prefix // ignore: cast_nullable_to_non_nullable
-                      as String,
-            status: null == status
-                ? _value.status
-                : status // ignore: cast_nullable_to_non_nullable
-                      as int,
+            usage: null == usage
+                ? _value.usage
+                : usage // ignore: cast_nullable_to_non_nullable
+                      as double,
           )
           as $Val,
     );
@@ -1215,64 +1225,41 @@ class _$OssInfoCopyWithImpl<$Res, $Val extends OssInfo>
 }
 
 /// @nodoc
-abstract class _$$OssInfoImplCopyWith<$Res> implements $OssInfoCopyWith<$Res> {
-  factory _$$OssInfoImplCopyWith(
-    _$OssInfoImpl value,
-    $Res Function(_$OssInfoImpl) then,
-  ) = __$$OssInfoImplCopyWithImpl<$Res>;
+abstract class _$$RecentUsageDtoImplCopyWith<$Res>
+    implements $RecentUsageDtoCopyWith<$Res> {
+  factory _$$RecentUsageDtoImplCopyWith(
+    _$RecentUsageDtoImpl value,
+    $Res Function(_$RecentUsageDtoImpl) then,
+  ) = __$$RecentUsageDtoImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    @JsonKey(name: '_id') String id,
-    String ossId,
-    String fileName,
-    String prefix,
-    int status,
-  });
+  $Res call({String date, double usage});
 }
 
 /// @nodoc
-class __$$OssInfoImplCopyWithImpl<$Res>
-    extends _$OssInfoCopyWithImpl<$Res, _$OssInfoImpl>
-    implements _$$OssInfoImplCopyWith<$Res> {
-  __$$OssInfoImplCopyWithImpl(
-    _$OssInfoImpl _value,
-    $Res Function(_$OssInfoImpl) _then,
+class __$$RecentUsageDtoImplCopyWithImpl<$Res>
+    extends _$RecentUsageDtoCopyWithImpl<$Res, _$RecentUsageDtoImpl>
+    implements _$$RecentUsageDtoImplCopyWith<$Res> {
+  __$$RecentUsageDtoImplCopyWithImpl(
+    _$RecentUsageDtoImpl _value,
+    $Res Function(_$RecentUsageDtoImpl) _then,
   ) : super(_value, _then);
 
-  /// Create a copy of OssInfo
+  /// Create a copy of RecentUsageDto
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? id = null,
-    Object? ossId = null,
-    Object? fileName = null,
-    Object? prefix = null,
-    Object? status = null,
-  }) {
+  $Res call({Object? date = null, Object? usage = null}) {
     return _then(
-      _$OssInfoImpl(
-        id: null == id
-            ? _value.id
-            : id // ignore: cast_nullable_to_non_nullable
+      _$RecentUsageDtoImpl(
+        date: null == date
+            ? _value.date
+            : date // ignore: cast_nullable_to_non_nullable
                   as String,
-        ossId: null == ossId
-            ? _value.ossId
-            : ossId // ignore: cast_nullable_to_non_nullable
-                  as String,
-        fileName: null == fileName
-            ? _value.fileName
-            : fileName // ignore: cast_nullable_to_non_nullable
-                  as String,
-        prefix: null == prefix
-            ? _value.prefix
-            : prefix // ignore: cast_nullable_to_non_nullable
-                  as String,
-        status: null == status
-            ? _value.status
-            : status // ignore: cast_nullable_to_non_nullable
-                  as int,
+        usage: null == usage
+            ? _value.usage
+            : usage // ignore: cast_nullable_to_non_nullable
+                  as double,
       ),
     );
   }
@@ -1280,177 +1267,143 @@ class __$$OssInfoImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$OssInfoImpl implements _OssInfo {
-  const _$OssInfoImpl({
-    @JsonKey(name: '_id') required this.id,
-    required this.ossId,
-    required this.fileName,
-    required this.prefix,
-    required this.status,
-  });
+class _$RecentUsageDtoImpl implements _RecentUsageDto {
+  const _$RecentUsageDtoImpl({required this.date, required this.usage});
 
-  factory _$OssInfoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$OssInfoImplFromJson(json);
+  factory _$RecentUsageDtoImpl.fromJson(Map<String, dynamic> json) =>
+      _$$RecentUsageDtoImplFromJson(json);
 
   @override
-  @JsonKey(name: '_id')
-  final String id;
+  final String date;
   @override
-  final String ossId;
-  @override
-  final String fileName;
-  @override
-  final String prefix;
-  @override
-  final int status;
+  final double usage;
 
   @override
   String toString() {
-    return 'OssInfo(id: $id, ossId: $ossId, fileName: $fileName, prefix: $prefix, status: $status)';
+    return 'RecentUsageDto(date: $date, usage: $usage)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$OssInfoImpl &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.ossId, ossId) || other.ossId == ossId) &&
-            (identical(other.fileName, fileName) ||
-                other.fileName == fileName) &&
-            (identical(other.prefix, prefix) || other.prefix == prefix) &&
-            (identical(other.status, status) || other.status == status));
+            other is _$RecentUsageDtoImpl &&
+            (identical(other.date, date) || other.date == date) &&
+            (identical(other.usage, usage) || other.usage == usage));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, ossId, fileName, prefix, status);
+  int get hashCode => Object.hash(runtimeType, date, usage);
 
-  /// Create a copy of OssInfo
+  /// Create a copy of RecentUsageDto
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$OssInfoImplCopyWith<_$OssInfoImpl> get copyWith =>
-      __$$OssInfoImplCopyWithImpl<_$OssInfoImpl>(this, _$identity);
+  _$$RecentUsageDtoImplCopyWith<_$RecentUsageDtoImpl> get copyWith =>
+      __$$RecentUsageDtoImplCopyWithImpl<_$RecentUsageDtoImpl>(
+        this,
+        _$identity,
+      );
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$OssInfoImplToJson(this);
+    return _$$RecentUsageDtoImplToJson(this);
   }
 }
 
-abstract class _OssInfo implements OssInfo {
-  const factory _OssInfo({
-    @JsonKey(name: '_id') required final String id,
-    required final String ossId,
-    required final String fileName,
-    required final String prefix,
-    required final int status,
-  }) = _$OssInfoImpl;
+abstract class _RecentUsageDto implements RecentUsageDto {
+  const factory _RecentUsageDto({
+    required final String date,
+    required final double usage,
+  }) = _$RecentUsageDtoImpl;
 
-  factory _OssInfo.fromJson(Map<String, dynamic> json) = _$OssInfoImpl.fromJson;
+  factory _RecentUsageDto.fromJson(Map<String, dynamic> json) =
+      _$RecentUsageDtoImpl.fromJson;
 
   @override
-  @JsonKey(name: '_id')
-  String get id;
+  String get date;
   @override
-  String get ossId;
-  @override
-  String get fileName;
-  @override
-  String get prefix;
-  @override
-  int get status;
+  double get usage;
 
-  /// Create a copy of OssInfo
+  /// Create a copy of RecentUsageDto
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$OssInfoImplCopyWith<_$OssInfoImpl> get copyWith =>
+  _$$RecentUsageDtoImplCopyWith<_$RecentUsageDtoImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
-AwsInfo _$AwsInfoFromJson(Map<String, dynamic> json) {
-  return _AwsInfo.fromJson(json);
+UsageStatsDto _$UsageStatsDtoFromJson(Map<String, dynamic> json) {
+  return _UsageStatsDto.fromJson(json);
 }
 
 /// @nodoc
-mixin _$AwsInfo {
-  @JsonKey(name: '_id')
-  String get id => throw _privateConstructorUsedError;
-  String get awsId => throw _privateConstructorUsedError;
-  String get fileName => throw _privateConstructorUsedError;
-  String get prefix => throw _privateConstructorUsedError;
-  int get status => throw _privateConstructorUsedError;
+mixin _$UsageStatsDto {
+  double get total => throw _privateConstructorUsedError;
+  double get average => throw _privateConstructorUsedError;
+  double get peak => throw _privateConstructorUsedError;
+  String? get peakDate => throw _privateConstructorUsedError;
 
-  /// Serializes this AwsInfo to a JSON map.
+  /// Serializes this UsageStatsDto to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
-  /// Create a copy of AwsInfo
+  /// Create a copy of UsageStatsDto
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $AwsInfoCopyWith<AwsInfo> get copyWith => throw _privateConstructorUsedError;
+  $UsageStatsDtoCopyWith<UsageStatsDto> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $AwsInfoCopyWith<$Res> {
-  factory $AwsInfoCopyWith(AwsInfo value, $Res Function(AwsInfo) then) =
-      _$AwsInfoCopyWithImpl<$Res, AwsInfo>;
+abstract class $UsageStatsDtoCopyWith<$Res> {
+  factory $UsageStatsDtoCopyWith(
+    UsageStatsDto value,
+    $Res Function(UsageStatsDto) then,
+  ) = _$UsageStatsDtoCopyWithImpl<$Res, UsageStatsDto>;
   @useResult
-  $Res call({
-    @JsonKey(name: '_id') String id,
-    String awsId,
-    String fileName,
-    String prefix,
-    int status,
-  });
+  $Res call({double total, double average, double peak, String? peakDate});
 }
 
 /// @nodoc
-class _$AwsInfoCopyWithImpl<$Res, $Val extends AwsInfo>
-    implements $AwsInfoCopyWith<$Res> {
-  _$AwsInfoCopyWithImpl(this._value, this._then);
+class _$UsageStatsDtoCopyWithImpl<$Res, $Val extends UsageStatsDto>
+    implements $UsageStatsDtoCopyWith<$Res> {
+  _$UsageStatsDtoCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of AwsInfo
+  /// Create a copy of UsageStatsDto
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
-    Object? awsId = null,
-    Object? fileName = null,
-    Object? prefix = null,
-    Object? status = null,
+    Object? total = null,
+    Object? average = null,
+    Object? peak = null,
+    Object? peakDate = freezed,
   }) {
     return _then(
       _value.copyWith(
-            id: null == id
-                ? _value.id
-                : id // ignore: cast_nullable_to_non_nullable
-                      as String,
-            awsId: null == awsId
-                ? _value.awsId
-                : awsId // ignore: cast_nullable_to_non_nullable
-                      as String,
-            fileName: null == fileName
-                ? _value.fileName
-                : fileName // ignore: cast_nullable_to_non_nullable
-                      as String,
-            prefix: null == prefix
-                ? _value.prefix
-                : prefix // ignore: cast_nullable_to_non_nullable
-                      as String,
-            status: null == status
-                ? _value.status
-                : status // ignore: cast_nullable_to_non_nullable
-                      as int,
+            total: null == total
+                ? _value.total
+                : total // ignore: cast_nullable_to_non_nullable
+                      as double,
+            average: null == average
+                ? _value.average
+                : average // ignore: cast_nullable_to_non_nullable
+                      as double,
+            peak: null == peak
+                ? _value.peak
+                : peak // ignore: cast_nullable_to_non_nullable
+                      as double,
+            peakDate: freezed == peakDate
+                ? _value.peakDate
+                : peakDate // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -1458,64 +1411,54 @@ class _$AwsInfoCopyWithImpl<$Res, $Val extends AwsInfo>
 }
 
 /// @nodoc
-abstract class _$$AwsInfoImplCopyWith<$Res> implements $AwsInfoCopyWith<$Res> {
-  factory _$$AwsInfoImplCopyWith(
-    _$AwsInfoImpl value,
-    $Res Function(_$AwsInfoImpl) then,
-  ) = __$$AwsInfoImplCopyWithImpl<$Res>;
+abstract class _$$UsageStatsDtoImplCopyWith<$Res>
+    implements $UsageStatsDtoCopyWith<$Res> {
+  factory _$$UsageStatsDtoImplCopyWith(
+    _$UsageStatsDtoImpl value,
+    $Res Function(_$UsageStatsDtoImpl) then,
+  ) = __$$UsageStatsDtoImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    @JsonKey(name: '_id') String id,
-    String awsId,
-    String fileName,
-    String prefix,
-    int status,
-  });
+  $Res call({double total, double average, double peak, String? peakDate});
 }
 
 /// @nodoc
-class __$$AwsInfoImplCopyWithImpl<$Res>
-    extends _$AwsInfoCopyWithImpl<$Res, _$AwsInfoImpl>
-    implements _$$AwsInfoImplCopyWith<$Res> {
-  __$$AwsInfoImplCopyWithImpl(
-    _$AwsInfoImpl _value,
-    $Res Function(_$AwsInfoImpl) _then,
+class __$$UsageStatsDtoImplCopyWithImpl<$Res>
+    extends _$UsageStatsDtoCopyWithImpl<$Res, _$UsageStatsDtoImpl>
+    implements _$$UsageStatsDtoImplCopyWith<$Res> {
+  __$$UsageStatsDtoImplCopyWithImpl(
+    _$UsageStatsDtoImpl _value,
+    $Res Function(_$UsageStatsDtoImpl) _then,
   ) : super(_value, _then);
 
-  /// Create a copy of AwsInfo
+  /// Create a copy of UsageStatsDto
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
-    Object? awsId = null,
-    Object? fileName = null,
-    Object? prefix = null,
-    Object? status = null,
+    Object? total = null,
+    Object? average = null,
+    Object? peak = null,
+    Object? peakDate = freezed,
   }) {
     return _then(
-      _$AwsInfoImpl(
-        id: null == id
-            ? _value.id
-            : id // ignore: cast_nullable_to_non_nullable
-                  as String,
-        awsId: null == awsId
-            ? _value.awsId
-            : awsId // ignore: cast_nullable_to_non_nullable
-                  as String,
-        fileName: null == fileName
-            ? _value.fileName
-            : fileName // ignore: cast_nullable_to_non_nullable
-                  as String,
-        prefix: null == prefix
-            ? _value.prefix
-            : prefix // ignore: cast_nullable_to_non_nullable
-                  as String,
-        status: null == status
-            ? _value.status
-            : status // ignore: cast_nullable_to_non_nullable
-                  as int,
+      _$UsageStatsDtoImpl(
+        total: null == total
+            ? _value.total
+            : total // ignore: cast_nullable_to_non_nullable
+                  as double,
+        average: null == average
+            ? _value.average
+            : average // ignore: cast_nullable_to_non_nullable
+                  as double,
+        peak: null == peak
+            ? _value.peak
+            : peak // ignore: cast_nullable_to_non_nullable
+                  as double,
+        peakDate: freezed == peakDate
+            ? _value.peakDate
+            : peakDate // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -1523,94 +1466,85 @@ class __$$AwsInfoImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$AwsInfoImpl implements _AwsInfo {
-  const _$AwsInfoImpl({
-    @JsonKey(name: '_id') required this.id,
-    required this.awsId,
-    required this.fileName,
-    required this.prefix,
-    required this.status,
+class _$UsageStatsDtoImpl implements _UsageStatsDto {
+  const _$UsageStatsDtoImpl({
+    required this.total,
+    required this.average,
+    required this.peak,
+    this.peakDate,
   });
 
-  factory _$AwsInfoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$AwsInfoImplFromJson(json);
+  factory _$UsageStatsDtoImpl.fromJson(Map<String, dynamic> json) =>
+      _$$UsageStatsDtoImplFromJson(json);
 
   @override
-  @JsonKey(name: '_id')
-  final String id;
+  final double total;
   @override
-  final String awsId;
+  final double average;
   @override
-  final String fileName;
+  final double peak;
   @override
-  final String prefix;
-  @override
-  final int status;
+  final String? peakDate;
 
   @override
   String toString() {
-    return 'AwsInfo(id: $id, awsId: $awsId, fileName: $fileName, prefix: $prefix, status: $status)';
+    return 'UsageStatsDto(total: $total, average: $average, peak: $peak, peakDate: $peakDate)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$AwsInfoImpl &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.awsId, awsId) || other.awsId == awsId) &&
-            (identical(other.fileName, fileName) ||
-                other.fileName == fileName) &&
-            (identical(other.prefix, prefix) || other.prefix == prefix) &&
-            (identical(other.status, status) || other.status == status));
+            other is _$UsageStatsDtoImpl &&
+            (identical(other.total, total) || other.total == total) &&
+            (identical(other.average, average) || other.average == average) &&
+            (identical(other.peak, peak) || other.peak == peak) &&
+            (identical(other.peakDate, peakDate) ||
+                other.peakDate == peakDate));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, awsId, fileName, prefix, status);
+  int get hashCode => Object.hash(runtimeType, total, average, peak, peakDate);
 
-  /// Create a copy of AwsInfo
+  /// Create a copy of UsageStatsDto
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$AwsInfoImplCopyWith<_$AwsInfoImpl> get copyWith =>
-      __$$AwsInfoImplCopyWithImpl<_$AwsInfoImpl>(this, _$identity);
+  _$$UsageStatsDtoImplCopyWith<_$UsageStatsDtoImpl> get copyWith =>
+      __$$UsageStatsDtoImplCopyWithImpl<_$UsageStatsDtoImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$AwsInfoImplToJson(this);
+    return _$$UsageStatsDtoImplToJson(this);
   }
 }
 
-abstract class _AwsInfo implements AwsInfo {
-  const factory _AwsInfo({
-    @JsonKey(name: '_id') required final String id,
-    required final String awsId,
-    required final String fileName,
-    required final String prefix,
-    required final int status,
-  }) = _$AwsInfoImpl;
+abstract class _UsageStatsDto implements UsageStatsDto {
+  const factory _UsageStatsDto({
+    required final double total,
+    required final double average,
+    required final double peak,
+    final String? peakDate,
+  }) = _$UsageStatsDtoImpl;
 
-  factory _AwsInfo.fromJson(Map<String, dynamic> json) = _$AwsInfoImpl.fromJson;
+  factory _UsageStatsDto.fromJson(Map<String, dynamic> json) =
+      _$UsageStatsDtoImpl.fromJson;
 
   @override
-  @JsonKey(name: '_id')
-  String get id;
+  double get total;
   @override
-  String get awsId;
+  double get average;
   @override
-  String get fileName;
+  double get peak;
   @override
-  String get prefix;
-  @override
-  int get status;
+  String? get peakDate;
 
-  /// Create a copy of AwsInfo
+  /// Create a copy of UsageStatsDto
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$AwsInfoImplCopyWith<_$AwsInfoImpl> get copyWith =>
+  _$$UsageStatsDtoImplCopyWith<_$UsageStatsDtoImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

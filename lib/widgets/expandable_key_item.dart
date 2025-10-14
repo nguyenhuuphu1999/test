@@ -1,14 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
 
 import 'package:vpncn2_app/l10n/generated/app_localizations.dart';
-import 'package:vpncn2_app/models/key_details.dart';
-import 'package:vpncn2_app/widgets/key_details_expansion.dart';
 import 'package:vpncn2_app/features/keys/domain/entities/key.dart' as KeyEntity;
 import 'package:vpncn2_app/services/outline_brigde.dart';
+import 'package:vpncn2_app/widgets/key_detail_modal.dart';
 
 class ExpandableKeyItem extends StatefulWidget {
   final String name;
@@ -35,7 +33,6 @@ class ExpandableKeyItem extends StatefulWidget {
 }
 
 class _ExpandableKeyItemState extends State<ExpandableKeyItem> {
-  bool _isExpanded = false;
   static const _vpnCh = MethodChannel('vpncn2/vpn_service');
 
   // Trạng thái kết nối qua proxy nội bộ (MobileProxy)
@@ -44,17 +41,9 @@ class _ExpandableKeyItemState extends State<ExpandableKeyItem> {
   String? _proxyAddress; // "127.0.0.1:<port>"
   IOClient? _ioClientViaProxy; // để test traffic qua proxy
 
-  late KeyDetails _keyDetails;
-
   @override
   void initState() {
     super.initState();
-    _keyDetails = KeyDetails.fromKeyItem(
-      widget.name,
-      widget.quotaText,
-      widget.remainDays ?? 0,
-      expired: widget.expired,
-    );
   }
 
   // ============== CONNECT ==============
@@ -213,6 +202,23 @@ class _ExpandableKeyItemState extends State<ExpandableKeyItem> {
     );
   }
 
+  void _showKeyDetailModal() {
+    if (widget.keyData?.id == null) {
+      _toast('Key ID not available', isError: true);
+      return;
+    }
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => KeyDetailModal(
+        keyId: widget.keyData!.id,
+        keyName: widget.name,
+      ),
+    );
+  }
+
   @override
   void dispose() {
     OutlineBridge.clearWebViewProxy();
@@ -243,9 +249,9 @@ class _ExpandableKeyItemState extends State<ExpandableKeyItem> {
       ),
       child: Column(
         children: [
-          // Header row (tap to expand)
+          // Header row (tap to show key details modal)
           GestureDetector(
-            onTap: () => setState(() => _isExpanded = !_isExpanded),
+            onTap: () => _showKeyDetailModal(),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
               child: Row(
@@ -374,9 +380,7 @@ class _ExpandableKeyItemState extends State<ExpandableKeyItem> {
 
                   const SizedBox(width: 8),
                   Icon(
-                    _isExpanded
-                        ? Icons.keyboard_arrow_up
-                        : Icons.keyboard_arrow_down,
+                    Icons.keyboard_arrow_up,
                     color: const Color(0xFF4894FE),
                     size: 24,
                   ),
@@ -385,28 +389,6 @@ class _ExpandableKeyItemState extends State<ExpandableKeyItem> {
             ),
           ),
 
-          // Expand content
-          if (_isExpanded)
-            KeyDetailsExpansion(
-              keyDetails: _keyDetails,
-              onServerLocationChanged: (code, country) {
-                setState(() {
-                  _keyDetails = KeyDetails(
-                    name: _keyDetails.name,
-                    packageName: _keyDetails.packageName,
-                    startDate: _keyDetails.startDate,
-                    endDate: _keyDetails.endDate,
-                    serverLocation: code,
-                    outlineLink: _keyDetails.outlineLink,
-                    alternateLink: _keyDetails.alternateLink,
-                    quotaText: _keyDetails.quotaText,
-                    remainDays: _keyDetails.remainDays,
-                    expired: _keyDetails.expired,
-                  );
-                });
-                widget.onServerLocationChanged?.call(code, country);
-              },
-            ),
         ],
       ),
     );

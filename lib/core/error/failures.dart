@@ -26,6 +26,9 @@ class Failure with _$Failure {
   const factory Failure.cache({required String message}) = CacheFailure;
 
   const factory Failure.timeout({required String message}) = TimeoutFailure;
+
+  const factory Failure.client({required String message, int? statusCode}) =
+      ClientFailure;
 }
 
 extension FailureX on Failure {
@@ -38,6 +41,7 @@ extension FailureX on Failure {
       unknown: (message, error) => message,
       cache: (message) => message,
       timeout: (message) => message,
+      client: (message, statusCode) => message,
     );
   }
 
@@ -48,4 +52,7 @@ extension FailureX on Failure {
 
   bool get isServerError =>
       maybeWhen(server: (_, __, ___) => true, orElse: () => false);
+
+  bool get isClientError =>
+      maybeWhen(client: (_, __) => true, orElse: () => false);
 }

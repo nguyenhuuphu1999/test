@@ -9,21 +9,33 @@ part of 'keys_response_dto.dart';
 _$KeysResponseDtoImpl _$$KeysResponseDtoImplFromJson(
   Map<String, dynamic> json,
 ) => _$KeysResponseDtoImpl(
-  currentPage: (json['currentPage'] as num).toInt(),
-  totalPage: (json['totalPage'] as num).toInt(),
-  itemsPerPage: (json['itemsPerPage'] as num).toInt(),
-  totalItems: (json['totalItems'] as num).toInt(),
-  data: (json['data'] as List<dynamic>)
-      .map((e) => KeyDto.fromJson(e as Map<String, dynamic>))
+  list: (json['list'] as List<dynamic>?)
+      ?.map((e) => KeyDto.fromJson(e as Map<String, dynamic>))
       .toList(),
+  keys: (json['keys'] as List<dynamic>?)
+      ?.map((e) => KeyDto.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  total: (json['total'] as num?)?.toInt(),
+  currentPage: (json['currentPage'] as num?)?.toInt(),
+  page: (json['page'] as num?)?.toInt(),
+  limit: (json['limit'] as num?)?.toInt(),
+  totalPages: (json['totalPages'] as num?)?.toInt(),
+  totalItems: (json['totalItems'] as num?)?.toInt(),
+  hasNextPage: json['hasNextPage'] as bool?,
+  hasPrevPage: json['hasPrevPage'] as bool?,
 );
 
 Map<String, dynamic> _$$KeysResponseDtoImplToJson(
   _$KeysResponseDtoImpl instance,
 ) => <String, dynamic>{
+  'list': instance.list,
+  'keys': instance.keys,
+  'total': instance.total,
   'currentPage': instance.currentPage,
-  'totalPage': instance.totalPage,
-  'itemsPerPage': instance.itemsPerPage,
+  'page': instance.page,
+  'limit': instance.limit,
+  'totalPages': instance.totalPages,
   'totalItems': instance.totalItems,
-  'data': instance.data,
+  'hasNextPage': instance.hasNextPage,
+  'hasPrevPage': instance.hasPrevPage,
 };

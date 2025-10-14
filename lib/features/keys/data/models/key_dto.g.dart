@@ -7,124 +7,126 @@ part of 'key_dto.dart';
 // **************************************************************************
 
 _$KeyDtoImpl _$$KeyDtoImplFromJson(Map<String, dynamic> json) => _$KeyDtoImpl(
-  id: json['_id'] as String,
-  keyId: json['keyId'] as String,
+  id: json['id'] as String,
+  keyId: json['keyId'] as String?,
   name: json['name'] as String,
-  password: json['password'] as String,
-  port: (json['port'] as num).toInt(),
-  method: json['method'] as String,
+  port: (json['port'] as num?)?.toInt(),
+  method: json['method'] as String?,
   accessUrl: json['accessUrl'] as String,
-  enable: json['enable'] as bool,
-  enableByAdmin: json['enableByAdmin'] as bool,
-  dataLimit: (json['dataLimit'] as num).toInt(),
-  dataUsage: (json['dataUsage'] as num).toInt(),
-  dataExpand: (json['dataExpand'] as num).toInt(),
-  serverId: ServerInfo.fromJson(json['serverId'] as Map<String, dynamic>),
-  userId: UserInfo.fromJson(json['userId'] as Map<String, dynamic>),
-  ossId: json['ossId'] == null
+  password: json['password'] as String?,
+  enable: json['enable'] as bool?,
+  enableByAdmin: json['enableByAdmin'] as bool?,
+  status: (json['status'] as num?)?.toInt(),
+  dataLimit: (json['dataLimit'] as num?)?.toInt(),
+  dataUsage: (json['dataUsage'] as num?)?.toInt(),
+  dataUsageToday: (json['dataUsageToday'] as num?)?.toInt(),
+  dataUsageYesterday: (json['dataUsageYesterday'] as num?)?.toInt(),
+  usagePercentage: (json['usagePercentage'] as num?)?.toDouble(),
+  server: json['server'] == null
       ? null
-      : OssInfo.fromJson(json['ossId'] as Map<String, dynamic>),
-  awsId: json['awsId'] == null
+      : ServerDto.fromJson(json['server'] as Map<String, dynamic>),
+  createdAt: json['createdAt'] == null
       ? null
-      : AwsInfo.fromJson(json['awsId'] as Map<String, dynamic>),
-  account: json['account'] as String,
-  startDate: json['startDate'] as String,
-  endDate: json['endDate'] as String,
-  status: (json['status'] as num).toInt(),
-  createdAt: json['createdAt'] as String,
-  updatedAt: json['updatedAt'] as String,
+      : DateTime.parse(json['createdAt'] as String),
+  endDate: json['endDate'] == null
+      ? null
+      : DateTime.parse(json['endDate'] as String),
+  daysRemaining: (json['daysRemaining'] as num?)?.toInt(),
+  isUserNormal: json['isUserNormal'] as bool?,
+  migration: json['migration'] == null
+      ? null
+      : MigrationDto.fromJson(json['migration'] as Map<String, dynamic>),
+  recentUsage: (json['recentUsage'] as List<dynamic>?)
+      ?.map((e) => RecentUsageDto.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  usageStats: json['usageStats'] == null
+      ? null
+      : UsageStatsDto.fromJson(json['usageStats'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$$KeyDtoImplToJson(_$KeyDtoImpl instance) =>
     <String, dynamic>{
-      '_id': instance.id,
+      'id': instance.id,
       'keyId': instance.keyId,
       'name': instance.name,
-      'password': instance.password,
       'port': instance.port,
       'method': instance.method,
       'accessUrl': instance.accessUrl,
+      'password': instance.password,
       'enable': instance.enable,
       'enableByAdmin': instance.enableByAdmin,
+      'status': instance.status,
       'dataLimit': instance.dataLimit,
       'dataUsage': instance.dataUsage,
-      'dataExpand': instance.dataExpand,
-      'serverId': instance.serverId,
-      'userId': instance.userId,
-      'ossId': instance.ossId,
-      'awsId': instance.awsId,
-      'account': instance.account,
-      'startDate': instance.startDate,
-      'endDate': instance.endDate,
-      'status': instance.status,
-      'createdAt': instance.createdAt,
-      'updatedAt': instance.updatedAt,
+      'dataUsageToday': instance.dataUsageToday,
+      'dataUsageYesterday': instance.dataUsageYesterday,
+      'usagePercentage': instance.usagePercentage,
+      'server': instance.server,
+      'createdAt': instance.createdAt?.toIso8601String(),
+      'endDate': instance.endDate?.toIso8601String(),
+      'daysRemaining': instance.daysRemaining,
+      'isUserNormal': instance.isUserNormal,
+      'migration': instance.migration,
+      'recentUsage': instance.recentUsage,
+      'usageStats': instance.usageStats,
     };
 
-_$ServerInfoImpl _$$ServerInfoImplFromJson(Map<String, dynamic> json) =>
-    _$ServerInfoImpl(
-      id: json['_id'] as String,
-      location: json['location'] as String,
+_$ServerDtoImpl _$$ServerDtoImplFromJson(Map<String, dynamic> json) =>
+    _$ServerDtoImpl(
+      id: json['id'] as String,
       name: json['name'] as String,
+      location: json['location'] as String?,
+      ip: json['ip'] as String?,
+      country: json['country'] as String?,
     );
 
-Map<String, dynamic> _$$ServerInfoImplToJson(_$ServerInfoImpl instance) =>
+Map<String, dynamic> _$$ServerDtoImplToJson(_$ServerDtoImpl instance) =>
     <String, dynamic>{
-      '_id': instance.id,
-      'location': instance.location,
+      'id': instance.id,
       'name': instance.name,
+      'location': instance.location,
+      'ip': instance.ip,
+      'country': instance.country,
     };
 
-_$UserInfoImpl _$$UserInfoImplFromJson(Map<String, dynamic> json) =>
-    _$UserInfoImpl(
-      id: json['_id'] as String,
-      email: json['email'] as String,
-      username: json['username'] as String,
-      role: (json['role'] as num).toInt(),
-      money: (json['money'] as num?)?.toInt(),
+_$MigrationDtoImpl _$$MigrationDtoImplFromJson(Map<String, dynamic> json) =>
+    _$MigrationDtoImpl(
+      migrateDate: json['migrateDate'] == null
+          ? null
+          : DateTime.parse(json['migrateDate'] as String),
+      counterMigrate: (json['counterMigrate'] as num?)?.toInt(),
+      counterMigrateV2: (json['counterMigrateV2'] as num?)?.toInt(),
     );
 
-Map<String, dynamic> _$$UserInfoImplToJson(_$UserInfoImpl instance) =>
+Map<String, dynamic> _$$MigrationDtoImplToJson(_$MigrationDtoImpl instance) =>
     <String, dynamic>{
-      '_id': instance.id,
-      'email': instance.email,
-      'username': instance.username,
-      'role': instance.role,
-      'money': instance.money,
+      'migrateDate': instance.migrateDate?.toIso8601String(),
+      'counterMigrate': instance.counterMigrate,
+      'counterMigrateV2': instance.counterMigrateV2,
     };
 
-_$OssInfoImpl _$$OssInfoImplFromJson(Map<String, dynamic> json) =>
-    _$OssInfoImpl(
-      id: json['_id'] as String,
-      ossId: json['ossId'] as String,
-      fileName: json['fileName'] as String,
-      prefix: json['prefix'] as String,
-      status: (json['status'] as num).toInt(),
+_$RecentUsageDtoImpl _$$RecentUsageDtoImplFromJson(Map<String, dynamic> json) =>
+    _$RecentUsageDtoImpl(
+      date: json['date'] as String,
+      usage: (json['usage'] as num).toDouble(),
     );
 
-Map<String, dynamic> _$$OssInfoImplToJson(_$OssInfoImpl instance) =>
-    <String, dynamic>{
-      '_id': instance.id,
-      'ossId': instance.ossId,
-      'fileName': instance.fileName,
-      'prefix': instance.prefix,
-      'status': instance.status,
-    };
+Map<String, dynamic> _$$RecentUsageDtoImplToJson(
+  _$RecentUsageDtoImpl instance,
+) => <String, dynamic>{'date': instance.date, 'usage': instance.usage};
 
-_$AwsInfoImpl _$$AwsInfoImplFromJson(Map<String, dynamic> json) =>
-    _$AwsInfoImpl(
-      id: json['_id'] as String,
-      awsId: json['awsId'] as String,
-      fileName: json['fileName'] as String,
-      prefix: json['prefix'] as String,
-      status: (json['status'] as num).toInt(),
+_$UsageStatsDtoImpl _$$UsageStatsDtoImplFromJson(Map<String, dynamic> json) =>
+    _$UsageStatsDtoImpl(
+      total: (json['total'] as num).toDouble(),
+      average: (json['average'] as num).toDouble(),
+      peak: (json['peak'] as num).toDouble(),
+      peakDate: json['peakDate'] as String?,
     );
 
-Map<String, dynamic> _$$AwsInfoImplToJson(_$AwsInfoImpl instance) =>
+Map<String, dynamic> _$$UsageStatsDtoImplToJson(_$UsageStatsDtoImpl instance) =>
     <String, dynamic>{
-      '_id': instance.id,
-      'awsId': instance.awsId,
-      'fileName': instance.fileName,
-      'prefix': instance.prefix,
-      'status': instance.status,
+      'total': instance.total,
+      'average': instance.average,
+      'peak': instance.peak,
+      'peakDate': instance.peakDate,
     };

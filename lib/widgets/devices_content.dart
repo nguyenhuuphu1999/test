@@ -3,11 +3,13 @@ import 'package:vpncn2_app/constants/app_colors.dart';
 import 'package:vpncn2_app/constants/app_strings.dart';
 import 'package:vpncn2_app/screens/add_device_screen.dart';
 import 'package:vpncn2_app/utils/responsive.dart';
-import 'package:vpncn2_app/widgets/common_search_field.dart';
+import 'package:vpncn2_app/widgets/top_search_bar.dart';
 import 'package:vpncn2_app/widgets/device_card.dart';
 import 'package:vpncn2_app/widgets/server_location_modal.dart';
 import 'package:vpncn2_app/widgets/vpn_package_modal.dart';
 import 'package:vpncn2_app/services/user_service.dart';
+import 'package:vpncn2_app/widgets/home_tabs.dart';
+import 'package:vpncn2_app/widgets/smooth_main_layout.dart';
 
 class DevicesContent extends StatefulWidget {
   const DevicesContent({super.key});
@@ -72,8 +74,40 @@ class _DevicesContentState extends State<DevicesContent> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Search Bar
-        CommonSearchField.devices(onChanged: (value) {}),
+        // Tabs like Home, with Device active
+        HomeTabs(
+          selectedIndex: 1,
+          keyCount: 0,
+          onChanged: (index) {
+            if (index == 0) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SmoothMainLayout(
+                    initialIndex: 0,
+                    homeInitialTabIndex: 0,
+                  ),
+                ),
+              );
+              return;
+            }
+            if (index == 2) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SmoothMainLayout(
+                    initialIndex: 0,
+                    homeInitialTabIndex: 2,
+                  ),
+                ),
+              );
+              return;
+            }
+          },
+        ),
+        SizedBox(height: Responsive.height(context, 1.5)),
+        // Unified top search bar
+        TopSearchBar(onChanged: (value) {}),
 
         SizedBox(height: Responsive.height(context, 3)),
 

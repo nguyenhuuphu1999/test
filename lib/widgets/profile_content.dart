@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vpncn2_app/services/user_service.dart';
+import 'package:vpncn2_app/widgets/top_search_bar.dart';
 
 class ProfileContent extends StatefulWidget {
   const ProfileContent({super.key});
@@ -19,6 +20,9 @@ class _ProfileContentState extends State<ProfileContent> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Unified top search bar
+            const TopSearchBar(),
+            const SizedBox(height: 12),
             // User Info Card
             Card(
               child: Padding(

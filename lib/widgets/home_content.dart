@@ -1,27 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:vpncn2_app/widgets/key_item_tile.dart';
-import 'package:vpncn2_app/widgets/common_search_field.dart';
-import 'package:vpncn2_app/services/user_service.dart';
-import 'package:vpncn2_app/services/keys_service.dart';
+import 'package:vpncn2_app/widgets/top_search_bar.dart';
+import 'package:vpncn2_app/widgets/home_tabs.dart';
+import 'package:vpncn2_app/widgets/keys_list_section.dart';
+import 'package:vpncn2_app/widgets/devices_list_section.dart';
+import 'package:vpncn2_app/widgets/activity_feed_list.dart';
+import 'package:vpncn2_app/widgets/plans_selection_modal.dart';
 import 'package:vpncn2_app/services/vpn_service.dart';
-import 'package:vpncn2_app/features/keys/domain/entities/key.dart' as KeyEntity;
+import 'package:vpncn2_app/constants/app_colors.dart';
+import 'package:vpncn2_app/utils/responsive.dart';
 
 class HomeContent extends StatefulWidget {
-  const HomeContent({super.key});
+  final int initialTabIndex; // 0: Key, 1: Device, 2: History
+
+  const HomeContent({super.key, this.initialTabIndex = 0});
 
   @override
   State<HomeContent> createState() => _HomeContentState();
 }
 
 class _HomeContentState extends State<HomeContent> {
-  List<KeyEntity.Key> _keys = [];
-  bool _isLoading = false;
+  late int _selectedTabIndex; // 0: Key, 1: Device, 2: History
+  final GlobalKey<KeysListSectionState> _keysListKey =
+      GlobalKey<KeysListSectionState>();
 
   @override
   void initState() {
     super.initState();
+    _selectedTabIndex = widget.initialTabIndex;
     _initializeVpn();
-    _loadKeys();
   }
 
   Future<void> _initializeVpn() async {
@@ -32,110 +38,82 @@ class _HomeContentState extends State<HomeContent> {
     }
   }
 
-  Future<void> _loadKeys() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    final result = await KeysService.getKeys(status: 1, pageSize: 10);
-
-    result.when(
-      ok: (keys) {
-        setState(() {
-          _keys = keys;
-          _isLoading = false;
-        });
-      },
-      err: (failure) {
-        setState(() {
-          _isLoading = false;
-        });
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Failed to load keys: ${failure.message}'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      },
-    );
+  int get _keyCount {
+    return _keysListKey.currentState?.count ?? 0;
   }
 
-  Future<void> _onRefresh() async {
-    // Refresh user data
-    await UserService.getCurrentUser();
-
-    // Refresh keys data
-    await _loadKeys();
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Home screen refreshed!'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 1),
-        ),
-      );
-    }
+  void _showPlansModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const PlansSelectionModal(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Stack(
       children: [
-        // Search Field
-        CommonSearchField.home(onChanged: (value) {}),
+        Column(
+          children: [
+            // Top search row like screenshot
+            TopSearchBar(onChanged: (value) {}),
+            const SizedBox(height: 12),
 
-        const SizedBox(height: 24),
+            // Tabs
+            HomeTabs(
+              selectedIndex: _selectedTabIndex,
+              keyCount: _keyCount,
+              onChanged: (index) {
+                setState(() {
+                  _selectedTabIndex = index;
+                });
+              },
+            ),
+            const SizedBox(height: 8),
 
-        // Key Items with Pull-to-Refresh
-        Expanded(
-          child: RefreshIndicator(
-            onRefresh: _onRefresh,
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _keys.isEmpty
-                ? const Center(
-                    child: Text(
-                      'No keys found',
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
-                    ),
-                  )
-                : ListView.builder(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    itemCount: _keys.length,
-                    itemBuilder: (context, index) {
-                      final key = _keys[index];
-                      final remainDays = key.endDate
-                          .difference(DateTime.now())
-                          .inDays;
-                      final quotaGB = (key.dataLimit / (1024 * 1024 * 1024))
-                          .round();
+            // Body by tab
+            Expanded(child: _buildBodyByTab()),
+          ],
+        ),
 
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 5),
-                        child: KeyItemTile(
-                          name: key.name,
-                          quotaText: '${quotaGB}GB',
-                          remainDays: remainDays > 0 ? remainDays : 0,
-                          keyData: key, // Pass the key data for VPN connection
-                          onServerLocationChanged: (code, country) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Server location changed to $country',
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  ),
+        // Shopping Cart Floating Action Button
+        Positioned(
+          left: Responsive.width(context, 4),
+          bottom: Responsive.height(context, 8),
+          child: FloatingActionButton(
+            onPressed: _showPlansModal,
+            backgroundColor: Colors.white,
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Image.asset(
+              'asset/images/shopping-cart.png',
+              width: Responsive.getFontSize(context, 24),
+              height: Responsive.getFontSize(context, 24),
+              fit: BoxFit.contain,
+            ),
           ),
         ),
       ],
     );
+  }
+
+  Widget _buildBodyByTab() {
+    switch (_selectedTabIndex) {
+      case 0:
+        // Key tab
+        return KeysListSection(key: _keysListKey);
+      case 1:
+        // Device tab: inline devices list, keep header/footer same
+        return const DevicesListSection();
+      case 2:
+        // History tab
+        return const ActivityFeedList();
+      default:
+        return KeysListSection(key: _keysListKey);
+    }
   }
 }

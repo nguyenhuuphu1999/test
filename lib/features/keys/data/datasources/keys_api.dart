@@ -1,22 +1,32 @@
 import 'package:dio/dio.dart';
-import '../models/keys_response_dto.dart';
 
 class KeysApi {
   final Dio _dio;
 
   KeysApi(this._dio);
 
-  Future<KeysResponseDto> getKeys({
-    int status = 1,
+  Future<Response<dynamic>> getKeys({
     int page = 1,
-    int pageSize = 10,
+    int limit = 10,
+    String? search,
+    int status = 1,
   }) async {
-    final response = await _dio.get(
-      '/keys',
-      queryParameters: {'status': status, 'page': page, 'pageSize': pageSize},
+    return _dio.get(
+      '/mobile/keys',
+      queryParameters: {
+        'page': page,
+        'limit': limit,
+        if (search != null && search.isNotEmpty) 'search': search,
+        'status': status,
+      },
+      options: Options(headers: {'accept': 'application/json'}),
     );
+  }
 
-    final responseData = response.data as Map<String, dynamic>;
-    return KeysResponseDto.fromJson(responseData);
+  Future<Response<dynamic>> getKeyDetail(String keyId) async {
+    return _dio.get(
+      '/mobile/keys/$keyId',
+      options: Options(headers: {'accept': 'application/json'}),
+    );
   }
 }

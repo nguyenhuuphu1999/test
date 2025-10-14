@@ -21,11 +21,16 @@ KeysResponseDto _$KeysResponseDtoFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$KeysResponseDto {
-  int get currentPage => throw _privateConstructorUsedError;
-  int get totalPage => throw _privateConstructorUsedError;
-  int get itemsPerPage => throw _privateConstructorUsedError;
-  int get totalItems => throw _privateConstructorUsedError;
-  List<KeyDto> get data => throw _privateConstructorUsedError;
+  List<KeyDto>? get list => throw _privateConstructorUsedError;
+  List<KeyDto>? get keys => throw _privateConstructorUsedError;
+  int? get total => throw _privateConstructorUsedError;
+  int? get currentPage => throw _privateConstructorUsedError;
+  int? get page => throw _privateConstructorUsedError;
+  int? get limit => throw _privateConstructorUsedError;
+  int? get totalPages => throw _privateConstructorUsedError;
+  int? get totalItems => throw _privateConstructorUsedError;
+  bool? get hasNextPage => throw _privateConstructorUsedError;
+  bool? get hasPrevPage => throw _privateConstructorUsedError;
 
   /// Serializes this KeysResponseDto to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -45,11 +50,16 @@ abstract class $KeysResponseDtoCopyWith<$Res> {
   ) = _$KeysResponseDtoCopyWithImpl<$Res, KeysResponseDto>;
   @useResult
   $Res call({
-    int currentPage,
-    int totalPage,
-    int itemsPerPage,
-    int totalItems,
-    List<KeyDto> data,
+    List<KeyDto>? list,
+    List<KeyDto>? keys,
+    int? total,
+    int? currentPage,
+    int? page,
+    int? limit,
+    int? totalPages,
+    int? totalItems,
+    bool? hasNextPage,
+    bool? hasPrevPage,
   });
 }
 
@@ -68,34 +78,59 @@ class _$KeysResponseDtoCopyWithImpl<$Res, $Val extends KeysResponseDto>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? currentPage = null,
-    Object? totalPage = null,
-    Object? itemsPerPage = null,
-    Object? totalItems = null,
-    Object? data = null,
+    Object? list = freezed,
+    Object? keys = freezed,
+    Object? total = freezed,
+    Object? currentPage = freezed,
+    Object? page = freezed,
+    Object? limit = freezed,
+    Object? totalPages = freezed,
+    Object? totalItems = freezed,
+    Object? hasNextPage = freezed,
+    Object? hasPrevPage = freezed,
   }) {
     return _then(
       _value.copyWith(
-            currentPage: null == currentPage
+            list: freezed == list
+                ? _value.list
+                : list // ignore: cast_nullable_to_non_nullable
+                      as List<KeyDto>?,
+            keys: freezed == keys
+                ? _value.keys
+                : keys // ignore: cast_nullable_to_non_nullable
+                      as List<KeyDto>?,
+            total: freezed == total
+                ? _value.total
+                : total // ignore: cast_nullable_to_non_nullable
+                      as int?,
+            currentPage: freezed == currentPage
                 ? _value.currentPage
                 : currentPage // ignore: cast_nullable_to_non_nullable
-                      as int,
-            totalPage: null == totalPage
-                ? _value.totalPage
-                : totalPage // ignore: cast_nullable_to_non_nullable
-                      as int,
-            itemsPerPage: null == itemsPerPage
-                ? _value.itemsPerPage
-                : itemsPerPage // ignore: cast_nullable_to_non_nullable
-                      as int,
-            totalItems: null == totalItems
+                      as int?,
+            page: freezed == page
+                ? _value.page
+                : page // ignore: cast_nullable_to_non_nullable
+                      as int?,
+            limit: freezed == limit
+                ? _value.limit
+                : limit // ignore: cast_nullable_to_non_nullable
+                      as int?,
+            totalPages: freezed == totalPages
+                ? _value.totalPages
+                : totalPages // ignore: cast_nullable_to_non_nullable
+                      as int?,
+            totalItems: freezed == totalItems
                 ? _value.totalItems
                 : totalItems // ignore: cast_nullable_to_non_nullable
-                      as int,
-            data: null == data
-                ? _value.data
-                : data // ignore: cast_nullable_to_non_nullable
-                      as List<KeyDto>,
+                      as int?,
+            hasNextPage: freezed == hasNextPage
+                ? _value.hasNextPage
+                : hasNextPage // ignore: cast_nullable_to_non_nullable
+                      as bool?,
+            hasPrevPage: freezed == hasPrevPage
+                ? _value.hasPrevPage
+                : hasPrevPage // ignore: cast_nullable_to_non_nullable
+                      as bool?,
           )
           as $Val,
     );
@@ -112,11 +147,16 @@ abstract class _$$KeysResponseDtoImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    int currentPage,
-    int totalPage,
-    int itemsPerPage,
-    int totalItems,
-    List<KeyDto> data,
+    List<KeyDto>? list,
+    List<KeyDto>? keys,
+    int? total,
+    int? currentPage,
+    int? page,
+    int? limit,
+    int? totalPages,
+    int? totalItems,
+    bool? hasNextPage,
+    bool? hasPrevPage,
   });
 }
 
@@ -134,34 +174,59 @@ class __$$KeysResponseDtoImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? currentPage = null,
-    Object? totalPage = null,
-    Object? itemsPerPage = null,
-    Object? totalItems = null,
-    Object? data = null,
+    Object? list = freezed,
+    Object? keys = freezed,
+    Object? total = freezed,
+    Object? currentPage = freezed,
+    Object? page = freezed,
+    Object? limit = freezed,
+    Object? totalPages = freezed,
+    Object? totalItems = freezed,
+    Object? hasNextPage = freezed,
+    Object? hasPrevPage = freezed,
   }) {
     return _then(
       _$KeysResponseDtoImpl(
-        currentPage: null == currentPage
+        list: freezed == list
+            ? _value._list
+            : list // ignore: cast_nullable_to_non_nullable
+                  as List<KeyDto>?,
+        keys: freezed == keys
+            ? _value._keys
+            : keys // ignore: cast_nullable_to_non_nullable
+                  as List<KeyDto>?,
+        total: freezed == total
+            ? _value.total
+            : total // ignore: cast_nullable_to_non_nullable
+                  as int?,
+        currentPage: freezed == currentPage
             ? _value.currentPage
             : currentPage // ignore: cast_nullable_to_non_nullable
-                  as int,
-        totalPage: null == totalPage
-            ? _value.totalPage
-            : totalPage // ignore: cast_nullable_to_non_nullable
-                  as int,
-        itemsPerPage: null == itemsPerPage
-            ? _value.itemsPerPage
-            : itemsPerPage // ignore: cast_nullable_to_non_nullable
-                  as int,
-        totalItems: null == totalItems
+                  as int?,
+        page: freezed == page
+            ? _value.page
+            : page // ignore: cast_nullable_to_non_nullable
+                  as int?,
+        limit: freezed == limit
+            ? _value.limit
+            : limit // ignore: cast_nullable_to_non_nullable
+                  as int?,
+        totalPages: freezed == totalPages
+            ? _value.totalPages
+            : totalPages // ignore: cast_nullable_to_non_nullable
+                  as int?,
+        totalItems: freezed == totalItems
             ? _value.totalItems
             : totalItems // ignore: cast_nullable_to_non_nullable
-                  as int,
-        data: null == data
-            ? _value._data
-            : data // ignore: cast_nullable_to_non_nullable
-                  as List<KeyDto>,
+                  as int?,
+        hasNextPage: freezed == hasNextPage
+            ? _value.hasNextPage
+            : hasNextPage // ignore: cast_nullable_to_non_nullable
+                  as bool?,
+        hasPrevPage: freezed == hasPrevPage
+            ? _value.hasPrevPage
+            : hasPrevPage // ignore: cast_nullable_to_non_nullable
+                  as bool?,
       ),
     );
   }
@@ -171,35 +236,62 @@ class __$$KeysResponseDtoImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$KeysResponseDtoImpl implements _KeysResponseDto {
   const _$KeysResponseDtoImpl({
-    required this.currentPage,
-    required this.totalPage,
-    required this.itemsPerPage,
-    required this.totalItems,
-    required final List<KeyDto> data,
-  }) : _data = data;
+    final List<KeyDto>? list,
+    final List<KeyDto>? keys,
+    this.total,
+    this.currentPage,
+    this.page,
+    this.limit,
+    this.totalPages,
+    this.totalItems,
+    this.hasNextPage,
+    this.hasPrevPage,
+  }) : _list = list,
+       _keys = keys;
 
   factory _$KeysResponseDtoImpl.fromJson(Map<String, dynamic> json) =>
       _$$KeysResponseDtoImplFromJson(json);
 
+  final List<KeyDto>? _list;
   @override
-  final int currentPage;
-  @override
-  final int totalPage;
-  @override
-  final int itemsPerPage;
-  @override
-  final int totalItems;
-  final List<KeyDto> _data;
-  @override
-  List<KeyDto> get data {
-    if (_data is EqualUnmodifiableListView) return _data;
+  List<KeyDto>? get list {
+    final value = _list;
+    if (value == null) return null;
+    if (_list is EqualUnmodifiableListView) return _list;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_data);
+    return EqualUnmodifiableListView(value);
+  }
+
+  final List<KeyDto>? _keys;
+  @override
+  List<KeyDto>? get keys {
+    final value = _keys;
+    if (value == null) return null;
+    if (_keys is EqualUnmodifiableListView) return _keys;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
   }
 
   @override
+  final int? total;
+  @override
+  final int? currentPage;
+  @override
+  final int? page;
+  @override
+  final int? limit;
+  @override
+  final int? totalPages;
+  @override
+  final int? totalItems;
+  @override
+  final bool? hasNextPage;
+  @override
+  final bool? hasPrevPage;
+
+  @override
   String toString() {
-    return 'KeysResponseDto(currentPage: $currentPage, totalPage: $totalPage, itemsPerPage: $itemsPerPage, totalItems: $totalItems, data: $data)';
+    return 'KeysResponseDto(list: $list, keys: $keys, total: $total, currentPage: $currentPage, page: $page, limit: $limit, totalPages: $totalPages, totalItems: $totalItems, hasNextPage: $hasNextPage, hasPrevPage: $hasPrevPage)';
   }
 
   @override
@@ -207,26 +299,37 @@ class _$KeysResponseDtoImpl implements _KeysResponseDto {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$KeysResponseDtoImpl &&
+            const DeepCollectionEquality().equals(other._list, _list) &&
+            const DeepCollectionEquality().equals(other._keys, _keys) &&
+            (identical(other.total, total) || other.total == total) &&
             (identical(other.currentPage, currentPage) ||
                 other.currentPage == currentPage) &&
-            (identical(other.totalPage, totalPage) ||
-                other.totalPage == totalPage) &&
-            (identical(other.itemsPerPage, itemsPerPage) ||
-                other.itemsPerPage == itemsPerPage) &&
+            (identical(other.page, page) || other.page == page) &&
+            (identical(other.limit, limit) || other.limit == limit) &&
+            (identical(other.totalPages, totalPages) ||
+                other.totalPages == totalPages) &&
             (identical(other.totalItems, totalItems) ||
                 other.totalItems == totalItems) &&
-            const DeepCollectionEquality().equals(other._data, _data));
+            (identical(other.hasNextPage, hasNextPage) ||
+                other.hasNextPage == hasNextPage) &&
+            (identical(other.hasPrevPage, hasPrevPage) ||
+                other.hasPrevPage == hasPrevPage));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
     runtimeType,
+    const DeepCollectionEquality().hash(_list),
+    const DeepCollectionEquality().hash(_keys),
+    total,
     currentPage,
-    totalPage,
-    itemsPerPage,
+    page,
+    limit,
+    totalPages,
     totalItems,
-    const DeepCollectionEquality().hash(_data),
+    hasNextPage,
+    hasPrevPage,
   );
 
   /// Create a copy of KeysResponseDto
@@ -248,26 +351,41 @@ class _$KeysResponseDtoImpl implements _KeysResponseDto {
 
 abstract class _KeysResponseDto implements KeysResponseDto {
   const factory _KeysResponseDto({
-    required final int currentPage,
-    required final int totalPage,
-    required final int itemsPerPage,
-    required final int totalItems,
-    required final List<KeyDto> data,
+    final List<KeyDto>? list,
+    final List<KeyDto>? keys,
+    final int? total,
+    final int? currentPage,
+    final int? page,
+    final int? limit,
+    final int? totalPages,
+    final int? totalItems,
+    final bool? hasNextPage,
+    final bool? hasPrevPage,
   }) = _$KeysResponseDtoImpl;
 
   factory _KeysResponseDto.fromJson(Map<String, dynamic> json) =
       _$KeysResponseDtoImpl.fromJson;
 
   @override
-  int get currentPage;
+  List<KeyDto>? get list;
   @override
-  int get totalPage;
+  List<KeyDto>? get keys;
   @override
-  int get itemsPerPage;
+  int? get total;
   @override
-  int get totalItems;
+  int? get currentPage;
   @override
-  List<KeyDto> get data;
+  int? get page;
+  @override
+  int? get limit;
+  @override
+  int? get totalPages;
+  @override
+  int? get totalItems;
+  @override
+  bool? get hasNextPage;
+  @override
+  bool? get hasPrevPage;
 
   /// Create a copy of KeysResponseDto
   /// with the given fields replaced by the non-null parameter values.

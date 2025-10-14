@@ -6,5 +6,8 @@ abstract class KeysRepository {
     int status = 1,
     int page = 1,
     int pageSize = 10,
+    String? search,
   });
+
+  Future<Result<Key>> getKeyDetail(String keyId);
 }

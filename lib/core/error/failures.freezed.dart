@@ -33,6 +33,7 @@ mixin _$Failure {
     required TResult Function(String message, dynamic error) unknown,
     required TResult Function(String message) cache,
     required TResult Function(String message) timeout,
+    required TResult Function(String message, int? statusCode) client,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
@@ -45,6 +46,7 @@ mixin _$Failure {
     TResult? Function(String message, dynamic error)? unknown,
     TResult? Function(String message)? cache,
     TResult? Function(String message)? timeout,
+    TResult? Function(String message, int? statusCode)? client,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
@@ -57,6 +59,7 @@ mixin _$Failure {
     TResult Function(String message, dynamic error)? unknown,
     TResult Function(String message)? cache,
     TResult Function(String message)? timeout,
+    TResult Function(String message, int? statusCode)? client,
     required TResult orElse(),
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -68,6 +71,7 @@ mixin _$Failure {
     required TResult Function(UnknownFailure value) unknown,
     required TResult Function(CacheFailure value) cache,
     required TResult Function(TimeoutFailure value) timeout,
+    required TResult Function(ClientFailure value) client,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
@@ -78,6 +82,7 @@ mixin _$Failure {
     TResult? Function(UnknownFailure value)? unknown,
     TResult? Function(CacheFailure value)? cache,
     TResult? Function(TimeoutFailure value)? timeout,
+    TResult? Function(ClientFailure value)? client,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
@@ -88,6 +93,7 @@ mixin _$Failure {
     TResult Function(UnknownFailure value)? unknown,
     TResult Function(CacheFailure value)? cache,
     TResult Function(TimeoutFailure value)? timeout,
+    TResult Function(ClientFailure value)? client,
     required TResult orElse(),
   }) => throw _privateConstructorUsedError;
 
@@ -228,6 +234,7 @@ class _$NetworkFailureImpl implements NetworkFailure {
     required TResult Function(String message, dynamic error) unknown,
     required TResult Function(String message) cache,
     required TResult Function(String message) timeout,
+    required TResult Function(String message, int? statusCode) client,
   }) {
     return network(message, statusCode);
   }
@@ -244,6 +251,7 @@ class _$NetworkFailureImpl implements NetworkFailure {
     TResult? Function(String message, dynamic error)? unknown,
     TResult? Function(String message)? cache,
     TResult? Function(String message)? timeout,
+    TResult? Function(String message, int? statusCode)? client,
   }) {
     return network?.call(message, statusCode);
   }
@@ -260,6 +268,7 @@ class _$NetworkFailureImpl implements NetworkFailure {
     TResult Function(String message, dynamic error)? unknown,
     TResult Function(String message)? cache,
     TResult Function(String message)? timeout,
+    TResult Function(String message, int? statusCode)? client,
     required TResult orElse(),
   }) {
     if (network != null) {
@@ -278,6 +287,7 @@ class _$NetworkFailureImpl implements NetworkFailure {
     required TResult Function(UnknownFailure value) unknown,
     required TResult Function(CacheFailure value) cache,
     required TResult Function(TimeoutFailure value) timeout,
+    required TResult Function(ClientFailure value) client,
   }) {
     return network(this);
   }
@@ -292,6 +302,7 @@ class _$NetworkFailureImpl implements NetworkFailure {
     TResult? Function(UnknownFailure value)? unknown,
     TResult? Function(CacheFailure value)? cache,
     TResult? Function(TimeoutFailure value)? timeout,
+    TResult? Function(ClientFailure value)? client,
   }) {
     return network?.call(this);
   }
@@ -306,6 +317,7 @@ class _$NetworkFailureImpl implements NetworkFailure {
     TResult Function(UnknownFailure value)? unknown,
     TResult Function(CacheFailure value)? cache,
     TResult Function(TimeoutFailure value)? timeout,
+    TResult Function(ClientFailure value)? client,
     required TResult orElse(),
   }) {
     if (network != null) {
@@ -442,6 +454,7 @@ class _$ServerFailureImpl implements ServerFailure {
     required TResult Function(String message, dynamic error) unknown,
     required TResult Function(String message) cache,
     required TResult Function(String message) timeout,
+    required TResult Function(String message, int? statusCode) client,
   }) {
     return server(message, statusCode, errorCode);
   }
@@ -458,6 +471,7 @@ class _$ServerFailureImpl implements ServerFailure {
     TResult? Function(String message, dynamic error)? unknown,
     TResult? Function(String message)? cache,
     TResult? Function(String message)? timeout,
+    TResult? Function(String message, int? statusCode)? client,
   }) {
     return server?.call(message, statusCode, errorCode);
   }
@@ -474,6 +488,7 @@ class _$ServerFailureImpl implements ServerFailure {
     TResult Function(String message, dynamic error)? unknown,
     TResult Function(String message)? cache,
     TResult Function(String message)? timeout,
+    TResult Function(String message, int? statusCode)? client,
     required TResult orElse(),
   }) {
     if (server != null) {
@@ -492,6 +507,7 @@ class _$ServerFailureImpl implements ServerFailure {
     required TResult Function(UnknownFailure value) unknown,
     required TResult Function(CacheFailure value) cache,
     required TResult Function(TimeoutFailure value) timeout,
+    required TResult Function(ClientFailure value) client,
   }) {
     return server(this);
   }
@@ -506,6 +522,7 @@ class _$ServerFailureImpl implements ServerFailure {
     TResult? Function(UnknownFailure value)? unknown,
     TResult? Function(CacheFailure value)? cache,
     TResult? Function(TimeoutFailure value)? timeout,
+    TResult? Function(ClientFailure value)? client,
   }) {
     return server?.call(this);
   }
@@ -520,6 +537,7 @@ class _$ServerFailureImpl implements ServerFailure {
     TResult Function(UnknownFailure value)? unknown,
     TResult Function(CacheFailure value)? cache,
     TResult Function(TimeoutFailure value)? timeout,
+    TResult Function(ClientFailure value)? client,
     required TResult orElse(),
   }) {
     if (server != null) {
@@ -634,6 +652,7 @@ class _$AuthFailureImpl implements AuthFailure {
     required TResult Function(String message, dynamic error) unknown,
     required TResult Function(String message) cache,
     required TResult Function(String message) timeout,
+    required TResult Function(String message, int? statusCode) client,
   }) {
     return auth(message);
   }
@@ -650,6 +669,7 @@ class _$AuthFailureImpl implements AuthFailure {
     TResult? Function(String message, dynamic error)? unknown,
     TResult? Function(String message)? cache,
     TResult? Function(String message)? timeout,
+    TResult? Function(String message, int? statusCode)? client,
   }) {
     return auth?.call(message);
   }
@@ -666,6 +686,7 @@ class _$AuthFailureImpl implements AuthFailure {
     TResult Function(String message, dynamic error)? unknown,
     TResult Function(String message)? cache,
     TResult Function(String message)? timeout,
+    TResult Function(String message, int? statusCode)? client,
     required TResult orElse(),
   }) {
     if (auth != null) {
@@ -684,6 +705,7 @@ class _$AuthFailureImpl implements AuthFailure {
     required TResult Function(UnknownFailure value) unknown,
     required TResult Function(CacheFailure value) cache,
     required TResult Function(TimeoutFailure value) timeout,
+    required TResult Function(ClientFailure value) client,
   }) {
     return auth(this);
   }
@@ -698,6 +720,7 @@ class _$AuthFailureImpl implements AuthFailure {
     TResult? Function(UnknownFailure value)? unknown,
     TResult? Function(CacheFailure value)? cache,
     TResult? Function(TimeoutFailure value)? timeout,
+    TResult? Function(ClientFailure value)? client,
   }) {
     return auth?.call(this);
   }
@@ -712,6 +735,7 @@ class _$AuthFailureImpl implements AuthFailure {
     TResult Function(UnknownFailure value)? unknown,
     TResult Function(CacheFailure value)? cache,
     TResult Function(TimeoutFailure value)? timeout,
+    TResult Function(ClientFailure value)? client,
     required TResult orElse(),
   }) {
     if (auth != null) {
@@ -845,6 +869,7 @@ class _$ValidationFailureImpl implements ValidationFailure {
     required TResult Function(String message, dynamic error) unknown,
     required TResult Function(String message) cache,
     required TResult Function(String message) timeout,
+    required TResult Function(String message, int? statusCode) client,
   }) {
     return validation(message, errors);
   }
@@ -861,6 +886,7 @@ class _$ValidationFailureImpl implements ValidationFailure {
     TResult? Function(String message, dynamic error)? unknown,
     TResult? Function(String message)? cache,
     TResult? Function(String message)? timeout,
+    TResult? Function(String message, int? statusCode)? client,
   }) {
     return validation?.call(message, errors);
   }
@@ -877,6 +903,7 @@ class _$ValidationFailureImpl implements ValidationFailure {
     TResult Function(String message, dynamic error)? unknown,
     TResult Function(String message)? cache,
     TResult Function(String message)? timeout,
+    TResult Function(String message, int? statusCode)? client,
     required TResult orElse(),
   }) {
     if (validation != null) {
@@ -895,6 +922,7 @@ class _$ValidationFailureImpl implements ValidationFailure {
     required TResult Function(UnknownFailure value) unknown,
     required TResult Function(CacheFailure value) cache,
     required TResult Function(TimeoutFailure value) timeout,
+    required TResult Function(ClientFailure value) client,
   }) {
     return validation(this);
   }
@@ -909,6 +937,7 @@ class _$ValidationFailureImpl implements ValidationFailure {
     TResult? Function(UnknownFailure value)? unknown,
     TResult? Function(CacheFailure value)? cache,
     TResult? Function(TimeoutFailure value)? timeout,
+    TResult? Function(ClientFailure value)? client,
   }) {
     return validation?.call(this);
   }
@@ -923,6 +952,7 @@ class _$ValidationFailureImpl implements ValidationFailure {
     TResult Function(UnknownFailure value)? unknown,
     TResult Function(CacheFailure value)? cache,
     TResult Function(TimeoutFailure value)? timeout,
+    TResult Function(ClientFailure value)? client,
     required TResult orElse(),
   }) {
     if (validation != null) {
@@ -1049,6 +1079,7 @@ class _$UnknownFailureImpl implements UnknownFailure {
     required TResult Function(String message, dynamic error) unknown,
     required TResult Function(String message) cache,
     required TResult Function(String message) timeout,
+    required TResult Function(String message, int? statusCode) client,
   }) {
     return unknown(message, error);
   }
@@ -1065,6 +1096,7 @@ class _$UnknownFailureImpl implements UnknownFailure {
     TResult? Function(String message, dynamic error)? unknown,
     TResult? Function(String message)? cache,
     TResult? Function(String message)? timeout,
+    TResult? Function(String message, int? statusCode)? client,
   }) {
     return unknown?.call(message, error);
   }
@@ -1081,6 +1113,7 @@ class _$UnknownFailureImpl implements UnknownFailure {
     TResult Function(String message, dynamic error)? unknown,
     TResult Function(String message)? cache,
     TResult Function(String message)? timeout,
+    TResult Function(String message, int? statusCode)? client,
     required TResult orElse(),
   }) {
     if (unknown != null) {
@@ -1099,6 +1132,7 @@ class _$UnknownFailureImpl implements UnknownFailure {
     required TResult Function(UnknownFailure value) unknown,
     required TResult Function(CacheFailure value) cache,
     required TResult Function(TimeoutFailure value) timeout,
+    required TResult Function(ClientFailure value) client,
   }) {
     return unknown(this);
   }
@@ -1113,6 +1147,7 @@ class _$UnknownFailureImpl implements UnknownFailure {
     TResult? Function(UnknownFailure value)? unknown,
     TResult? Function(CacheFailure value)? cache,
     TResult? Function(TimeoutFailure value)? timeout,
+    TResult? Function(ClientFailure value)? client,
   }) {
     return unknown?.call(this);
   }
@@ -1127,6 +1162,7 @@ class _$UnknownFailureImpl implements UnknownFailure {
     TResult Function(UnknownFailure value)? unknown,
     TResult Function(CacheFailure value)? cache,
     TResult Function(TimeoutFailure value)? timeout,
+    TResult Function(ClientFailure value)? client,
     required TResult orElse(),
   }) {
     if (unknown != null) {
@@ -1239,6 +1275,7 @@ class _$CacheFailureImpl implements CacheFailure {
     required TResult Function(String message, dynamic error) unknown,
     required TResult Function(String message) cache,
     required TResult Function(String message) timeout,
+    required TResult Function(String message, int? statusCode) client,
   }) {
     return cache(message);
   }
@@ -1255,6 +1292,7 @@ class _$CacheFailureImpl implements CacheFailure {
     TResult? Function(String message, dynamic error)? unknown,
     TResult? Function(String message)? cache,
     TResult? Function(String message)? timeout,
+    TResult? Function(String message, int? statusCode)? client,
   }) {
     return cache?.call(message);
   }
@@ -1271,6 +1309,7 @@ class _$CacheFailureImpl implements CacheFailure {
     TResult Function(String message, dynamic error)? unknown,
     TResult Function(String message)? cache,
     TResult Function(String message)? timeout,
+    TResult Function(String message, int? statusCode)? client,
     required TResult orElse(),
   }) {
     if (cache != null) {
@@ -1289,6 +1328,7 @@ class _$CacheFailureImpl implements CacheFailure {
     required TResult Function(UnknownFailure value) unknown,
     required TResult Function(CacheFailure value) cache,
     required TResult Function(TimeoutFailure value) timeout,
+    required TResult Function(ClientFailure value) client,
   }) {
     return cache(this);
   }
@@ -1303,6 +1343,7 @@ class _$CacheFailureImpl implements CacheFailure {
     TResult? Function(UnknownFailure value)? unknown,
     TResult? Function(CacheFailure value)? cache,
     TResult? Function(TimeoutFailure value)? timeout,
+    TResult? Function(ClientFailure value)? client,
   }) {
     return cache?.call(this);
   }
@@ -1317,6 +1358,7 @@ class _$CacheFailureImpl implements CacheFailure {
     TResult Function(UnknownFailure value)? unknown,
     TResult Function(CacheFailure value)? cache,
     TResult Function(TimeoutFailure value)? timeout,
+    TResult Function(ClientFailure value)? client,
     required TResult orElse(),
   }) {
     if (cache != null) {
@@ -1429,6 +1471,7 @@ class _$TimeoutFailureImpl implements TimeoutFailure {
     required TResult Function(String message, dynamic error) unknown,
     required TResult Function(String message) cache,
     required TResult Function(String message) timeout,
+    required TResult Function(String message, int? statusCode) client,
   }) {
     return timeout(message);
   }
@@ -1445,6 +1488,7 @@ class _$TimeoutFailureImpl implements TimeoutFailure {
     TResult? Function(String message, dynamic error)? unknown,
     TResult? Function(String message)? cache,
     TResult? Function(String message)? timeout,
+    TResult? Function(String message, int? statusCode)? client,
   }) {
     return timeout?.call(message);
   }
@@ -1461,6 +1505,7 @@ class _$TimeoutFailureImpl implements TimeoutFailure {
     TResult Function(String message, dynamic error)? unknown,
     TResult Function(String message)? cache,
     TResult Function(String message)? timeout,
+    TResult Function(String message, int? statusCode)? client,
     required TResult orElse(),
   }) {
     if (timeout != null) {
@@ -1479,6 +1524,7 @@ class _$TimeoutFailureImpl implements TimeoutFailure {
     required TResult Function(UnknownFailure value) unknown,
     required TResult Function(CacheFailure value) cache,
     required TResult Function(TimeoutFailure value) timeout,
+    required TResult Function(ClientFailure value) client,
   }) {
     return timeout(this);
   }
@@ -1493,6 +1539,7 @@ class _$TimeoutFailureImpl implements TimeoutFailure {
     TResult? Function(UnknownFailure value)? unknown,
     TResult? Function(CacheFailure value)? cache,
     TResult? Function(TimeoutFailure value)? timeout,
+    TResult? Function(ClientFailure value)? client,
   }) {
     return timeout?.call(this);
   }
@@ -1507,6 +1554,7 @@ class _$TimeoutFailureImpl implements TimeoutFailure {
     TResult Function(UnknownFailure value)? unknown,
     TResult Function(CacheFailure value)? cache,
     TResult Function(TimeoutFailure value)? timeout,
+    TResult Function(ClientFailure value)? client,
     required TResult orElse(),
   }) {
     if (timeout != null) {
@@ -1528,5 +1576,209 @@ abstract class TimeoutFailure implements Failure {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$TimeoutFailureImplCopyWith<_$TimeoutFailureImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$ClientFailureImplCopyWith<$Res>
+    implements $FailureCopyWith<$Res> {
+  factory _$$ClientFailureImplCopyWith(
+    _$ClientFailureImpl value,
+    $Res Function(_$ClientFailureImpl) then,
+  ) = __$$ClientFailureImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String message, int? statusCode});
+}
+
+/// @nodoc
+class __$$ClientFailureImplCopyWithImpl<$Res>
+    extends _$FailureCopyWithImpl<$Res, _$ClientFailureImpl>
+    implements _$$ClientFailureImplCopyWith<$Res> {
+  __$$ClientFailureImplCopyWithImpl(
+    _$ClientFailureImpl _value,
+    $Res Function(_$ClientFailureImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of Failure
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? message = null, Object? statusCode = freezed}) {
+    return _then(
+      _$ClientFailureImpl(
+        message: null == message
+            ? _value.message
+            : message // ignore: cast_nullable_to_non_nullable
+                  as String,
+        statusCode: freezed == statusCode
+            ? _value.statusCode
+            : statusCode // ignore: cast_nullable_to_non_nullable
+                  as int?,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+
+class _$ClientFailureImpl implements ClientFailure {
+  const _$ClientFailureImpl({required this.message, this.statusCode});
+
+  @override
+  final String message;
+  @override
+  final int? statusCode;
+
+  @override
+  String toString() {
+    return 'Failure.client(message: $message, statusCode: $statusCode)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ClientFailureImpl &&
+            (identical(other.message, message) || other.message == message) &&
+            (identical(other.statusCode, statusCode) ||
+                other.statusCode == statusCode));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, message, statusCode);
+
+  /// Create a copy of Failure
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ClientFailureImplCopyWith<_$ClientFailureImpl> get copyWith =>
+      __$$ClientFailureImplCopyWithImpl<_$ClientFailureImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String message, int? statusCode) network,
+    required TResult Function(
+      String message,
+      int? statusCode,
+      String? errorCode,
+    )
+    server,
+    required TResult Function(String message) auth,
+    required TResult Function(String message, Map<String, List<String>>? errors)
+    validation,
+    required TResult Function(String message, dynamic error) unknown,
+    required TResult Function(String message) cache,
+    required TResult Function(String message) timeout,
+    required TResult Function(String message, int? statusCode) client,
+  }) {
+    return client(message, statusCode);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String message, int? statusCode)? network,
+    TResult? Function(String message, int? statusCode, String? errorCode)?
+    server,
+    TResult? Function(String message)? auth,
+    TResult? Function(String message, Map<String, List<String>>? errors)?
+    validation,
+    TResult? Function(String message, dynamic error)? unknown,
+    TResult? Function(String message)? cache,
+    TResult? Function(String message)? timeout,
+    TResult? Function(String message, int? statusCode)? client,
+  }) {
+    return client?.call(message, statusCode);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String message, int? statusCode)? network,
+    TResult Function(String message, int? statusCode, String? errorCode)?
+    server,
+    TResult Function(String message)? auth,
+    TResult Function(String message, Map<String, List<String>>? errors)?
+    validation,
+    TResult Function(String message, dynamic error)? unknown,
+    TResult Function(String message)? cache,
+    TResult Function(String message)? timeout,
+    TResult Function(String message, int? statusCode)? client,
+    required TResult orElse(),
+  }) {
+    if (client != null) {
+      return client(message, statusCode);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(NetworkFailure value) network,
+    required TResult Function(ServerFailure value) server,
+    required TResult Function(AuthFailure value) auth,
+    required TResult Function(ValidationFailure value) validation,
+    required TResult Function(UnknownFailure value) unknown,
+    required TResult Function(CacheFailure value) cache,
+    required TResult Function(TimeoutFailure value) timeout,
+    required TResult Function(ClientFailure value) client,
+  }) {
+    return client(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(NetworkFailure value)? network,
+    TResult? Function(ServerFailure value)? server,
+    TResult? Function(AuthFailure value)? auth,
+    TResult? Function(ValidationFailure value)? validation,
+    TResult? Function(UnknownFailure value)? unknown,
+    TResult? Function(CacheFailure value)? cache,
+    TResult? Function(TimeoutFailure value)? timeout,
+    TResult? Function(ClientFailure value)? client,
+  }) {
+    return client?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(NetworkFailure value)? network,
+    TResult Function(ServerFailure value)? server,
+    TResult Function(AuthFailure value)? auth,
+    TResult Function(ValidationFailure value)? validation,
+    TResult Function(UnknownFailure value)? unknown,
+    TResult Function(CacheFailure value)? cache,
+    TResult Function(TimeoutFailure value)? timeout,
+    TResult Function(ClientFailure value)? client,
+    required TResult orElse(),
+  }) {
+    if (client != null) {
+      return client(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class ClientFailure implements Failure {
+  const factory ClientFailure({
+    required final String message,
+    final int? statusCode,
+  }) = _$ClientFailureImpl;
+
+  @override
+  String get message;
+  int? get statusCode;
+
+  /// Create a copy of Failure
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ClientFailureImplCopyWith<_$ClientFailureImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
