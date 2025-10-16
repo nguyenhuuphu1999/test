@@ -10,4 +10,5 @@ abstract class KeysRepository {
   });
 
   Future<Result<Key>> getKeyDetail(String keyId);
+  Future<Result<Key>> getKeyDetailV2(String keyId);
 }

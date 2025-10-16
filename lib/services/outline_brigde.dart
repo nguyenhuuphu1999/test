@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
@@ -31,12 +32,18 @@ class OutlineBridge {
   static const _vpnCh = MethodChannel('vpncn2/vpn_service');
 
   // Giữ nguyên nếu bạn đang dùng WebView proxy:
-  static Future<void> applyWebViewProxy(String address) =>
-      _wvCh.invokeMethod('setWebViewProxy', {"address": address});
-  static Future<void> clearWebViewProxy() =>
-      _wvCh.invokeMethod('clearWebViewProxy');
+  static Future<void> applyWebViewProxy(String address) async {
+    if (kIsWeb) return; // no-op on web
+    await _wvCh.invokeMethod('setWebViewProxy', {"address": address});
+  }
+
+  static Future<void> clearWebViewProxy() async {
+    if (kIsWeb) return; // no-op on web
+    await _wvCh.invokeMethod('clearWebViewProxy');
+  }
 
   static Future<bool> ensureVpnPermission() async {
+    if (kIsWeb) return true; // web has no VPN permission flow
     final ok = await _vpnCh.invokeMethod<bool>('requestPermission');
     return ok == true;
   }
@@ -146,7 +153,10 @@ class OutlineBridge {
   }
 
   /// Stop local proxy
-  static Future<void> stopLocalProxy() => _sdkCh.invokeMethod('stopLocalProxy');
+  static Future<void> stopLocalProxy() async {
+    if (kIsWeb) return; // no-op on web
+    await _sdkCh.invokeMethod('stopLocalProxy');
+  }
 
   /// Tạo IOClient đi qua HTTP proxy (http CONNECT) tại `address` (vd: "127.0.0.1:54321")
   /// - [allowBadCerts] chỉ nên bật khi test nội bộ.

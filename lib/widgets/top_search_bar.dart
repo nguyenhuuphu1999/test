@@ -7,12 +7,15 @@ class TopSearchBar extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final VoidCallback? onLeftIconPressed;
   final VoidCallback? onRightIconPressed;
+  // When provided, this widget will be shown in the center instead of the search field
+  final Widget? centerChild;
 
   const TopSearchBar({
     super.key,
     this.onChanged,
     this.onLeftIconPressed,
     this.onRightIconPressed,
+    this.centerChild,
   });
 
   @override
@@ -29,18 +32,23 @@ class TopSearchBar extends StatelessWidget {
         ),
         const SizedBox(width: 10),
         Expanded(
-          child: CommonSearchField(
-            hintText: AppStrings.searchYourKey,
-            onChanged: onChanged,
-            backgroundColor: AppColors.SURFACE_LIGHT_COLOR,
-            borderRadius: BorderRadius.circular(20),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            prefixIcon: Icon(
-              Icons.search,
-              color: AppColors.TEXT_HINT_COLOR,
-              size: 18,
-            ),
-          ),
+          child: centerChild != null
+              ? Center(child: centerChild)
+              : CommonSearchField(
+                  hintText: AppStrings.searchYourKey,
+                  onChanged: onChanged,
+                  backgroundColor: AppColors.SURFACE_LIGHT_COLOR,
+                  borderRadius: BorderRadius.circular(20),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: AppColors.TEXT_HINT_COLOR,
+                    size: 18,
+                  ),
+                ),
         ),
         const SizedBox(width: 10),
         InkWell(

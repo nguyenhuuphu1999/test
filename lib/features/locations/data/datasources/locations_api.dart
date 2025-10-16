@@ -4,16 +4,9 @@ class LocationsApi {
   final Dio _dio;
   LocationsApi(Dio dio) : _dio = dio;
 
-  Future<Response<dynamic>> getLocations({
-    required String deviceId,
-    String? search,
-  }) async {
+  Future<Response<dynamic>> getLocationsByKey({required String keyId}) async {
     return _dio.get(
-      '/mobile/locations',
-      queryParameters: {
-        'deviceId': deviceId,
-        if (search != null && search.isNotEmpty) 'search': search,
-      },
+      '/mobile/get-locations/$keyId',
       options: Options(headers: {'accept': 'application/json'}),
     );
   }

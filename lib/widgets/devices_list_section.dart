@@ -566,7 +566,7 @@ class _DevicesListSectionState extends State<DevicesListSection>
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) =>
-          ChangeLocationModal(deviceId: deviceId, deviceName: deviceName),
+          ChangeLocationModal(keyId: deviceId, deviceName: deviceName),
     );
   }
 }

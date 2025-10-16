@@ -7,6 +7,7 @@ import 'package:vpncn2_app/l10n/generated/app_localizations.dart';
 import 'package:vpncn2_app/features/keys/domain/entities/key.dart' as KeyEntity;
 import 'package:vpncn2_app/services/outline_brigde.dart';
 import 'package:vpncn2_app/widgets/key_detail_modal.dart';
+import 'package:vpncn2_app/services/vpn_backend_service.dart';
 
 class ExpandableKeyItem extends StatefulWidget {
   final String name;
@@ -52,6 +53,21 @@ class _ExpandableKeyItemState extends State<ExpandableKeyItem> {
     setState(() => _isConnecting = true);
 
     try {
+      // 1) Notify backend we are attempting a CONNECT (required by server)
+      if (widget.keyData?.id != null) {
+        final res = await VpnBackendService.updateDeviceVpnStatus(
+          keyId: widget.keyData!.id,
+          connected: true,
+        );
+        res.when(
+          ok: (_) {},
+          err: (f) {
+            _toast('Backend status update failed: ${f.message}', isError: true);
+          },
+        );
+      }
+
+      // 2) Ensure VPN permission (no-op on web)
       final ok = await OutlineBridge.ensureVpnPermission();
       debugPrint("Ensure VPN permission ok: $ok");
       if (!ok) {
@@ -84,6 +100,14 @@ class _ExpandableKeyItemState extends State<ExpandableKeyItem> {
       if (responseStartVPN == true) {
         _connected = true;
         _toast('✅ VPN đã kết nối thành công!');
+        // Notify backend status
+        if (widget.keyData?.id != null) {
+          // ignore: unawaited_futures
+          VpnBackendService.updateDeviceVpnStatus(
+            keyId: widget.keyData!.id,
+            connected: true,
+          );
+        }
       } else {
         throw Exception('Failed to start VPN service');
       }
@@ -110,6 +134,13 @@ class _ExpandableKeyItemState extends State<ExpandableKeyItem> {
 
       setState(() => _connected = false);
       _toast('Đã ngắt kết nối');
+      if (widget.keyData?.id != null) {
+        // ignore: unawaited_futures
+        VpnBackendService.updateDeviceVpnStatus(
+          keyId: widget.keyData!.id,
+          connected: false,
+        );
+      }
     } catch (e) {
       _toast('Lỗi ngắt kết nối: $e', isError: true);
     } finally {
@@ -212,10 +243,8 @@ class _ExpandableKeyItemState extends State<ExpandableKeyItem> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => KeyDetailModal(
-        keyId: widget.keyData!.id,
-        keyName: widget.name,
-      ),
+      builder: (context) =>
+          KeyDetailModal(keyId: widget.keyData!.id, keyName: widget.name),
     );
   }
 
@@ -388,7 +417,6 @@ class _ExpandableKeyItemState extends State<ExpandableKeyItem> {
               ),
             ),
           ),
-
         ],
       ),
     );

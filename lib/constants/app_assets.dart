@@ -5,8 +5,9 @@ class AppAssets {
   // Navigation icons
   static const String homeIcon = 'asset/images/home.png';
   static const String cloudIcon = 'asset/images/cloud.png';
+  static const String connectIcon = 'asset/images/connect.png';
   static const String userIcon = 'asset/images/user.png';
-
+  static const String earthIcon = 'asset/images/earth.png';
   // Action icons
   static const String arrowsIcon = 'asset/images/arrows.png';
 
