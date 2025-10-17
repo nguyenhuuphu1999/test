@@ -45,6 +45,20 @@ extension FailureX on Failure {
     );
   }
 
+  /// Get status code if available
+  int? get statusCode {
+    return when(
+      network: (message, statusCode) => statusCode,
+      server: (message, statusCode, errorCode) => statusCode,
+      auth: (message) => null,
+      validation: (message, errors) => null,
+      unknown: (message, error) => null,
+      cache: (message) => null,
+      timeout: (message) => null,
+      client: (message, statusCode) => statusCode,
+    );
+  }
+
   bool get isNetworkError =>
       maybeWhen(network: (_, __) => true, orElse: () => false);
 

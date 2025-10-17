@@ -37,15 +37,60 @@ class _PaymentMethodSelectionModalState
 
     final result = await PaymentMethodsService.getActivePaymentMethods();
 
-    handleApiResult(
-      result,
-      onSuccess: (paymentMethods) {
+    result.when(
+      ok: (paymentMethods) {
         setState(() {
           _paymentMethods = paymentMethods;
           _isLoading = false;
         });
       },
-      onRetry: () => _loadPaymentMethods(),
+      err: (failure) {
+        setState(() {
+          _isLoading = false;
+        });
+        
+        // Handle different types of errors
+        final statusCode = failure.when(
+          network: (message, statusCode) => statusCode,
+          server: (message, statusCode, errorCode) => statusCode,
+          auth: (message) => null,
+          validation: (message, errors) => null,
+          unknown: (message, error) => null,
+          cache: (message) => null,
+          timeout: (message) => null,
+          client: (message, statusCode) => statusCode,
+        );
+        
+        if (statusCode != null && statusCode >= 400) {
+          // Show specific error message for HTTP status errors
+          showError(
+            failure,
+            customMessage: 'Failed to load payment methods ($statusCode): ${failure.when(
+              network: (message, statusCode) => message,
+              server: (message, statusCode, errorCode) => message,
+              auth: (message) => message,
+              validation: (message, errors) => message,
+              unknown: (message, error) => message,
+              cache: (message) => message,
+              timeout: (message) => message,
+              client: (message, statusCode) => message,
+            )}',
+            onRetry: () => _loadPaymentMethods(),
+          );
+        } else {
+          // Handle network or other errors
+          handleApiResult(
+            result,
+            onSuccess: (paymentMethods) {
+              setState(() {
+                _paymentMethods = paymentMethods;
+                _isLoading = false;
+              });
+            },
+            onRetry: () => _loadPaymentMethods(),
+          );
+        }
+      },
     );
   }
 

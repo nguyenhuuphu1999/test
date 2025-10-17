@@ -144,9 +144,21 @@ class _BottomNavigation extends StatelessWidget {
             },
           ),
           _BottomItem(
-            imageAsset: 'asset/images/cloud.png',
+            icon: Icons.flash_on,
             label: '',
             active: activeIndex == 1,
+            onTap: () {
+              // Navigate to connect screen
+              Navigator.pushNamed(
+                context,
+                '/connect',
+              );
+            },
+          ),
+          _BottomItem(
+            imageAsset: 'asset/images/cloud.png',
+            label: '',
+            active: activeIndex == 2,
             onTap: () {
               // Navigate to devices
               Navigator.pushNamedAndRemoveUntil(
@@ -159,7 +171,7 @@ class _BottomNavigation extends StatelessWidget {
           _BottomItem(
             imageAsset: 'asset/images/user.png',
             label: '',
-            active: activeIndex == 2,
+            active: activeIndex == 3,
             onTap: () {
               // Navigate to user profile
               Navigator.pushNamedAndRemoveUntil(

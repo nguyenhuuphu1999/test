@@ -50,7 +50,7 @@ class DeviceKeyStyleCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
-              Icons.router,
+              Icons.flash_on,
               color: Colors.white,
               size: Responsive.getFontSize(context, 24),
             ),

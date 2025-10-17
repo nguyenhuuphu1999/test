@@ -69,7 +69,7 @@ class _DeviceCardState extends State<DeviceCard> {
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  Icons.wifi,
+                  Icons.flash_on,
                   color: Colors.white,
                   size: Responsive.getFontSize(context, 24),
                 ),

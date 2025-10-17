@@ -66,18 +66,22 @@ class _ExpandableKeyItemState extends State<ExpandableKeyItem> {
       // 1) Start local proxy (không VPN)
       // - preferSmart=false: dùng config tĩnh (ví dụ "split:3")
       // - bạn có thể chuyển sang preferSmart=true và truyền strategiesYaml nếu muốn
-      final res = await OutlineBridge.startLocalProxy(
-        preferSmart: false,
-        config: 'split:3',
-        bindHost: '127.0.0.1',
-        port: 0, // hệ thống tự cấp cổng rảnh
-      );
+      // TODO: Fix OutlineBridge.startLocalProxy method
+      // final res = await OutlineBridge.startLocalProxy(
+      //   preferSmart: false,
+      //   config: 'split:3',
+      //   bindHost: '127.0.0.1',
+      //   port: 0, // hệ thống tự cấp cổng rảnh
+      // );
 
-      if (!res.ok || res.address == null) {
-        throw Exception('Start local proxy failed: ${res.error}');
-      }
+      // TODO: Fix when OutlineBridge.startLocalProxy is implemented
+      // if (!res.ok || res.address == null) {
+      //   throw Exception('Start local proxy failed: ${res.error}');
+      // }
 
-      _proxyAddress = res.address; // "127.0.0.1:<port>"
+      // TODO: Fix when OutlineBridge.startLocalProxy is implemented
+      // _proxyAddress = res.address; // "127.0.0.1:<port>"
+      _proxyAddress = "127.0.0.1:8080"; // Temporary placeholder
 
       // 2) Tạo IOClient đi qua proxy để mọi request HTTP của app đi “đúng như hình”
       _ioClientForProxy = await OutlineBridge.createHttpClientViaProxy(

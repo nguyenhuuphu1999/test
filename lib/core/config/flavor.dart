@@ -4,11 +4,12 @@ class Flavor {
   static String get baseUrl {
     switch (Env.current) {
       case Environment.development:
-        return 'https://26d70c194b64.ngrok-free.app/api';
+        // Try localhost first, fallback to ngrok if needed
+        return 'http://localhost:3001/api'; // Change this to your backend URL
       case Environment.staging:
-        return 'https://26d70c194b64.ngrok-free.app/api';
+        return 'https://d29653d5a8e9.ngrok-free.app/api';
       case Environment.production:
-        return 'https://26d70c194b64.ngrok-free.app/api';
+        return 'https://d29653d5a8e9.ngrok-free.app/api';
     }
   }
 
@@ -32,4 +33,8 @@ class Flavor {
         return false;
     }
   }
+
+  static bool get isDevelopment => Env.current == Environment.development;
+  static bool get isStaging => Env.current == Environment.staging;
+  static bool get isProduction => Env.current == Environment.production;
 }
