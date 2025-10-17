@@ -9,12 +9,11 @@ class LocationsRepositoryImpl implements LocationsRepository {
   LocationsRepositoryImpl(this._api);
 
   @override
-  Future<Result<LocationsResponse>> getLocations({
-    required String deviceId,
-    String? search,
+  Future<Result<LocationsResponse>> getLocationsByKey({
+    required String keyId,
   }) async {
     try {
-      final res = await _api.getLocations(deviceId: deviceId, search: search);
+      final res = await _api.getLocationsByKey(keyId: keyId);
       final dto = LocationsResponseDto.fromJson(
         res.data as Map<String, dynamic>,
       );

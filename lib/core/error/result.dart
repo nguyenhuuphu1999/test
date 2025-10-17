@@ -67,7 +67,12 @@ class ResultMapper {
 
           if (data is Map<String, dynamic>) {
             if (data['message'] != null) {
-              message = data['message'].toString();
+              final raw = data['message'];
+              if (raw is List) {
+                message = raw.join(', ');
+              } else {
+                message = raw.toString();
+              }
             }
             if (data['errors'] != null) {
               errors = Map<String, List<String>>.from(
@@ -88,10 +93,12 @@ class ResultMapper {
           );
         }
 
-        return Failure.server(
-          message: data?['message'] ?? 'Server error',
-          statusCode: statusCode,
-        );
+        String serverMsg = 'Server error';
+        final rawMsg = data?['message'];
+        if (rawMsg != null) {
+          serverMsg = rawMsg is List ? rawMsg.join(', ') : rawMsg.toString();
+        }
+        return Failure.server(message: serverMsg, statusCode: statusCode);
 
       case DioExceptionType.cancel:
         return const Failure.network(message: 'Request cancelled');

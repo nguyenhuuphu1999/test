@@ -4,6 +4,7 @@ import 'package:vpncn2_app/constants/app_strings.dart';
 import 'package:vpncn2_app/constants/app_assets.dart';
 import 'package:vpncn2_app/utils/responsive.dart';
 import 'package:vpncn2_app/widgets/smooth_main_layout.dart';
+import 'package:vpncn2_app/screens/connect_screen.dart';
 import 'package:vpncn2_app/screens/profile_screen.dart';
 
 class CommonFooter extends StatelessWidget {
@@ -31,13 +32,14 @@ class CommonFooter extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          // Home Screen
           _FooterItem(
             imageAsset: AppAssets.homeIcon,
             label: AppStrings.home,
             isActive: activeIndex == 0,
             onTap: () {
               Navigator.pushAndRemoveUntil(
-                context!,
+                context,
                 MaterialPageRoute(
                   builder: (context) => SmoothMainLayout(initialIndex: 0),
                 ),
@@ -45,27 +47,27 @@ class CommonFooter extends StatelessWidget {
               );
             },
           ),
+          // Connect Screen
           _FooterItem(
-            imageAsset: AppAssets.cloudIcon,
+            imageAsset: AppAssets.connectIcon,
             label: '',
             isActive: activeIndex == 1,
             onTap: () {
               Navigator.pushAndRemoveUntil(
-                context!,
-                MaterialPageRoute(
-                  builder: (context) => SmoothMainLayout(initialIndex: 1),
-                ),
+                context,
+                MaterialPageRoute(builder: (context) => const ConnectScreen()),
                 (route) => false,
               );
             },
           ),
+          // Profile Screen
           _FooterItem(
             imageAsset: AppAssets.userIcon,
             label: '',
             isActive: activeIndex == 2,
             onTap: () {
               Navigator.push(
-                context!,
+                context,
                 MaterialPageRoute(builder: (context) => const ProfileScreen()),
               );
             },

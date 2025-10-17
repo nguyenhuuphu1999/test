@@ -23,10 +23,19 @@ class KeysApi {
     );
   }
 
+  // OLD (existing) endpoint - keep for current features
   Future<Response<dynamic>> getKeyDetail(String keyId) async {
     return _dio.get(
       '/mobile/keys/$keyId',
       options: Options(headers: {'accept': 'application/json'}),
+    );
+  }
+
+  // NEW endpoint requested for Connect screen
+  Future<Response<dynamic>> getKeyDetailV2(String keyId) async {
+    return _dio.get(
+      '/key/get-key-detail/$keyId',
+      options: Options(headers: {'accept': '*/*'}),
     );
   }
 }

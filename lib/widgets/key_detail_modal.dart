@@ -10,17 +10,14 @@ class KeyDetailModal extends StatefulWidget {
   final String keyId;
   final String keyName;
 
-  const KeyDetailModal({
-    super.key,
-    required this.keyId,
-    required this.keyName,
-  });
+  const KeyDetailModal({super.key, required this.keyId, required this.keyName});
 
   @override
   State<KeyDetailModal> createState() => _KeyDetailModalState();
 }
 
-class _KeyDetailModalState extends State<KeyDetailModal> with ErrorHandlerMixin {
+class _KeyDetailModalState extends State<KeyDetailModal>
+    with ErrorHandlerMixin {
   KeyEntity.Key? _keyDetail;
   bool _isLoading = true;
 
@@ -36,7 +33,7 @@ class _KeyDetailModalState extends State<KeyDetailModal> with ErrorHandlerMixin 
     });
 
     final result = await KeysService.getKeyDetail(widget.keyId);
-    
+
     handleApiResult(
       result,
       onSuccess: (keyDetail) {
@@ -93,7 +90,9 @@ class _KeyDetailModalState extends State<KeyDetailModal> with ErrorHandlerMixin 
                     ),
                   ),
                 ),
-                SizedBox(width: Responsive.getFontSize(context, 20)), // Placeholder for alignment
+                SizedBox(
+                  width: Responsive.getFontSize(context, 20),
+                ), // Placeholder for alignment
               ],
             ),
           ),
@@ -104,8 +103,8 @@ class _KeyDetailModalState extends State<KeyDetailModal> with ErrorHandlerMixin 
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _keyDetail == null
-                    ? const Center(child: Text('Failed to load key details'))
-                    : _buildKeyDetailContent(),
+                ? const Center(child: Text('Failed to load key details'))
+                : _buildKeyDetailContent(),
           ),
         ],
       ),
@@ -200,7 +199,11 @@ class _KeyDetailModalState extends State<KeyDetailModal> with ErrorHandlerMixin 
           SizedBox(height: Responsive.height(context, 1.5)),
           _buildInfoRow('End', _formatDateTime(key.endDate)),
           SizedBox(height: Responsive.height(context, 1.5)),
-          _buildInfoRowWithIcon('Server Location', key.serverLocation, Icons.refresh),
+          _buildInfoRowWithIcon(
+            'Server Location',
+            key.serverLocation,
+            Icons.refresh,
+          ),
           SizedBox(height: Responsive.height(context, 1.5)),
           _buildInfoRowWithIcon('Outline link', 'Main link', Icons.copy),
 

@@ -18,11 +18,10 @@ class LocationsService {
     _isInitialized = true;
   }
 
-  static Future<Result<LocationsResponse>> getLocations({
-    required String deviceId,
-    String? search,
+  static Future<Result<LocationsResponse>> getLocationsByKey({
+    required String keyId,
   }) async {
     await initialize();
-    return _repository.getLocations(deviceId: deviceId, search: search);
+    return _repository.getLocationsByKey(keyId: keyId);
   }
 }

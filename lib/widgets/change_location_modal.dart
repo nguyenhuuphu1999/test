@@ -6,12 +6,12 @@ import 'package:vpncn2_app/features/locations/domain/entities/location.dart';
 import 'package:vpncn2_app/core/error/error_handler_mixin.dart';
 
 class ChangeLocationModal extends StatefulWidget {
-  final String deviceId;
+  final String keyId;
   final String deviceName;
 
   const ChangeLocationModal({
     super.key,
-    required this.deviceId,
+    required this.keyId,
     required this.deviceName,
   });
 
@@ -45,9 +45,8 @@ class _ChangeLocationModalState extends State<ChangeLocationModal>
       _isLoading = true;
     });
 
-    final result = await LocationsService.getLocations(
-      deviceId: widget.deviceId,
-      search: null,
+    final result = await LocationsService.getLocationsByKey(
+      keyId: widget.keyId,
     );
 
     handleApiResult(

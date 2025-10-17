@@ -60,4 +60,53 @@ class KeysRepositoryImpl implements KeysRepository {
       return Err(UnknownFailure(message: '$e'));
     }
   }
+
+  @override
+  Future<Result<Key>> getKeyDetailV2(String keyId) async {
+    try {
+      final response = await _keysApi.getKeyDetailV2(keyId);
+      final responseData = response.data as Map<String, dynamic>;
+      final data =
+          responseData['data'] as Map<String, dynamic>? ?? responseData;
+
+      // Map new response shape to existing Key entity
+      final server = data['server'] as Map<String, dynamic>?;
+      final location = server?['location'] as Map<String, dynamic>?;
+
+      final key = Key(
+        id: data['keyId']?.toString() ?? '',
+        keyId: data['keyId']?.toString() ?? '',
+        name: data['keyName']?.toString() ?? '',
+        password: '',
+        port: 443,
+        method: 'chacha20-ietf-poly1305',
+        accessUrl: '',
+        enable: true,
+        enableByAdmin: true,
+        dataLimit: (data['dataLimit'] as num?)?.toInt() ?? 0,
+        dataUsage: (data['dataUsage'] as num?)?.toInt() ?? 0,
+        dataExpand: (data['dataLimit'] as num?)?.toInt() ?? 0,
+        serverLocation: location?['locationName']?.toString() ?? 'Unknown',
+        serverName: server?['name']?.toString() ?? 'Unknown Server',
+        account: '',
+        startDate:
+            DateTime.tryParse(server?['startTime']?.toString() ?? '') ??
+            DateTime.now(),
+        endDate:
+            DateTime.tryParse(data['endDate']?.toString() ?? '') ??
+            DateTime.now(),
+        status: 1,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        ossId: null,
+        fileName: null,
+        prefix: null,
+      );
+      return Ok(key);
+    } on DioException catch (e) {
+      return Err(ResultMapper.mapDioError(e));
+    } catch (e) {
+      return Err(UnknownFailure(message: '$e'));
+    }
+  }
 }

@@ -90,7 +90,9 @@ flutter:
     - asset/images/arrows.png
     - asset/images/home.png
     - asset/images/cloud.png
+    - asset/images/connect.png
     - asset/images/user.png
+    - asset/images/earth.png
     - asset/images/add-button-12016.png
     - asset/images/shopping-cart.png
     - asset/images/Ellipse757.png

@@ -36,4 +36,10 @@ class KeysService {
     await initialize();
     return _repository.getKeyDetail(keyId);
   }
+
+  // New endpoint for connect screen
+  static Future<Result<Key>> getKeyDetailV2(String keyId) async {
+    await initialize();
+    return _repository.getKeyDetailV2(keyId);
+  }
 }
