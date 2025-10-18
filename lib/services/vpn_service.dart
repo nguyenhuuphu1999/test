@@ -9,9 +9,9 @@ import '../features/keys/domain/entities/key.dart' as KeyEntity;
 import 'outline_brigde.dart';
 
 /// VpnService phiên bản "đi như hình":
-/// App mở proxy nội bộ bằng MobileProxy, KHÔNG dùng VpnService/tun2socks.
-/// - connectWithKey: mở proxy local, tạo IOClient qua proxy, (Android) set proxy cho WebView
-/// - disconnect: clear WebView proxy + stop proxy local
+/// - connectWithKey: mở proxy local qua Shadowsocks, tạo IOClient qua proxy,
+///   áp dụng proxy cho WebView và khởi động VPN TUN để toàn bộ traffic đi qua
+/// - disconnect: dừng VPN, clear WebView proxy và stop proxy local
 class VpnService {
   static final VpnService _instance = VpnService._internal();
   factory VpnService() => _instance;
@@ -61,15 +61,16 @@ class VpnService {
     try {
       debugPrint('🚀 Starting proxy (MobileProxy) for key: ${key.name}');
 
-      // 1) Start local proxy (config tĩnh "split:3" — có thể thay bằng SmartDialer YAML)
-      final ssconfUrl =
-          'ssconf://oss.vpncn2.net/vpncn2key/20251013-m150-manhnguyen-ojdh.json#m150-jessi-251013-1';
+      final permissionOk = await OutlineBridge.ensureVpnPermission();
+      if (!permissionOk) {
+        throw Exception('VPN permission not granted');
+      }
 
-      final res = await OutlineBridge.startFromSsconfUrl(
-        ssconfUrl,
-        port: 0, // 0 = để hệ thống tự chọn
+      // 1) Start local proxy using key configuration (Shadowsocks)
+      final res = await OutlineBridge.startProxyForKey(
+        key,
+        port: 0,
         bindHost: '127.0.0.1',
-        remarks: key.name,
       );
 
       if (!res.ok || res.address == null) {
@@ -88,7 +89,21 @@ class VpnService {
       // 3) (Android) Áp dụng proxy cho tất cả WebView trong app
       await OutlineBridge.applyWebViewProxy(_proxyAddress!);
 
-      // 4) Mark connected
+      // 4) Khởi động VPN TUN để toàn bộ traffic đi qua Shadowsocks
+      final vpnStarted = await OutlineBridge.startVpnTunnel(
+        socksUpstream: _proxyAddress!,
+        config: res.config ?? OutlineBridge.buildConfigForKey(key),
+        port: res.port?.toString() ?? '1080',
+        perApp: false,
+        keyId: key.id?.toString(),
+        keyName: key.name.isNotEmpty ? key.name : null,
+      );
+
+      if (!vpnStarted) {
+        throw Exception('Failed to start VPN tunnel');
+      }
+
+      // 5) Mark connected
       _connectedKey = key;
       _setStatus('connected');
 
@@ -98,6 +113,15 @@ class VpnService {
       return true;
     } catch (e) {
       debugPrint('❌ connectWithKey error: $e');
+      try {
+        await OutlineBridge.stopVpnTunnel();
+      } catch (_) {}
+      try {
+        await OutlineBridge.clearWebViewProxy();
+      } catch (_) {}
+      try {
+        await OutlineBridge.stopLocalProxy();
+      } catch (_) {}
       await _forceCleanup();
       rethrow; // để UI hiện thông báo từ nơi gọi
     }
@@ -107,6 +131,7 @@ class VpnService {
   Future<void> disconnect() async {
     try {
       debugPrint('🛑 Disconnecting (proxy) ...');
+      await OutlineBridge.stopVpnTunnel();
       await OutlineBridge.clearWebViewProxy();
       await OutlineBridge.stopLocalProxy();
     } catch (e) {
