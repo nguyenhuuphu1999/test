@@ -17,6 +17,8 @@ import platerrors.PlatformError
 import tun2socks.RemoteDevice
 import tun2socks.Tun2socks
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 class MyVpnService : VpnService() {
 
@@ -34,6 +36,11 @@ class MyVpnService : VpnService() {
     private var remoteDevice: RemoteDevice? = null
     private var relayThread: Thread? = null
     private val isRelaying = AtomicBoolean(false)
+    private val lifecycleLock = Any()
+    private val starterExecutor: ExecutorService =
+        Executors.newSingleThreadExecutor { r ->
+            Thread(r, "outline-vpn-starter").apply { isDaemon = true }
+        }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "onStartCommand called with action: ${intent?.action}")
@@ -85,7 +92,7 @@ class MyVpnService : VpnService() {
 
         val ssConfig = intent.getStringExtra("CONFIG") ?: ""
         val keyId = intent.getStringExtra("KEY_ID") ?: "outline-key"
-        val keyName = intent.getStringExtra("KEY_NAME")
+        val keyName = intent.getStringExtra("KEY_NAME") ?: "OutlineVPN"
 
         if (ssConfig.isEmpty()) {
             Log.e(TAG, "Missing Shadowsocks config, aborting VPN start")
@@ -93,56 +100,67 @@ class MyVpnService : VpnService() {
             return
         }
 
-        try {
-            Log.d(TAG, "Building TUN interface...")
-            val builder = Builder()
-                .setSession(keyName ?: "OutlineVPN")
-                .setMtu(1500)
-                .addAddress("10.0.0.2", 32)
-                .addRoute("0.0.0.0", 0)
-                .addDnsServer("8.8.8.8")
-                .addDnsServer("1.1.1.1")
+        starterExecutor.execute {
+            synchronized(lifecycleLock) {
+                if (isConnected) {
+                    Log.d(TAG, "Existing VPN session detected, restarting")
+                    stopVpnLocked(stopService = false)
+                }
 
-            tunFd = builder.establish()
-            if (tunFd == null) {
-                Log.e(TAG, "Failed to establish TUN interface")
-                stopVpn()
-                return
+                try {
+                    Log.d(TAG, "Building TUN interface...")
+                    val builder = Builder()
+                        .setSession(keyName)
+                        .setMtu(1500)
+                        .addAddress("10.0.0.2", 32)
+                        .addRoute("0.0.0.0", 0)
+                        .addDnsServer("8.8.8.8")
+                        .addDnsServer("1.1.1.1")
+
+                    tunFd = builder.establish()
+                    if (tunFd == null) {
+                        Log.e(TAG, "Failed to establish TUN interface")
+                        stopVpnLocked()
+                        return@synchronized
+                    }
+                    Log.d(TAG, "TUN interface established: ${tunFd?.fd}")
+
+                    configureGoBackend()
+                    Outline.touch()
+                    Tun2socks.touch()
+
+                    val clientResult = createOutlineClient(ssConfig, keyId)
+                    val clientError = clientResult.error
+                    if (clientError != null) {
+                        Log.e(TAG, "Failed to create Outline client: ${clientError.message}")
+                        stopVpnLocked()
+                        return@synchronized
+                    }
+
+                    outlineClient = clientResult.client
+                    outlineClient?.startSession()
+                    Log.d(TAG, "Outline session started")
+
+                    val deviceResult = Tun2socks.connectRemoteDevice(outlineClient)
+                    val deviceError = deviceResult.error
+                    if (deviceError != null) {
+                        Log.e(TAG, "Failed to connect remote device: ${deviceError.message}")
+                        stopVpnLocked()
+                        return@synchronized
+                    }
+
+                    remoteDevice = deviceResult.device
+                    startRelayingTraffic(remoteDevice!!)
+
+                    isConnected = true
+                    Log.d(TAG, "VPN started successfully")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error starting VPN", e)
+                    stopVpnLocked()
+                }
             }
-            Log.d(TAG, "TUN interface established: ${tunFd?.fd}")
-
-            configureGoBackend()
-
-            val clientResult = createOutlineClient(ssConfig, keyId)
-            val clientError = clientResult.error
-            if (clientError != null) {
-                Log.e(TAG, "Failed to create Outline client: ${clientError.message}")
-                stopVpn()
-                return
-            }
-
-            outlineClient = clientResult.client
-            outlineClient?.startSession()
-            Log.d(TAG, "Outline session started")
-
-            val deviceResult = Tun2socks.connectRemoteDevice(outlineClient)
-            val deviceError = deviceResult.error
-            if (deviceError != null) {
-                Log.e(TAG, "Failed to connect remote device: ${deviceError.message}")
-                stopVpn()
-                return
-            }
-
-            remoteDevice = deviceResult.device
-            startRelayingTraffic(remoteDevice!!)
-
-            isConnected = true
-            Log.d(TAG, "VPN started successfully")
-
-        } catch (e: Exception) {
-            Log.e(TAG, "Error starting VPN", e)
-            stopVpn()
         }
+        return clientConfig.new_(keyId, configText)
     }
 
     private fun createOutlineClient(configText: String, keyId: String): NewClientResult {
@@ -170,8 +188,8 @@ class MyVpnService : VpnService() {
         }.apply { start() }
     }
 
-    private fun stopVpn() {
-        Log.d(TAG, "stopVpn called")
+    private fun stopVpnLocked(stopService: Boolean = true) {
+        Log.d(TAG, "stopVpnLocked invoked (stopService=$stopService)")
 
         try {
             remoteDevice?.close()
@@ -204,13 +222,22 @@ class MyVpnService : VpnService() {
         tunFd = null
 
         isConnected = false
-        stopForeground(STOP_FOREGROUND_REMOVE)
-        stopSelf()
-        Log.d(TAG, "VPN service stopped")
+        if (stopService) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+            stopSelf()
+            Log.d(TAG, "VPN service stopped")
+        }
+    }
+
+    private fun stopVpn() {
+        synchronized(lifecycleLock) {
+            stopVpnLocked()
+        }
     }
 
     override fun onDestroy() {
         stopVpn()
+        starterExecutor.shutdownNow()
         super.onDestroy()
     }
 }
