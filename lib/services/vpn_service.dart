@@ -95,6 +95,8 @@ class VpnService {
         config: res.config ?? OutlineBridge.buildConfigForKey(key),
         port: res.port?.toString() ?? '1080',
         perApp: false,
+        keyId: key.id?.toString(),
+        keyName: key.name.isNotEmpty ? key.name : null,
       );
 
       if (!vpnStarted) {

@@ -119,6 +119,7 @@ afterEvaluate {
 
 dependencies {
     implementation(files("mobileproxy.aar"))
+    implementation(files("libs/outline-go-tun2socks.aar"))
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("org.apache.commons:commons-collections4:4.4")
