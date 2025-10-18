@@ -160,6 +160,7 @@ class MyVpnService : VpnService() {
                 }
             }
         }
+        return clientConfig.new_(keyId, configText)
     }
 
     private fun createOutlineClient(configText: String, keyId: String): NewClientResult {
