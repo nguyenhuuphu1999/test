@@ -5,7 +5,7 @@ class Flavor {
     switch (Env.current) {
       case Environment.development:
         // Try localhost first, fallback to ngrok if needed
-        return 'http://localhost:3001/api'; // Change this to your backend URL
+        return 'http://localhost:3000/api'; // Change this to your backend URL
       case Environment.staging:
         return 'https://d29653d5a8e9.ngrok-free.app/api';
       case Environment.production:
