@@ -59,6 +59,8 @@ class VpnServicePlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 val port = call.argument<String>("port") ?: "1080"
                 val socksUpstream = call.argument<String>("socks_upstream") ?: ""
                 val perApp = call.argument<Boolean>("per_app") ?: true
+                val keyId = call.argument<String>("key_id")
+                val keyName = call.argument<String>("key_name")
                 
                 Log.d(TAG, "Config: $config")
                 Log.d(TAG, "Port: $port")
@@ -73,6 +75,8 @@ class VpnServicePlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                         putExtra("PROXY_ADDRESS", socksUpstream)
                         putExtra("socks_upstream", socksUpstream)
                         putExtra("per_app", perApp)
+                        if (!keyId.isNullOrEmpty()) putExtra("KEY_ID", keyId)
+                        if (!keyName.isNullOrEmpty()) putExtra("KEY_NAME", keyName)
                     }
                     Log.d(TAG, "Starting MyVpnService...")
                     act.startForegroundService(intent)
