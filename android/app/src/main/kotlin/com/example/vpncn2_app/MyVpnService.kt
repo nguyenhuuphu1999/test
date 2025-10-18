@@ -8,19 +8,15 @@ import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.net.InetSocketAddress
-import java.net.Socket
-import java.nio.ByteBuffer
-import java.nio.channels.FileChannel
+import outline.Client
+import outline.ClientConfig
+import outline.GoBackendConfig
+import outline.NewClientResult
+import outline.Outline
+import platerrors.PlatformError
+import tun2socks.RemoteDevice
+import tun2socks.Tun2socks
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.Executors
-
-// Using mobileproxy AAR
-import mobileproxy.Mobileproxy
-import mobileproxy.Proxy
 
 class MyVpnService : VpnService() {
 
@@ -34,11 +30,10 @@ class MyVpnService : VpnService() {
     }
 
     private var tunFd: ParcelFileDescriptor? = null
-    private var proxy: Proxy? = null
-    private var tun2socksThread: Thread? = null
-    private val isRunning = AtomicBoolean(false)
-    private val connectionPool = ConcurrentHashMap<String, Socket>()
-    private val executor = Executors.newFixedThreadPool(10)
+    private var outlineClient: Client? = null
+    private var remoteDevice: RemoteDevice? = null
+    private var relayThread: Thread? = null
+    private val isRelaying = AtomicBoolean(false)
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "onStartCommand called with action: ${intent?.action}")
@@ -72,265 +67,144 @@ class MyVpnService : VpnService() {
         Log.d(TAG, "Foreground notification started")
     }
 
+    private fun configureGoBackend() {
+        try {
+            val backendConfig: GoBackendConfig = Outline.getBackendConfig()
+            if (backendConfig.dataDir.isNullOrEmpty()) {
+                backendConfig.dataDir = filesDir.absolutePath
+                Log.d(TAG, "Configured Outline backend data dir: ${backendConfig.dataDir}")
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Unable to configure Outline backend", e)
+        }
+    }
+
     private fun startVpn(intent: Intent) {
         Log.d(TAG, "startVpn called")
-        // 1) Foreground noti
         startForegroundNotif()
 
-        // 2) Get proxy address from intent (passed from Flutter)
-        val proxyAddress = intent.getStringExtra("PROXY_ADDRESS") ?: ""
-        val socksUpstream = intent.getStringExtra("socks_upstream") ?: ""
-        
-        Log.d(TAG, "ProxyAddress: $proxyAddress")
-        Log.d(TAG, "SocksUpstream: $socksUpstream")
-        
+        val ssConfig = intent.getStringExtra("CONFIG") ?: ""
+        val keyId = intent.getStringExtra("KEY_ID") ?: "outline-key"
+        val keyName = intent.getStringExtra("KEY_NAME")
+
+        if (ssConfig.isEmpty()) {
+            Log.e(TAG, "Missing Shadowsocks config, aborting VPN start")
+            stopVpn()
+            return
+        }
+
         try {
-            // 3) Build TUN interface
             Log.d(TAG, "Building TUN interface...")
             val builder = Builder()
-                .setSession("OutlineVPN")
+                .setSession(keyName ?: "OutlineVPN")
                 .setMtu(1500)
-                .addAddress("10.0.0.2", 32)  // VPN client IP
-                .addRoute("0.0.0.0", 0)      // Route all traffic through VPN
+                .addAddress("10.0.0.2", 32)
+                .addRoute("0.0.0.0", 0)
                 .addDnsServer("8.8.8.8")
                 .addDnsServer("1.1.1.1")
-            
+
             tunFd = builder.establish()
             if (tunFd == null) {
                 Log.e(TAG, "Failed to establish TUN interface")
                 stopVpn()
                 return
             }
-            
             Log.d(TAG, "TUN interface established: ${tunFd?.fd}")
-            
-            // 4) Start tun2socks if we have proxy address
-            if (proxyAddress.isNotEmpty()) {
-                Log.d(TAG, "Starting tun2socks with proxy: $proxyAddress...")
-                val parts = proxyAddress.split(":")
-                if (parts.size == 2) {
-                    val host = parts[0]
-                    val port = parts[1].toIntOrNull() ?: 1080
-                    
-                    Log.d(TAG, "Starting tun2socks thread...")
-                    isRunning.set(true)
-                    tun2socksThread = Thread {
-                        try {
-                            runTun2Socks(host, port)
-                        } catch (e: Exception) {
-                            Log.e(TAG, "Error in tun2socks thread", e)
-                        }
-                    }
-                    tun2socksThread?.start()
-                    Log.d(TAG, "Tun2socks thread started")
-                }
+
+            configureGoBackend()
+
+            val clientResult = createOutlineClient(ssConfig, keyId)
+            val clientError = clientResult.error
+            if (clientError != null) {
+                Log.e(TAG, "Failed to create Outline client: ${clientError.message}")
+                stopVpn()
+                return
             }
-            
+
+            outlineClient = clientResult.client
+            outlineClient?.startSession()
+            Log.d(TAG, "Outline session started")
+
+            val deviceResult = Tun2socks.connectRemoteDevice(outlineClient)
+            val deviceError = deviceResult.error
+            if (deviceError != null) {
+                Log.e(TAG, "Failed to connect remote device: ${deviceError.message}")
+                stopVpn()
+                return
+            }
+
+            remoteDevice = deviceResult.device
+            startRelayingTraffic(remoteDevice!!)
+
             isConnected = true
             Log.d(TAG, "VPN started successfully")
-            
+
         } catch (e: Exception) {
             Log.e(TAG, "Error starting VPN", e)
-            e.printStackTrace()
             stopVpn()
         }
     }
 
-    private fun runTun2Socks(proxyHost: String, proxyPort: Int) {
-        Log.d(TAG, "Tun2socks starting with proxy: $proxyHost:$proxyPort")
-        
-        try {
-            val tunInput = FileInputStream(tunFd?.fileDescriptor)
-            val tunOutput = FileOutputStream(tunFd?.fileDescriptor)
-            val tunChannel = tunInput.channel
-            
-            val buffer = ByteBuffer.allocate(32768)
-            
-            while (isRunning.get() && !Thread.currentThread().isInterrupted) {
-                try {
-                    buffer.clear()
-                    val bytesRead = tunChannel.read(buffer)
-                    
-                    if (bytesRead > 0) {
-                        buffer.flip()
-                        val packet = ByteArray(bytesRead)
-                        buffer.get(packet)
-                        
-                        // Forward packet to SOCKS proxy
-                        forwardPacketToProxy(packet, proxyHost, proxyPort)
-                    } else {
-                        Thread.sleep(10)
-                    }
-                } catch (e: Exception) {
-                    if (isRunning.get()) {
-                        Log.e(TAG, "Error reading from TUN", e)
-                    }
-                    break
-                }
-            }
-            
-            Log.d(TAG, "Tun2socks thread stopped")
-            
-        } catch (e: Exception) {
-            Log.e(TAG, "Error in tun2socks", e)
+    private fun createOutlineClient(configText: String, keyId: String): NewClientResult {
+        val clientConfig = ClientConfig().apply {
+            dataDir = filesDir.absolutePath
         }
+        return clientConfig.new_(keyId, configText)
     }
-    
-    private fun forwardPacketToProxy(packet: ByteArray, proxyHost: String, proxyPort: Int) {
-        executor.execute {
-            try {
-                // Parse IP packet to get destination
-                if (packet.size < 20) return@execute // Minimum IP header size
-                
-                val version = (packet[0].toInt() shr 4) and 0x0F
-                if (version != 4) return@execute // Only support IPv4 for now
-                
-                val protocol = packet[9].toInt() and 0xFF
-                if (protocol != 6 && protocol != 17) return@execute // Only TCP/UDP
-                
-                val destIp = String.format("%d.%d.%d.%d",
-                    packet[16].toInt() and 0xFF,
-                    packet[17].toInt() and 0xFF,
-                    packet[18].toInt() and 0xFF,
-                    packet[19].toInt() and 0xFF
-                )
-                
-                val destPort = if (protocol == 6) { // TCP
-                    ((packet[20].toInt() and 0xFF) shl 8) or (packet[21].toInt() and 0xFF)
-                } else { // UDP
-                    ((packet[22].toInt() and 0xFF) shl 8) or (packet[23].toInt() and 0xFF)
-                }
-                
-                Log.d(TAG, "Forwarding packet to $destIp:$destPort via SOCKS5 proxy")
-                
-                // Use SOCKS5 proxy to connect to destination
-                val connectionKey = "$destIp:$destPort"
-                var socket = connectionPool[connectionKey]
-                
-                // Check if existing connection is still valid
-                if (socket == null || socket.isClosed) {
-                    socket = createSocks5Connection(proxyHost, proxyPort, destIp, destPort)
-                    if (socket != null) {
-                        connectionPool[connectionKey] = socket
-                        Log.d(TAG, "Created new SOCKS5 connection for $connectionKey")
-                    }
-                }
-                
-                if (socket != null && !socket.isClosed) {
-                    try {
-                        // For TCP, forward the payload (skip IP header)
-                        val headerLength = (packet[0].toInt() and 0x0F) * 4
-                        val payload = packet.sliceArray(headerLength until packet.size)
-                        socket.getOutputStream().write(payload)
-                    } catch (e: Exception) {
-                        Log.w(TAG, "Connection broken for $connectionKey, removing from pool")
-                        connectionPool.remove(connectionKey)
-                        try { socket.close() } catch (_: Exception) {}
-                    }
-                } else {
-                    Log.w(TAG, "No valid connection available for $connectionKey")
-                }
-                
-            } catch (e: Exception) {
-                Log.e(TAG, "Error forwarding packet to proxy", e)
-            }
+
+    private fun startRelayingTraffic(device: RemoteDevice) {
+        val fd = tunFd ?: throw IllegalStateException("TUN FD not available")
+        if (isRelaying.getAndSet(true)) {
+            Log.w(TAG, "Relay thread already running")
+            return
         }
-    }
-    
-    private fun createSocks5Connection(proxyHost: String, proxyPort: Int, destIp: String, destPort: Int): Socket? {
-        return try {
-            val socket = Socket()
-            socket.connect(InetSocketAddress(proxyHost, proxyPort), 5000)
-            socket.soTimeout = 5000
-            val output = socket.getOutputStream()
-            val input = socket.getInputStream()
-            
-            // SOCKS5 handshake
-            output.write(byteArrayOf(0x05, 0x01, 0x00)) // Version 5, 1 auth method, No auth
-            output.flush()
-            
-            val handshakeResponse = ByteArray(2)
-            input.read(handshakeResponse)
-            if (handshakeResponse[0] != 0x05.toByte() || handshakeResponse[1] != 0x00.toByte()) {
-                Log.e(TAG, "SOCKS5 handshake failed for $destIp:$destPort")
-                socket.close()
-                return null
+
+        relayThread = Thread {
+            Log.d(TAG, "Starting Outline goRelayTraffic")
+            val error: PlatformError? = Tun2socks.goRelayTraffic(fd.fd.toLong(), device)
+            if (error != null) {
+                Log.e(TAG, "goRelayTraffic error: ${error.message}")
+            } else {
+                Log.d(TAG, "goRelayTraffic finished without error")
             }
-            
-            // SOCKS5 connect request
-            val connectRequest = ByteArray(10)
-            connectRequest[0] = 0x05 // Version
-            connectRequest[1] = 0x01 // Connect
-            connectRequest[2] = 0x00 // Reserved
-            connectRequest[3] = 0x01 // IPv4
-            
-            // Destination IP
-            val ipParts = destIp.split(".")
-            for (i in 0..3) {
-                connectRequest[4 + i] = ipParts[i].toInt().toByte()
-            }
-            
-            // Destination port
-            connectRequest[8] = (destPort shr 8).toByte()
-            connectRequest[9] = destPort.toByte()
-            
-            output.write(connectRequest)
-            output.flush()
-            
-            // Read connect response
-            val connectResponse = ByteArray(10)
-            input.read(connectResponse)
-            if (connectResponse[1] != 0x00.toByte()) {
-                Log.e(TAG, "SOCKS5 connect failed for $destIp:$destPort, response: ${connectResponse[1]}")
-                socket.close()
-                return null
-            }
-            
-            Log.d(TAG, "SOCKS5 connection established to $destIp:$destPort")
-            socket
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to create SOCKS5 connection to $destIp:$destPort", e)
-            null
-        }
+        }.apply { start() }
     }
 
     private fun stopVpn() {
         Log.d(TAG, "stopVpn called")
-        
-        // Stop tun2socks thread
-        isRunning.set(false)
-        tun2socksThread?.interrupt()
+
         try {
-            tun2socksThread?.join(1000)
+            remoteDevice?.close()
+        } catch (e: Exception) {
+            Log.w(TAG, "Error closing remote device", e)
+        }
+        remoteDevice = null
+
+        isRelaying.set(false)
+        relayThread?.interrupt()
+        try {
+            relayThread?.join(1000)
         } catch (e: InterruptedException) {
-            Log.e(TAG, "Error stopping tun2socks thread", e)
+            Log.w(TAG, "Interrupted while stopping relay thread", e)
         }
-        tun2socksThread = null
-        
-        // Close all SOCKS5 connections
-        connectionPool.values.forEach { socket ->
-            try {
-                socket.close()
-            } catch (e: Exception) {
-                Log.e(TAG, "Error closing SOCKS5 connection", e)
-            }
+        relayThread = null
+
+        try {
+            outlineClient?.endSession()
+        } catch (e: Exception) {
+            Log.w(TAG, "Error ending Outline session", e)
         }
-        connectionPool.clear()
-        
-        // Shutdown executor
-        executor.shutdown()
-        
-        try { 
-            proxy?.stop(0) 
-            Log.d(TAG, "Proxy stopped")
-        } catch (e: Throwable) {
-            Log.e(TAG, "Error stopping proxy", e)
+        outlineClient = null
+
+        try {
+            tunFd?.close()
+        } catch (e: Exception) {
+            Log.w(TAG, "Error closing TUN FD", e)
         }
-        proxy = null
-        try { tunFd?.close() } catch (_: Throwable) {}
         tunFd = null
+
         isConnected = false
-        stopForeground(STOP_FOREGROUND_REMOVE) // minSdk 29 nên dùng được
+        stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
         Log.d(TAG, "VPN service stopped")
     }

@@ -289,6 +289,8 @@ class OutlineBridge {
     String config = '',
     String port = '1080',
     bool perApp = false,
+    String? keyId,
+    String? keyName,
   }) async {
     if (kIsWeb) return false;
     final res = await _vpnCh.invokeMethod<bool>('startVpn', {
@@ -296,6 +298,8 @@ class OutlineBridge {
       'port': port,
       'socks_upstream': socksUpstream,
       'per_app': perApp,
+      if (keyId != null) 'key_id': keyId,
+      if (keyName != null) 'key_name': keyName,
     });
     return res == true;
   }
