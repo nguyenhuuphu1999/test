@@ -7,18 +7,22 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
 
+import '../features/keys/domain/entities/key.dart' as KeyEntity;
+
 class StartProxyResult {
   final bool ok;
   final String? address;
   final String? host;
   final int? port;
   final String? error;
+  final String? config; // ss:// config string actually used for the proxy
   StartProxyResult({
     required this.ok,
     this.address,
     this.host,
     this.port,
     this.error,
+    this.config,
   });
 }
 
@@ -73,7 +77,46 @@ class OutlineBridge {
     return 'ss://$credB64@$host:$port$query$tag';
   }
 
-  /// Đọc ssconf://... → fetch JSON → tạo ss://... → start local proxy
+  static Future<StartProxyResult> _startLocalProxyWithConfig(
+    String config, {
+    int port = 0,
+    String bindHost = '127.0.0.1',
+  }) async {
+    try {
+      final res = await _sdkCh.invokeMapMethod<String, dynamic>(
+        'startLocalProxy',
+        {
+          "preferSmart": false,
+          "config": config,
+          "bindHost": bindHost,
+          "port": port,
+        },
+      );
+
+      if (res == null || res['success'] != true) {
+        return StartProxyResult(
+          ok: false,
+          error: res?['error']?.toString() ?? 'Unknown error',
+          config: config,
+        );
+      }
+
+      return StartProxyResult(
+        ok: true,
+        address: res['address']?.toString(),
+        host: res['host']?.toString(),
+        port: (res['port'] is int)
+            ? res['port'] as int
+            : int.tryParse(res['port']?.toString() ?? ''),
+        config: config,
+      );
+    } catch (e) {
+      debugPrint('❌ Error starting local proxy: $e');
+      return StartProxyResult(ok: false, error: e.toString(), config: config);
+    }
+  }
+
+  /// Đọc ssconf://.../https://... → fetch JSON → tạo ss://... → start local proxy
   static Future<StartProxyResult> startFromSsconfUrl(
     String ssconfUrl, {
     int port = 0, // 0 = cho hệ thống chọn cổng rảnh
@@ -120,31 +163,10 @@ class OutlineBridge {
         prefixUtf8: prefixBytes,
       );
 
-      // 4) Gọi native để chạy local HTTP proxy qua Shadowsocks
-      final res = await _sdkCh.invokeMapMethod<String, dynamic>(
-        'startLocalProxy',
-        {
-          "preferSmart": false,
-          "config": ssKey, // <<< QUAN TRỌNG: dùng chính ss://...
-          "bindHost": bindHost,
-          "port": port, // 0 = auto port
-        },
-      );
-
-      if (res == null || res['success'] != true) {
-        return StartProxyResult(
-          ok: false,
-          error: res?['error']?.toString() ?? 'Unknown error',
-        );
-      }
-
-      return StartProxyResult(
-        ok: true,
-        address: res['address']?.toString(),
-        host: res['host']?.toString(),
-        port: (res['port'] is int)
-            ? res['port'] as int
-            : int.tryParse(res['port']?.toString() ?? ''),
+      return await _startLocalProxyWithConfig(
+        ssKey,
+        port: port,
+        bindHost: bindHost,
       );
     } catch (e) {
       debugPrint("❌ Error starting from ssconf URL: $e");
@@ -188,12 +210,98 @@ class OutlineBridge {
     // nếu cần prefix
     // '?prefix=%16%03%01%00%A8%01%01'
     ;
-    final res = await _sdkCh.invokeMethod<Map>('startLocalProxy', {
-      'preferSmart': false,
-      'bindHost': '127.0.0.1',
-      'port': 0, // để hệ thống chọn port
-      'config': cfg, // ✨ quan trọng: SS URI
+    final res = await _startLocalProxyWithConfig(cfg);
+    if (!res.ok) return {'success': false, 'error': res.error};
+    return {
+      'success': true,
+      'address': res.address,
+      'host': res.host,
+      'port': res.port,
+    };
+  }
+
+  static String? _resolveConfigSource(KeyEntity.Key key) {
+    if (key.fileName != null && key.fileName!.trim().isNotEmpty) {
+      return key.fileName!.trim();
+    }
+    if (key.accessUrl.trim().isNotEmpty) {
+      return key.accessUrl.trim();
+    }
+    return null;
+  }
+
+  static String _buildSsUriFromKey(KeyEntity.Key key, {String? remarks}) {
+    return _buildLegacySsKey(
+      host: key.serverName,
+      port: key.port,
+      method: key.method,
+      password: key.password,
+      remarks: remarks,
+      prefixUtf8: key.prefix,
+    );
+  }
+
+  static Future<StartProxyResult> startProxyForKey(
+    KeyEntity.Key key, {
+    int port = 0,
+    String bindHost = '127.0.0.1',
+  }) async {
+    final source = _resolveConfigSource(key);
+
+    if (source != null && source.toLowerCase().startsWith('ss://')) {
+      final withRemarks = (key.name.isEmpty || source.contains('#'))
+          ? source
+          : '$source#${Uri.encodeComponent(key.name)}';
+      return _startLocalProxyWithConfig(withRemarks,
+          port: port, bindHost: bindHost);
+    }
+
+    if (source != null &&
+        (source.toLowerCase().startsWith('ssconf://') ||
+            source.toLowerCase().startsWith('https://') ||
+            source.toLowerCase().startsWith('http://'))) {
+      final res = await startFromSsconfUrl(
+        source,
+        port: port,
+        bindHost: bindHost,
+        remarks: key.name,
+      );
+      if (res.ok) {
+        return res;
+      }
+    }
+
+    final ssUri = _buildSsUriFromKey(key, remarks: key.name);
+    return _startLocalProxyWithConfig(
+      ssUri,
+      port: port,
+      bindHost: bindHost,
+    );
+  }
+
+  static String buildConfigForKey(KeyEntity.Key key) {
+    return _resolveConfigSource(key) ??
+        _buildSsUriFromKey(key, remarks: key.name);
+  }
+
+  static Future<bool> startVpnTunnel({
+    required String socksUpstream,
+    String config = '',
+    String port = '1080',
+    bool perApp = false,
+  }) async {
+    if (kIsWeb) return false;
+    final res = await _vpnCh.invokeMethod<bool>('startVpn', {
+      'config': config,
+      'port': port,
+      'socks_upstream': socksUpstream,
+      'per_app': perApp,
     });
-    return res;
+    return res == true;
+  }
+
+  static Future<void> stopVpnTunnel() async {
+    if (kIsWeb) return;
+    await _vpnCh.invokeMethod('stopVpn');
   }
 }
